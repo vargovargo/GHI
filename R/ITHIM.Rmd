@@ -49,7 +49,7 @@ quintTotalTravelMET = list(M = quintWalkingMET[["M"]] + quintCyclingMET[["M"]], 
 ```
 Now we print all of the parameters and results.
 ```{r ITHIM}
-ITHIM
+names(ITHIM)
 ```
 ### Example
 To run the example contained in the _ITHIM_ package run the following.
@@ -62,19 +62,19 @@ example("ITHIM-package")
 ```{r plot1}
 D <- melt(ITHIM$means$meanActiveTransportTime, c("age","sex"), value.name = "activeTransportTime")
 p <- ggplot(D, aes(age,  activeTransportTime)) + geom_bar(aes(fill=sex), stat = "identity", position = "dodge")
-p 
+p
 ```
 
 ```{r plot2}
 D <- melt(ITHIM$parameters$Rwt, c("age","sex"), value.name = "rhowt")
 p <- ggplot(D, aes(age,  rhowt)) + geom_bar(aes(fill=sex), stat = "identity", position = "dodge")
-p 
+p
 ```
 
 ## Archive
 ### Active Transport Estimates (Speed and Distance by Transport Mode)
 These data were ripped out of the EXCEL workbook and vary per scenario.
-```{r transportData, eval = TRUE, echo = FALSE} 
+```{r transportData, eval = FALSE, echo = FALSE}
 
 transportMode <- c("walk","cycle","bus","minibus","train","car.driver","car.passenger","mbike","elec.bike.scooter","LGV","HGV.rigid","HGV.articulated")
 
@@ -85,11 +85,11 @@ dist <- c(2.44072161538462,1.19969769230769,4.37851867307692,NA,5.58545353846154
 Data.Speed <- data.frame(speed,dist, row.names = transportMode)
 ```
 
-```{r headDataSpeed}
+```{r headDataSpeed, eval = FALSE}
 Data.Speed
 ```
 
-```{r transportTime, echo = FALSE, results = "hide", eval = TRUE}
+```{r transportTime, echo = FALSE, results = "hide", eval = FALSE}
 head(transportTime <- Data.Speed$dist/Data.Speed$speed*60)
 ```
 
@@ -99,7 +99,7 @@ head(transportTime <- Data.Speed$dist/Data.Speed$speed*60)
 
 
 
-```{r roadAndCO2Data, echo = FALSE, eval = TRUE, results = "hide"}
+```{r roadAndCO2Data, echo = FALSE, eval = FALSE, results = "hide"}
 
 CO2 <- c(957.686509527760,221.578783667454,203.624526028894,247.869842164617,333.468424533125,90.000000000000,835.014773125786)
 
@@ -116,7 +116,7 @@ To accomodate this we need the distribution of road type by transport
 mode.  At some point we need the expected number of passengers per
 transport mode and we create it here, arbitrarily perhaps.
 
-```{r showData, echo = TRUE, eval = TRUE, results = "show"}
+```{r showData, echo = TRUE, eval = FALSE, results = "show"}
 Data.CO2
 Data.RoadType
 Data.Occupancy
@@ -132,12 +132,12 @@ METs.  The data are stratified by age and sex.  Variable names were
 not given for the 7 numerical variables listed.  Here we name them x1
 through x7.
 
-```{r nonTravelMETs, eval = TRUE, echo = FALSE}
+```{r nonTravelMETs, eval = FALSE, echo = FALSE}
 nonTravelMETs <- data.frame(scan(file="./data/NonTravelMETs.csv", sep = ",", what = list("","","","",1,1,1,1,1,1,1), skip = 1))
 names(nonTravelMETs) <- c("ID","sexcat","agecat2","GESTFIPS", paste0("x",1:7))
 ```
 
-```{r ggplot, fig.width=12, fig.height=12, echo = FALSE, message = FALSE, warning = FALSE, results = "hide"}
+```{r ggplot, fig.width=12, fig.height=12, echo = FALSE, message = FALSE, warning = FALSE, results = "hide", eval = FALSE}
 D <- melt(nonTravelMETs)
 p <- ggplot(D, aes(x = variable, y = value, colour = agecat2), outlier.colour = "red", outlier.shape = 1 )
 p + geom_boxplot()
@@ -145,7 +145,7 @@ p + geom_boxplot()
 
 Who is the outlier?  Perhaps it is a cohort of laborers, e.g., a county of coal miners?
 
-```{r foo, eval = TRUE, echo = TRUE}
+```{r foo, eval = FALSE, echo = TRUE}
 nonTravelMETs[which.max(nonTravelMETs$x5),]
 ```
 
@@ -153,12 +153,12 @@ Strange that it is group of middle-aged men.  I see this as a red
 flag.  I remove this datum and redraw the boxplots, but this time only
 for x5, x6 and x7, the others seemed less interesting.
 
-```{r fips, eval = TRUE, echo = FALSE, results = "hide"}
+```{r fips, eval = FALSE, echo = FALSE, results = "hide"}
 fips <- read.csv("./data/fips_codes_website.csv")
 any(fips$County.FIPS.Code==38)
 ```
 
-```{r Nontravelmets, echo = FALSE, message = FALSE, warning = FALSE, results = "hide", fig.width=12, fig.height=6}
+```{r Nontravelmets, echo = FALSE, message = FALSE, warning = FALSE, results = "hide", fig.width=12, fig.height=6, eval = FALSE}
 D <- melt(nonTravelMETs[-which.max(nonTravelMETs$x5),-(5:8)])
 p <- ggplot(D, aes(x = variable, y = value, colour = agecat2), outlier.colour = "red", outlier.shape = 1 ) + geom_boxplot()
 
@@ -199,13 +199,13 @@ saveRDS(mortality2001, file = "./data/mortality2001.rds")
 
 Lets read in the CDC data using the file VS11MORT.DUSMCPUB and see whats up.
 
-```{r VS11, echo = FALSE}
+```{r VS11, echo = FALSE, eval = FALSE}
 tapePosition <- list(state = c(29:30), skippedVars = c(31:34), county = c(35:37), skippedVars = c(38:68), sex = 69, ageUnit = 70, ageValue = c(71:73), skippedVars = c(74:145), ICD = c(146:149), skippedVars = c(150:444), race = c(445:446)) # Magic number!!!
 colClasses <- c("factor","factor","factor", "factor","integer", "character", "factor")
 fileWidth <- 488 # Magic number!!!
 ```
 
-```{r VS11Classes, echo = FALSE}
+```{r VS11Classes, echo = FALSE, eval = FALSE}
 names(colClasses) <- names(tapePosition)[-which(names(tapePosition)=="skippedVars")]
 colClasses
 ```
@@ -213,7 +213,7 @@ colClasses
 To include more variables edit the above lines.  The variable listed
 must be contiguous.
 
-```{r convertAge, warning = FALSE, eval = TRUE, echo = FALSE}
+```{r convertAge, warning = FALSE, eval = FALSE, echo = FALSE}
 
 varWidths <- unlist(lapply(tapePosition, "length"))
 varWidths <- ifelse(names(tapePosition) == "skippedVars", -varWidths, varWidths)
@@ -228,7 +228,7 @@ p + facet_grid(. ~ sex)
 
 ```
 
-```{r ICD, fig.width = 12, echo = FALSE}
+```{r ICD, fig.width = 12, echo = FALSE, eval = FALSE}
 Data.IDC.Codes <- read.csv(file="./data/IDC_Codes_key.csv", header = TRUE, colClasses = c("character","character","character"), na.string = "")
 Data.IDC.Codes <- subset(Data.IDC.Codes, Include == "1" & !is.na(ITHIMCause))
 ITHIMCauseOfDeath <- Data.IDC.Codes$ITHIMCause
@@ -241,11 +241,11 @@ p + geom_bar()
 
 ```
 
-```{r CoDTable}
+```{r CoDTable, eval = FALSE}
 with(Data.Mortality, table(CauseofDeathITHIM))
 ```
 
-```{r ageClass, fig.width = 12, echo = FALSE}
+```{r ageClass, fig.width = 12, echo = FALSE, eval = FALSE}
 ageClass <- c(rep("00-04",5),rep("05-14",10),rep("15-29",15),rep("30-44",15),rep("45-59",15),rep("60-69",10),rep("70-79",10),rep("80+",121))
 names(ageClass) <- as.character(0:200)
 Data.Mortality <- data.frame(Data.Mortality, ageClass = as.factor(ageClass[as.character(as.integer(Data.Mortality$convertedAge))]))
@@ -256,13 +256,13 @@ p <- ggplot(D, aes(disease))
 p + geom_bar(aes(fill=ageClass))
 ```
 
-```{r histbyDisease, fig.width = 12, echo = FALSE}
+```{r histbyDisease, fig.width = 12, echo = FALSE, eval = FALSE}
 D <- data.frame(convertedAge = Data.Mortality$convertedAge, disease = Data.Mortality$CauseofDeathITHIM)
 p <- ggplot(D, aes(convertedAge, ..density.., colour = disease)) + geom_histogram(binwidth=5, show.legend = TRUE)
 p + facet_grid( . ~ disease)
 ```
 
-```{r counties}
+```{r counties, eval = FALSE}
 Data.AgeSex <- read.csv("./data/county_age_sex2002.csv", header=T, col.names = c("county.name","state.name", "MSA","sex","all.ages","age0-4","age5-14","age15-29","age30-44","age45-59","age60-69","age70-79","age80+", "STATE","COUNTY"), colClasses = c("factor","factor","factor","factor","integer","integer","integer","integer","integer","integer","integer","integer","integer", "factor", "factor"))
 
 age.sex.2 <- melt(age.sex[,c(14,15,4,6:13)], id=c("STATE","COUNTY","sex"))
@@ -277,11 +277,11 @@ mort.age$app.pop <- ifelse(mort.age$sex ==1, mort.age$male, mort.age$female)
 
 ```
 
-```{r tabulate}
+```{r tabulate, eval = FALSE}
 Data.Mortality.Table <- as.data.frame(ftable(with(Data.Mortality, table(sex,ageClass,CauseofDeathITHIM))))
 ```
 
-```{r saveMortality, echo = FALSE}
+```{r saveMortality, echo = FALSE, eval = FALSE}
 saveRDS(object = Data.Mortality, file = "./data/Data.Mortality.rds")
 saveRDS(object = Data.Mortality.Table, file = "./data/Data.Mortality.Table.rds")
 ```
