@@ -1,5 +1,6 @@
-## Integrated Transport and Health Impacts Model (ITHIM)
+# Integrated Transport and Health Impacts Model
 
+## R Package _ITHIM_
 This document will eventually serve as a compendium to the R package
 _ITHIM_.  It will describe how to use the package to implement the
 ITHIM model, as well as a detailed description of the model itself.
@@ -7,75 +8,62 @@ ITHIM model, as well as a detailed description of the model itself.
 As a working document it will serve as a place for SGY to post
 results, questions, interpreations, notes, etc.
 
-```{r date}
-date()
-```
-
 ```{r libs, eval = TRUE, echo = FALSE, results = "hide", warning = FALSE, error = FALSE, message = FALSE}
 options(repos='http://cran.rstudio.com/')
 library("ggplot2")
 library("reshape2")
 library("plyr")
 ```
-```{r loadITHIM}
+```{r loadITHIM, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE}
 library("devtools")
 install_github("syounkin/ITHIM")
 library("ITHIM")
+date()
 ```
 
-## R Implementation
+### Instanciation
 
 ```{r instantiate}
-ITHIM <- list(parameters = parList <- createParameterList(), means = computeMeanMatrices(parList))
-```
-Then we compute quintiles for active transport time.
-```{r quints}
-ITHIM <- within(ITHIM, {
-quintilesActiveTransportTime <- computeQuintiles(means$meanActiveTransportTime, means$sdActiveTransportTime)
-})
+ITHIM <- list(
+  parameters = parameters <- createParameterList(),
+  means = means <- computeMeanMatrices(parameters),
+  quintiles = quintiles <- getQuintiles(means)
+)
 ```
 
-Then the METs by walking and cycling.
-```{r quintMETs}
-ITHIM <- within(ITHIM, {
-  quintWalkingTime = list(M = quintilesActiveTransportTime[["M"]] * (1-means$propTimeCycling[,"M"]), F = quintilesActiveTransportTime[["F"]] * (1-means$propTimeCycling[,"F"]))
-  quintCyclingTime = list(M = quintilesActiveTransportTime[["M"]] * (means$propTimeCycling[,"M"]), F = quintilesActiveTransportTime[["F"]] * (means$propTimeCycling[,"F"]))
-  quintWalkingMET = list(M = means$meanWalkMET[,"M"]*quintWalkingTime[["M"]]/60, F = means$meanWalkMET[,"F"]*quintWalkingTime[["F"]]/60)
-  quintCyclingMET = list(M = means$meanCycleMET[,"M"]*quintCyclingTime[["M"]]/60, F = means$meanCycleMET[,"F"]*quintCyclingTime[["F"]]/60)
-})
-```
-
-And the METs for active travel.
-```{r totalTravelMETS}
-ITHIM <- within(ITHIM, {
-quintTotalTravelMET = list(M = quintWalkingMET[["M"]] + quintCyclingMET[["M"]], F = quintWalkingMET[["F"]] + quintCyclingMET[["F"]])
-})
-```
-Now we print all of the parameters and results.
 ```{r ITHIM}
 names(ITHIM)
 ```
+
+For help run the following.
+```{r help, eval = FALSE}
+help(createParameterList)
+help(computeMeansMatrices)
+help(getQuintiles)
+```
+
 ### Example
 To run the example contained in the _ITHIM_ package run the following.
 
-```{r package}
-library("ITHIM")
+```{r package, eval = FALSE}
 example("ITHIM-package")
 ```
+### Figures
 
-```{r plot1}
+```{r plot1, echo = FALSE}
 D <- melt(ITHIM$means$meanActiveTransportTime, c("age","sex"), value.name = "activeTransportTime")
 p <- ggplot(D, aes(age,  activeTransportTime)) + geom_bar(aes(fill=sex), stat = "identity", position = "dodge")
 p
 ```
 
-```{r plot2}
+```{r plot2, echo = FALSE}
 D <- melt(ITHIM$parameters$Rwt, c("age","sex"), value.name = "rhowt")
 p <- ggplot(D, aes(age,  rhowt)) + geom_bar(aes(fill=sex), stat = "identity", position = "dodge")
 p
 ```
 
-## Archive
+# Code Graveyard
+
 ### Active Transport Estimates (Speed and Distance by Transport Mode)
 These data were ripped out of the EXCEL workbook and vary per scenario.
 ```{r transportData, eval = FALSE, echo = FALSE}
