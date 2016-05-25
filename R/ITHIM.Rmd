@@ -11,13 +11,16 @@ results, questions, interpreations, notes, etc.
 date()
 ```
 
-```{r libs, eval = TRUE, echo = TRUE, results = "hide", warning = FALSE, error = FALSE, message = FALSE}
+```{r libs, eval = TRUE, echo = FALSE, results = "hide", warning = FALSE, error = FALSE, message = FALSE}
 options(repos='http://cran.rstudio.com/')
 library("ggplot2")
 library("reshape2")
 library("plyr")
+```
+```{r loadITHIM}
 library("devtools")
 install_github("syounkin/ITHIM")
+library("ITHIM")
 ```
 
 ## R Implementation
