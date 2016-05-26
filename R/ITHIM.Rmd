@@ -24,15 +24,22 @@ date()
 ### Instanciation
 
 ```{r instantiate}
-ITHIM <- list(
-  parameters = parameters <- createParameterList(),
+ITHIM.baseline <- list(
+  parameters = parameters <- createParameterList(baseline = TRUE),
+  means = means <- computeMeanMatrices(parameters),
+  quintiles = quintiles <- getQuintiles(means)
+)
+ITHIM.scenario <- list(
+  parameters = parameters <- createParameterList(baseline = FALSE),
   means = means <- computeMeanMatrices(parameters),
   quintiles = quintiles <- getQuintiles(means)
 )
 
 RR <- createActiveTransportRRs()
 RR <- matrix(RR$BreastCancer[,"F"],nrow=nAgeClass,ncol = 5, byrow = FALSE)
-totalMETs <- mapply("+",ITHIM$quintiles$TotalTravelMET,computeNonTravelMETs(),SIMPLIFY=FALSE)
+
+totalMETs.baseline <- mapply("+",ITHIM.baseline$quintiles$TotalTravelMET,computeNonTravelMETs(),SIMPLIFY=FALSE)
+totalMETs.scenario <- mapply("+",ITHIM.scenario$quintiles$TotalTravelMET,computeNonTravelMETs(),SIMPLIFY=FALSE)
 
 RR^(totalMETs$F^0.5)
 
