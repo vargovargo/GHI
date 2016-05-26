@@ -29,6 +29,13 @@ ITHIM <- list(
   means = means <- computeMeanMatrices(parameters),
   quintiles = quintiles <- getQuintiles(means)
 )
+
+RR <- createActiveTransportRRs()
+RR <- matrix(RR$BreastCancer[,"F"],nrow=nAgeClass,ncol = 5, byrow = FALSE)
+totalMETs <- mapply("+",ITHIM$quintiles$TotalTravelMET,computeNonTravelMETs(),SIMPLIFY=FALSE)
+
+RR^(totalMETs$F^0.5)
+
 ```
 
 ```{r ITHIM}
