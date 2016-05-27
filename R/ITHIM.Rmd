@@ -21,7 +21,7 @@ library("ITHIM")
 date()
 ```
 
-### Instanciation
+### Running in R
 
 ```{r instantiate}
 ITHIM.baseline <- list(
@@ -35,32 +35,35 @@ ITHIM.scenario <- list(
   quintiles = quintiles <- getQuintiles(means)
 )
 
-RR <- createActiveTransportRRs()
-
-nAgeClass <- 8
-
-
 totalMETs.baseline <- mapply("+",ITHIM.baseline$quintiles$TotalTravelMET,computeNonTravelMETs(),SIMPLIFY=FALSE)
 totalMETs.scenario <- mapply("+",ITHIM.scenario$quintiles$TotalTravelMET,computeNonTravelMETs(),SIMPLIFY=FALSE)
-
 totalMETs.baseline <- lapply(totalMETs.baseline, function(x) ifelse(x<2.5,0.1,x))
 totalMETs.scenario <- lapply(totalMETs.scenario, function(x) ifelse(x<2.5,0.1,x))
+```
+Now we can compute the attributable fraction (AF).
 
+```{r RRs}
 ## RR for Females and Breast Cancer
+RR <- createActiveTransportRRs()
+nAgeClass <- 8
 RR <- matrix(RR$BreastCancer[,"F"],nrow=nAgeClass,ncol = 5, byrow = FALSE)
 RR.baseline <- RR^(totalMETs.baseline$F^0.5)
 RR.scenario <- RR^(totalMETs.scenario$F^0.5)
-diseaseBurden <- RR.baseline/RR.scenario
-burden <- 1 - (rowSums(diseaseBurden)-ncol(diseaseBurden))/rowSums(diseaseBurden)
-(AF <- 1 - burden)
+diseaseBurden.scenario <- RR.baseline/RR.scenario
+diseaseBurden.baseline <- RR.baseline/RR.baseline # What!
+(AF <- (rowSums(diseaseBurden.scenario)-rowSums(diseaseBurden.baseline))/rowSums(diseaseBurden.scenario))
 ```
 
-```{r ITHIM}
-ITHIM <- ITHIM.baseline
-names(ITHIM)
+```{r explore}
+names(ITHIM.baseline$parameters)
 ```
 
-For help run the following.
+We use Rws to estimate mean walking speed and from that mean walking
+METs.  Mean cycling METs, however, is constant and is not a function
+of mean cycling speed or Rcs.  So, I do not think Rcs is currently
+used.
+
+To see the help page for a function use help().
 ```{r help, eval = FALSE}
 help(createParameterList)
 help(computeMeansMatrices)
