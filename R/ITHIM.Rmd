@@ -16,7 +16,7 @@ library("plyr")
 ```
 ```{r loadITHIM, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE}
 library("devtools")
-install_github("syounkin/ITHIM")
+install_github("syounkin/ITHIM", ref = "devel", force = TRUE)
 library("ITHIM")
 date()
 ```
@@ -36,16 +36,27 @@ ITHIM.scenario <- list(
 )
 
 RR <- createActiveTransportRRs()
-RR <- matrix(RR$BreastCancer[,"F"],nrow=nAgeClass,ncol = 5, byrow = FALSE)
+
+nAgeClass <- 8
+
 
 totalMETs.baseline <- mapply("+",ITHIM.baseline$quintiles$TotalTravelMET,computeNonTravelMETs(),SIMPLIFY=FALSE)
 totalMETs.scenario <- mapply("+",ITHIM.scenario$quintiles$TotalTravelMET,computeNonTravelMETs(),SIMPLIFY=FALSE)
 
-RR^(totalMETs$F^0.5)
+totalMETs.baseline <- lapply(totalMETs.baseline, function(x) ifelse(x<2.5,0.1,x))
+totalMETs.scenario <- lapply(totalMETs.scenario, function(x) ifelse(x<2.5,0.1,x))
 
+## RR for Females and Breast Cancer
+RR <- matrix(RR$BreastCancer[,"F"],nrow=nAgeClass,ncol = 5, byrow = FALSE)
+RR.baseline <- RR^(totalMETs.baseline$F^0.5)
+RR.scenario <- RR^(totalMETs.scenario$F^0.5)
+diseaseBurden <- RR.baseline/RR.scenario
+burden <- 1 - (rowSums(diseaseBurden)-ncol(diseaseBurden))/rowSums(diseaseBurden)
+(AF <- 1 - burden)
 ```
 
 ```{r ITHIM}
+ITHIM <- ITHIM.baseline
 names(ITHIM)
 ```
 
