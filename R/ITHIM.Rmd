@@ -16,7 +16,8 @@ library("plyr")
 ```
 ```{r loadITHIM, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE}
 library("devtools")
-install_github("syounkin/ITHIM", ref = "devel", force = TRUE)
+install("~/ITHIM/")
+# install_github("syounkin/ITHIM", ref = "devel", force = TRUE)
 library("ITHIM")
 date()
 ```
@@ -34,25 +35,25 @@ ITHIM.scenario <- list(
   means = means <- computeMeanMatrices(parameters),
   quintiles = quintiles <- getQuintiles(means)
 )
-
-totalMETs.baseline <- mapply("+",ITHIM.baseline$quintiles$TotalTravelMET,computeNonTravelMETs(),SIMPLIFY=FALSE)
-totalMETs.scenario <- mapply("+",ITHIM.scenario$quintiles$TotalTravelMET,computeNonTravelMETs(),SIMPLIFY=FALSE)
-totalMETs.baseline <- lapply(totalMETs.baseline, function(x) ifelse(x<2.5,0.1,x))
-totalMETs.scenario <- lapply(totalMETs.scenario, function(x) ifelse(x<2.5,0.1,x))
 ```
 Now we can compute the attributable fraction (AF).
 
 ```{r RRs}
-## RR for Females and Breast Cancer
 RR <- createActiveTransportRRs()
-nAgeClass <- 8
-RR <- matrix(RR$BreastCancer[,"F"],nrow=nAgeClass,ncol = 5, byrow = FALSE)
-RR.baseline <- RR^(totalMETs.baseline$F^0.5)
-RR.scenario <- RR^(totalMETs.scenario$F^0.5)
-diseaseBurden.scenario <- RR.baseline/RR.scenario
-diseaseBurden.baseline <- RR.baseline/RR.baseline # What!
-(AF <- (rowSums(diseaseBurden.scenario)-rowSums(diseaseBurden.baseline))/rowSums(diseaseBurden.scenario))
+RR.baseline <- lapply(RR, MET2RR, ITHIM.baseline$quintiles$TotalMET)
+RR.scenario <- lapply(RR, MET2RR, ITHIM.scenario$quintiles$TotalMET)
+
+diseaseBurden.scenario <- mapply(ratioForList,RR.baseline, RR.scenario, SIMPLIFY = FALSE)
+diseaseBurden.baseline <- mapply(ratioForList,RR.baseline, RR.baseline, SIMPLIFY = FALSE) # What!
+AF <- mapply(AFForList, diseaseBurden.scenario,diseaseBurden.baseline, SIMPLIFY = FALSE)
 ```
+
+Note that some of the AF values will disagree with the EXCEL
+spreadsheet because Diabetes, HHD_Air, CVD_Air and Stroke_Air do not
+combine travel METs with non-travel METs.
+
+```{r AF}
+100*round(AF$BreastCancer[-(1:2),],4)
 
 ```{r explore}
 names(ITHIM.baseline$parameters)
