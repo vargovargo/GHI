@@ -16,3 +16,15 @@ foo.R
 html
 *.tar.gz
 #*
+GitPrimer
+PipelinePresentation
+misc
+*-bkup
+*.aux
+*.log
+*.nav
+*.out
+*.pdf
+*.snm
+*.toc
+*.vrb
