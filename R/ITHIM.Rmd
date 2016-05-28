@@ -52,17 +52,21 @@ Note that some of the AF values will disagree with the EXCEL
 spreadsheet because Diabetes, HHD_Air, CVD_Air and Stroke_Air do not
 combine travel METs with non-travel METs.
 
-```{r AF}
-100*round(AF$BreastCancer[-(1:2),],4)
-
+```{r AF, echo = FALSE}
+lapply(AF[-(which(names(AF)%in%c("CVD","Diabetes")))], function(x) 100*round(x[-(1:2),],4))
+```
+### Relative Risk Model
 ```{r explore}
 names(ITHIM.baseline$parameters)
 ```
-
-We use Rws to estimate mean walking speed and from that mean walking
-METs.  Mean cycling METs, however, is constant and is not a function
-of mean cycling speed or Rcs.  So, I do not think Rcs is currently
-used.
+```{r RRFigure, echo = FALSE}
+phi <- function(x,k=0.5,phi0=RR$BreastCancer$F[1,1]) phi0^{x^k}
+plot(x = xvec <- seq(0,xmax <- 10,length.out=1e3), y = phi(xvec, k = 0.25), main = "Relative Risk Models for MET Exposure", xlab = "METs per week", ylab = "Breast Cancer Relative Risk", type = "l", lwd = 2, col = 1, ylim = c(0.9,1),xlim=c(0,xmax))
+lines(x = xvec <- seq(0,xmax,length.out=1e3), y = phi(x = xvec, k = 0.375), lwd = 2, col = 3)
+lines(x = xvec <- seq(0,xmax,length.out=1e3), y = phi(x = xvec, k = 0.5), lwd = 2, col = 2)
+lines(x = xvec <- seq(0,xmax,length.out=1e3), y = phi(x = xvec, k = 1), lwd = 2, col = 4)
+legend(x="topright",legend=paste0("k=",c("0.25","0.375","0.5","1")), col=1:4,lty=1,lwd=2)
+```
 
 To see the help page for a function use help().
 ```{r help, eval = FALSE}
@@ -80,13 +84,13 @@ example("ITHIM-package")
 ### Figures
 
 ```{r plot1, echo = FALSE}
-D <- melt(ITHIM$means$meanActiveTransportTime, c("age","sex"), value.name = "activeTransportTime")
+D <- melt(ITHIM.baseline$means$meanActiveTransportTime, c("age","sex"), value.name = "activeTransportTime")
 p <- ggplot(D, aes(age,  activeTransportTime)) + geom_bar(aes(fill=sex), stat = "identity", position = "dodge")
 p
 ```
 
 ```{r plot2, echo = FALSE}
-D <- melt(ITHIM$parameters$Rwt, c("age","sex"), value.name = "rhowt")
+D <- melt(ITHIM.baseline$parameters$Rwt, c("age","sex"), value.name = "rhowt")
 p <- ggplot(D, aes(age,  rhowt)) + geom_bar(aes(fill=sex), stat = "identity", position = "dodge")
 p
 ```
