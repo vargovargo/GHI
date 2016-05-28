@@ -1,0 +1,160 @@
+\def\handout{0}   % set to 1 to produce 4-up handouts instead of slides
+\def\notes{0}     % set to 1 to show \note{}s
+\ifnum\handout=1  % see above for an alternative which uses two preamble files
+\documentclass[handout,13pt,compress,c]{beamer}
+\usepackage{pgfpages}
+\pgfpagesuselayout{4 on 1}[letterpaper,landscape,border shrink=4mm]
+\setbeamertemplate{footline}[page number]   % omit if don't want slide number at bottom right
+\else
+\documentclass[13pt,compress,c]{beamer}
+\fi
+\usetheme{PaloAlto}
+\usepackage{graphicx}
+\usepackage{natbib}          % for author year citations \citet \citep
+\usepackage{relsize}         % for \smaller etc.
+\usepackage{xcolor}
+\usepackage{listings}
+\lstset{language=bash,
+        basicstyle=\tiny,
+        frame=single,
+        backgroundcolor=\color{lightgray},
+        commentstyle=\color{black},
+        showstringspaces=false
+        }
+
+\DeclareGraphicsExtensions{.pdf, .jpg, .png}
+\setbeamercolor{normal text}{bg=blue!5}
+\setbeamertemplate{footline}[page number] % omit if don't want slide number at bottom right
+\ifnum\notes=1 \setbeameroption{show notes} \fi
+\newcommand{\ft}[1]{\frametitle{#1}}
+\newcommand{\bi}{\begin{itemize}}
+\newcommand{\ei}{\end{itemize}}
+\newcommand{\figw}[2]{\centerline{\includegraphics[width=#2\textwidth]{#1}}}
+\newcommand{\figh}[2]{\centerline{\includegraphics[height=#2\textheight]{#1}}}
+\newcommand{\fig}[1]{\centerline{\includegraphics{#1}}}
+\newcommand{\foot}[1]{\footnotetext{#1}} % smaller text in bottom margin, e.g. citations
+\makeatletter
+\renewcommand\@makefntext[1]{\noindent#1} % see p. 114 of LaTeX Companion 2nd edition
+\makeatother
+\renewcommand\footnoterule{}
+\def\newblock{\hskip .11em plus .33em minus .07em}
+
+\title[ITHIM]{A Discussion about ITHIM and Its Future Implementation}
+\author[Younkin et al.]{\small{Samuel Younkin, Jason Vargo, Maggie Grabow, Jonathan Patz}}
+\institute{Global Health Institute\\University of Wisconsin-Madison}
+\date{\tiny{June 2016}}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{document}
+\frame{\titlepage}
+\section{Introduction}
+\begin{frame}[fragile]
+\frametitle{Introduction}
+\end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\frame{
+   \ft{Outline}
+\tableofcontents
+}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\section{ITHIM}
+\subsection{Relative Risk vs.\ Exposure}
+\begin{frame}[fragile]
+\frametitle{Relative Risk vs.\ Exposure}
+We model the relative risk, $\varphi(x^\prime)$, as a function of
+transformed exposure.
+\begin{equation}
+\varphi\left(\tilde{x}\right) = e^{r \tilde{x}}
+\end{equation}
+\bi
+\item $r=\log\left(\varphi_1\right)$ \bi\item$\varphi_1$ is ``RR 1 MET'' in the EXCEL workbook\ei
+\item $\tilde{x}=x^k$, $k=0.25,0.375,0.5,\ldots$
+\ei
+\bi
+\item How can we update the estimates for $\varphi_1$ and $k$?
+\item Is it better to vary $k$ by disease?\ei
+\end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\subsection{METs}
+\begin{frame}[fragile]
+\frametitle{METs}
+\bi
+\item $\mathbf{\mathrm{MET}}_\mathrm{cycling} = 6\ \mathrm{METs}$
+\item $\mathbf{\mathrm{MET}}_\mathrm{walking} = f\left( \mu_s  \right) \mathrm{METs}$
+\ei
+\begin{equation}
+f(\mu_s) = \begin{cases} 1.2\mu_s + 0.08 &\mbox{if } \mu_s \ge 2.02\ \mathrm{kph} \\
+2.5 & \mbox{if } \mu_s < 2.02\ \mathrm{kph}\end{cases}
+\end{equation}
+\bi
+\item Why are the two treated differently?
+\item Should we model cycling METs as a function of cycling speed?
+\item Note that model exposure is in terms of $\frac{\mathrm{MET}\cdot\mathrm{hrs}}{\mathrm{week}}$
+\ei
+\end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%% \subsection{$\mathrm{RR}_\mathrm{1MET}$}
+%% \begin{frame}[fragile]
+%% \frametitle{$\mathrm{RR}_\mathrm{1MET}$}
+%% \bi
+%% \item Physical Act. RRs worksheet contains values for $\varphi_1$, given fixed $k$ for each disease
+%% \item $\varphi_1$ is estimated using values for $x_{\textrm{lit}}$ and $\varphi(x_{\textrm{lit}})$ and a fixed $k$
+%% \ei
+%% \end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\section{R Implementation}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{frame}[fragile]
+\frametitle{R Package}
+\bi
+\item Create a list that defines the scenario/baseline model
+\bi \item Define parasmeters \item Compute means, stratified by age and sex \item Retrieve quantiles of active transport time (lognormal with constant $c_v$)\ei
+\ei
+\begin{semiverbatim}
+\begin{lstlisting}
+> ITHIM <- list(
+  parameters = parameters <- createParameterList(),
+  means = means <- computeMeanMatrices(parameters),
+  quintiles = quintiles <- getQuintiles(means)
+)
+\end{lstlisting}
+\end{semiverbatim}
+\end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{frame}[fragile]
+\frametitle{Parameter List}
+\begin{semiverbatim}
+\begin{lstlisting}
+> cbind(names(ITHIM$parameters))
+       [,1]
+  [1,] ``F''
+  [2,] ``Rwt''
+  [3,] ``Rws''
+  [4,] ``Rct''
+  [5,] ``muwt''
+  [6,] ``muws''
+  [7,] ``muct''
+  [8,] ``cv''
+  [9,] ``nAgeClass''
+\end{lstlisting}
+\end{semiverbatim}
+\end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\end{document}
