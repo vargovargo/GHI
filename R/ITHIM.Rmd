@@ -25,7 +25,7 @@ date()
 ### Running in R
 
 ```{r instantiate}
-ITHIM.baseline <- list(
+ITHIM <- list(
   parameters = parameters <- createParameterList(baseline = TRUE),
   means = means <- computeMeanMatrices(parameters),
   quintiles = quintiles <- getQuintiles(means)
