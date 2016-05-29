@@ -25,7 +25,7 @@ date()
 ### Running in R
 
 ```{r instantiate}
-ITHIM <- list(
+ITHIM.baseline <- list(
   parameters = parameters <- createParameterList(baseline = TRUE),
   means = means <- computeMeanMatrices(parameters),
   quintiles = quintiles <- getQuintiles(means)
@@ -39,13 +39,12 @@ ITHIM.scenario <- list(
 Now we can compute the attributable fraction (AF).
 
 ```{r RRs}
-RR <- createActiveTransportRRs()
-RR.baseline <- lapply(RR, MET2RR, ITHIM.baseline$quintiles$TotalMET)
-RR.scenario <- lapply(RR, MET2RR, ITHIM.scenario$quintiles$TotalMET)
+comparitiveRisk <- compareModels(ITHIM.baseline,ITHIM.scenario)
+names(comparitiveRisk)
+```
 
-diseaseBurden.scenario <- mapply(ratioForList,RR.baseline, RR.scenario, SIMPLIFY = FALSE)
-diseaseBurden.baseline <- mapply(ratioForList,RR.baseline, RR.baseline, SIMPLIFY = FALSE) # What!
-AF <- mapply(AFForList, diseaseBurden.scenario,diseaseBurden.baseline, SIMPLIFY = FALSE)
+```{r show}
+100*round(comparitiveRisk$AF$BreastCancer,4)
 ```
 
 Note that some of the AF values will disagree with the EXCEL
@@ -53,14 +52,14 @@ spreadsheet because Diabetes, HHD_Air, CVD_Air and Stroke_Air do not
 combine travel METs with non-travel METs.
 
 ```{r AF, echo = FALSE}
-lapply(AF[-(which(names(AF)%in%c("CVD","Diabetes")))], function(x) 100*round(x[-(1:2),],4))
+lapply(comparitiveRisk$AF[-(which(names(comparitiveRisk$AF)%in%c("CVD","Diabetes")))], function(x) 100*round(x[-(1:2),],4))
 ```
 ### Relative Risk Model
 ```{r explore}
 names(ITHIM.baseline$parameters)
 ```
 ```{r RRFigure, echo = FALSE}
-phi <- function(x,k=0.5,phi0=RR$BreastCancer$F[1,1]) phi0^{x^k}
+phi <- function(x,k=0.5,phi0=comparitiveRisk$RR.baseline$BreastCancer$F[1,1]) phi0^{x^k}
 plot(x = xvec <- seq(0,xmax <- 10,length.out=1e3), y = phi(xvec, k = 0.25), main = "Relative Risk Models for MET Exposure", xlab = "METs per week", ylab = "Breast Cancer Relative Risk", type = "l", lwd = 2, col = 1, ylim = c(0.9,1),xlim=c(0,xmax))
 lines(x = xvec <- seq(0,xmax,length.out=1e3), y = phi(x = xvec, k = 0.375), lwd = 2, col = 3)
 lines(x = xvec <- seq(0,xmax,length.out=1e3), y = phi(x = xvec, k = 0.5), lwd = 2, col = 2)
@@ -71,8 +70,6 @@ legend(x="topright",legend=paste0("k=",c("0.25","0.375","0.5","1")), col=1:4,lty
 To see the help page for a function use help().
 ```{r help, eval = FALSE}
 help(createParameterList)
-help(computeMeansMatrices)
-help(getQuintiles)
 ```
 
 ### Example
@@ -83,21 +80,29 @@ example("ITHIM-package")
 ```
 ### Figures
 
-```{r plot1, echo = FALSE}
-D <- melt(ITHIM.baseline$means$meanActiveTransportTime, c("age","sex"), value.name = "activeTransportTime")
-p <- ggplot(D, aes(age,  activeTransportTime)) + geom_bar(aes(fill=sex), stat = "identity", position = "dodge")
-p
+```{r plot2, echo = FALSE, fig.width = 12}
+plotRR(comparitiveRisk$RR.baseline$Depression,comparitiveRisk$RR.scenario$Depression) + coord_cartesian(ylim = c(0.75, 1.05))+ggtitle("Depression")
 ```
 
-```{r plot2, echo = FALSE}
-D <- melt(ITHIM.baseline$parameters$Rwt, c("age","sex"), value.name = "rhowt")
-p <- ggplot(D, aes(age,  rhowt)) + geom_bar(aes(fill=sex), stat = "identity", position = "dodge")
-p
+```{r plot3, echo = FALSE, fig.width = 12, eval = FALSE}
+plotRR(comparitiveRisk$RR.baseline$BreastCancer,comparitiveRisk$RR.scenario$BreastCancer) + coord_cartesian(ylim = c(0.75, 1.05)) + ggtitle("Breast Cancer")
 ```
 
+```{r plot4, echo = FALSE, fig.height = 12}
+D<-melt(comparitiveRisk$AF)
+names(D)<- c("age","sex","AF","disease")
+p <- ggplot(D, aes(age,AF)) + geom_bar(aes(fill=sex), stat = "identity") + facet_grid( disease ~ .) + coord_cartesian(ylim = c(0, 0.1))
+p
+```
 # Code Graveyard
 
 ### Active Transport Estimates (Speed and Distance by Transport Mode)
+```{r plot1, echo = FALSE, eval = FALSE}
+D <- melt(ITHIM.baseline$means$meanActiveTransportTime, c("age","sex"), value.name = "activeTransportTime")
+p <- ggplot(D, aes(age,  activeTransportTime)) + geom_bar(aes(fill=sex), stat = "identity", position = "dodge")
+p + coord_cartesian(ylim = c(0.75, 1.05))
+```
+
 These data were ripped out of the EXCEL workbook and vary per scenario.
 ```{r transportData, eval = FALSE, echo = FALSE}
 
