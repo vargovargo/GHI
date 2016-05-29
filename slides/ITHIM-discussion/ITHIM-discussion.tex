@@ -137,20 +137,45 @@ f(\mu_s) = \begin{cases} 1.2\mu_s + 0.08 &\mbox{if } \mu_s \ge 2.02\ \mathrm{kph
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{frame}[fragile]
-\frametitle{Parameter List}
+\frametitle{ITHIM Objects}
 \begin{semiverbatim}
 \begin{lstlisting}
-> cbind(names(ITHIM$parameters))
-       [,1]
-  [1,] ``F''
-  [2,] ``Rwt''
-  [3,] ``Rws''
-  [4,] ``Rct''
-  [5,] ``muwt''
-  [6,] ``muws''
-  [7,] ``muct''
-  [8,] ``cv''
-  [9,] ``nAgeClass''
+> ITHIM.baseline <- list(
+  parameters = parameters <- createParameterList(baseline = TRUE),
+  means = means <- computeMeanMatrices(parameters),
+  quintiles = quintiles <- getQuintiles(means)
+)
+
+> ITHIM.scenario <- list(
+  parameters = parameters <- createParameterList(baseline = FALSE),
+  means = means <- computeMeanMatrices(parameters),
+  quintiles = quintiles <- getQuintiles(means)
+)
+\end{lstlisting}
+\end{semiverbatim}
+\end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{frame}[fragile]
+\frametitle{AF Breast Cancer}
+\begin{semiverbatim}
+\begin{lstlisting}
+> comparitiveRisk <- compareModels(ITHIM.baseline,ITHIM.scenario)
+\end{lstlisting}
+\end{semiverbatim}
+Foo
+\begin{semiverbatim}
+\begin{lstlisting}
+> with(comparitiveRisk, as.data.frame(lapply(AF[c("BreastCancer","Depression")], function(x) 100*round(x[-(1:2),],4))))
+
+##           BreastCancer.M BreastCancer.F Depression.M Depression.F
+## ageClass3              0           1.92         2.36         3.19
+## ageClass4              0           1.61         2.97         2.67
+## ageClass5              0           1.77         2.96         2.93
+## ageClass6              0           2.65         2.53         4.36
+## ageClass7              0           1.61         1.95         2.67
+## ageClass8              0           0.95         1.26         1.57
 \end{lstlisting}
 \end{semiverbatim}
 \end{frame}

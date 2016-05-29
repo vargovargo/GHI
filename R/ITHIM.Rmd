@@ -40,11 +40,10 @@ Now we can compute the attributable fraction (AF).
 
 ```{r RRs}
 comparitiveRisk <- compareModels(ITHIM.baseline,ITHIM.scenario)
-names(comparitiveRisk)
 ```
 
 ```{r show}
-100*round(comparitiveRisk$AF$BreastCancer,4)
+with(comparitiveRisk, 100*round(AF$BreastCancer,4))
 ```
 
 Note that some of the AF values will disagree with the EXCEL
@@ -52,7 +51,7 @@ spreadsheet because Diabetes, HHD_Air, CVD_Air and Stroke_Air do not
 combine travel METs with non-travel METs.
 
 ```{r AF, echo = FALSE}
-lapply(comparitiveRisk$AF[-(which(names(comparitiveRisk$AF)%in%c("CVD","Diabetes")))], function(x) 100*round(x[-(1:2),],4))
+with(comparitiveRisk, as.data.frame(lapply(AF[c("BreastCancer","Depression")], function(x) 100*round(x[-(1:2),],4))))
 ```
 ### Relative Risk Model
 ```{r explore}
