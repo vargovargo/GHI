@@ -53,6 +53,10 @@ combine travel METs with non-travel METs.
 ```{r AF, echo = FALSE}
 with(comparitiveRisk, as.data.frame(lapply(AF[c("BreastCancer","Depression")], function(x) 100*round(x[-(1:2),],4))))
 ```
+```{r ap}
+k <- createAirPollutionRRs()
+```
+
 ### Relative Risk Model
 ```{r explore}
 names(ITHIM.baseline$parameters)
