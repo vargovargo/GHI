@@ -21,7 +21,6 @@
         commentstyle=\color{black},
         showstringspaces=false
         }
-
 \DeclareGraphicsExtensions{.pdf, .jpg, .png}
 \setbeamercolor{normal text}{bg=blue!5}
 \setbeamertemplate{footline}[page number] % omit if don't want slide number at bottom right
@@ -38,7 +37,6 @@
 \makeatother
 \renewcommand\footnoterule{}
 \def\newblock{\hskip .11em plus .33em minus .07em}
-
 \title[ITHIM]{A Discussion about ITHIM and Its Future Implementation}
 \author[Younkin et al.]{\small{Samuel Younkin, Jason Vargo, Maggie Grabow, Jonathan Patz}}
 \institute{Global Health Institute\\University of Wisconsin-Madison}
@@ -48,10 +46,6 @@
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{document}
 \frame{\titlepage}
-\section{Introduction}
-\begin{frame}[fragile]
-\frametitle{Introduction}
-\end{frame}
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -62,54 +56,106 @@
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\section{Introduction}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{frame}{Introduction}
+Samuel G. Younkin, Ph.D.
+\bi\item R programmer from the World of Biostats \& Epi.
+\item Contracting with GHI for Summer
+\item C.V.
+\bi \item Research Associate: UW-Madison, Department of Biostatistics
+\& Medical Informatics
+\item Postdoctoral Fellow: Johns Hopkins Bloomberg, School of Public Health
+\item Ph.D.: Case Western Reserve University, School of Medicine
+\item \url{https://github.com/syounkin}
+\ei\ei
+\end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \section{ITHIM}
-\subsection{Relative Risk vs.\ Exposure}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{frame}[fragile]
-\frametitle{Relative Risk vs.\ Exposure}
-We model the relative risk, $\varphi(x^\prime)$, as a function of
-transformed exposure.
-\begin{equation}
-\varphi\left(\tilde{x}\right) = e^{r \tilde{x}}
-\end{equation}
-\bi
-\item $r=\log\left(\varphi_1\right)$ \bi\item$\varphi_1$ is ``RR 1 MET'' in the EXCEL workbook\ei
-\item $\tilde{x}=x^k$, $k=0.25,0.375,0.5,\ldots$
+\frametitle{ITHIM}
+\bi \item The ITHIM Model is composed of three exposures
+\bi \item Active Transport, $\mathrm{AT}$, $\frac{\mathrm{MET}\cdot\mathrm{hrs}}{\mathrm{week}}$
+\item Air Particulates, $\mathrm{PM}_{25}$, units?
+\item Road Exposure, $x_\mathrm{road}$, $\frac{\mathrm{person}\cdot\mathrm{miles}}{\mathrm{week}}$
 \ei
-\bi
-\item How can we update the estimates for $\varphi_1$ and $k$?
-\item Is it better to vary $k$ by disease?\ei
-\end{frame}
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\subsection{METs}
-\begin{frame}[fragile]
-\frametitle{METs}
-\bi
-\item $\mathbf{\mathrm{MET}}_\mathrm{cycling} = 6\ \mathrm{METs}$
-\item $\mathbf{\mathrm{MET}}_\mathrm{walking} = f\left( \mu_s  \right) \mathrm{METs}$
-\ei
-\begin{equation}
-f(\mu_s) = \begin{cases} 1.2\mu_s + 0.08 &\mbox{if } \mu_s \ge 2.02\ \mathrm{kph} \\
-2.5 & \mbox{if } \mu_s < 2.02\ \mathrm{kph}\end{cases}
-\end{equation}
-\bi
-\item Why are the two treated differently?
-\item Should we model cycling METs as a function of cycling speed?
-\item Note that model exposure is in terms of $\frac{\mathrm{MET}\cdot\mathrm{hrs}}{\mathrm{week}}$
+\item ITHIM models a collection of responses (including road injuries)
+  and sums over disease to provide an overall burden of
+  disease
 \ei
 \end{frame}
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%% \subsection{$\mathrm{RR}_\mathrm{1MET}$}
-%% \begin{frame}[fragile]
-%% \frametitle{$\mathrm{RR}_\mathrm{1MET}$}
-%% \bi
-%% \item Physical Act. RRs worksheet contains values for $\varphi_1$, given fixed $k$ for each disease
-%% \item $\varphi_1$ is estimated using values for $x_{\textrm{lit}}$ and $\varphi(x_{\textrm{lit}})$ and a fixed $k$
-%% \ei
-%% \end{frame}
+\subsection{Active Transport}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{frame}[fragile]
+\frametitle{Active Transport}
+\bi
+\item Breast Cancer, Colon Cancer, Depression, Dementia
+\bi\item How do we find good estimates for $\varphi_1$ and $k$?
+\bi\item See slide \ref{RR}\ei
+\item Do these estimates vary by region?
+\item Should we use disease-specific estimates for $k$?
+\ei 
+\ei
+\end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{frame}[fragile]
+\frametitle{Active Transport}
+\bi
+\item Diabetes, IHD, Hypertensive Heart Disease, Lung Cancer, Stroke
+\bi\item Why is non-Travel METs not included in the exposure variable
+for these diseases?\ei
+\ei
+\end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{frame}[fragile]
+\frametitle{Active Transport}
+\bi\item Why is cycling MET expenditure fixed at 6 across age
+group and sex while walking MET expenditure is a function of walking
+speed? 
+\bi\item See Slide \ref{METs}\ei
+\ei
+\end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\subsection{Air Pollution}
+\begin{frame}[fragile]
+\frametitle{Air Pollution}
+\bi\item How do we estimate exposure (baseline and scenario)?
+\item How do we model risk to exposure relationship?
+\bi\item Does the exponential parameter $k$ vary by region or
+disease?\ei
+\item Is the $\mathrm{PM}_{25}$ exposure a function of $x_{\mathrm{road}}$?
+\ei
+\end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\subsection{Road Injuries}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{frame}[fragile]
+\frametitle{Road Injuries}
+\bi\item Best source for regional data on road accidents? 
+\item How do we estimate mutipliers?\ei
+\end{frame}
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -118,10 +164,11 @@ f(\mu_s) = \begin{cases} 1.2\mu_s + 0.08 &\mbox{if } \mu_s \ge 2.02\ \mathrm{kph
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{frame}[fragile]
-\frametitle{R Package}
+\frametitle{R Package, \textit{ITHIM}}
 \bi
+\item \url{https://github.com/syounkin/ITHIM}
 \item Create a list that defines the scenario/baseline model
-\bi \item Define parasmeters \item Compute means, stratified by age and sex \item Retrieve quantiles of active transport time (lognormal with constant $c_v$)\ei
+\bi \item Define parameters \item Compute means, stratified by age and sex \item Retrieve quantiles of active transport time (lognormal with constant $c_v$)\ei
 \ei
 \begin{semiverbatim}
 \begin{lstlisting}
@@ -161,13 +208,16 @@ f(\mu_s) = \begin{cases} 1.2\mu_s + 0.08 &\mbox{if } \mu_s \ge 2.02\ \mathrm{kph
 \frametitle{AF Breast Cancer}
 \begin{semiverbatim}
 \begin{lstlisting}
-> comparitiveRisk <- compareModels(ITHIM.baseline,ITHIM.scenario)
+> comparativeRisk <- compareModels(ITHIM.baseline,ITHIM.scenario)
 \end{lstlisting}
 \end{semiverbatim}
-Foo
 \begin{semiverbatim}
 \begin{lstlisting}
-> with(comparitiveRisk, as.data.frame(lapply(AF[c("BreastCancer","Depression")], function(x) 100*round(x[-(1:2),],4))))
+> with(comparativeRisk, {
+  as.data.frame(lapply(AF[c("BreastCancer","Depression")],
+    function(x) 100*round(x[-(1:2),],4))
+  )
+)
 
 ##           BreastCancer.M BreastCancer.F Depression.M Depression.F
 ## ageClass3              0           1.92         2.36         3.19
@@ -182,4 +232,54 @@ Foo
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\section{Appendix}
+\subsection{Relative Risk vs.\ Exposure}
+\begin{frame}[fragile]
+\label{RR}
+\frametitle{Relative Risk vs.\ Exposure}
+We model the relative risk, $\varphi(x^\prime)$, as a function of
+transformed exposure.
+\begin{equation}
+\varphi\left(\tilde{x}\right) = e^{r \tilde{x}}
+\end{equation}
+\bi
+\item $r=\log\left(\varphi_1\right)$ \bi\item$\varphi_1$ is ``RR 1 MET'' in the EXCEL workbook\ei
+\item $\tilde{x}=x^k$, $k=0.25,0.375,0.5,\ldots$
+\ei
+\bi
+\item How can we update the estimates for $\varphi_1$ and $k$?
+\item Is it better to vary $k$ by disease?\ei
+\end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\subsection{METs}
+\begin{frame}[fragile]
+\label{METs}
+\frametitle{METs}
+\bi
+\item $\mathbf{\mathrm{MET}}_\mathrm{cycling} = 6\ \mathrm{METs}$
+\item $\mathbf{\mathrm{MET}}_\mathrm{walking} = f\left( \mu_s  \right) \mathrm{METs}$
+\ei
+\begin{equation}
+f(\mu_s) = \begin{cases} 1.2\mu_s + 0.08 &\mbox{if } \mu_s \ge 2.02\ \mathrm{kph} \\
+2.5 & \mbox{if } \mu_s < 2.02\ \mathrm{kph}\end{cases}
+\end{equation}
+\bi
+\item Why are the two treated differently?
+\item Should we model cycling METs as a function of cycling speed?
+\item Note that model exposure is in terms of $\frac{\mathrm{MET}\cdot\mathrm{hrs}}{\mathrm{week}}$
+\ei
+\end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%% \subsection{$\mathrm{RR}_\mathrm{1MET}$}
+%% \begin{frame}[fragile]
+%% \frametitle{$\mathrm{RR}_\mathrm{1MET}$}
+%% \bi
+%% \item Physical Act. RRs worksheet contains values for $\varphi_1$, given fixed $k$ for each disease
+%% \item $\varphi_1$ is estimated using values for $x_{\textrm{lit}}$ and $\varphi(x_{\textrm{lit}})$ and a fixed $k$
+%% \ei
+%% \end{frame}
 \end{document}

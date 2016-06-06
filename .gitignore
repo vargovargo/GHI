@@ -28,3 +28,5 @@ misc
 *.snm
 *.toc
 *.vrb
+*.bbl
+*.blg
