@@ -97,6 +97,20 @@ names(D)<- c("age","sex","AF","disease")
 p <- ggplot(D, aes(age,AF)) + geom_bar(aes(fill=sex), stat = "identity") + facet_grid( disease ~ .) + coord_cartesian(ylim = c(0, 0.1))
 p
 ```
+### Road Injury Array
+```{r road}
+baselineInjuries <- array(dim=c(6,7,3,2))
+injury <- c("fatal","serious")
+road <- c("minor road","major road","motorway")
+vehicle <- c("walk","cycle","bus","car","HGV","mbike")
+dimnames(baselineInjuries) <- list(vehicle,c(vehicle,"NOV"),road,injury)
+
+Data.RoadType <- data.frame(local=c(0.75,0.53,0.0,0.09,0.29,NA,0.09,NA), arterial=c(0.25,0.47,0.96,0.31,0.42,NA,0.31,NA), highway=c(0.0,0,0.04,0.60,0.29,NA,0.60,NA),row.names=c("walk","cycle","bus","car","HGV","LGV","mbike","elec.bike") )
+
+Data.Occupancy <- data.frame(occupancy = c(1.0,1.0,18.9,1.3,1.0,NA,1.0,NA), row.names = c("walk","cycle","bus","car","HGV","LGV","mbike","elec.bike"))
+
+
+```
 # Code Graveyard
 
 ### Active Transport Estimates (Speed and Distance by Transport Mode)
