@@ -50,6 +50,28 @@ Note that some of the AF values will disagree with the EXCEL
 spreadsheet because Diabetes, HHD_Air, CVD_Air and Stroke_Air do not
 combine travel METs with non-travel METs.
 
+```{r parlist}
+AF.sum <- numeric(1e3); i <- 0;
+muwt.vec <- seq(107.1,150,length.out=length(AF.pseudo))
+#muct.vec <- seq(2.7,3.0,length.out=length(AF.pseudo))
+for(muwt in muwt.vec){
+i <- i+1
+parameters <- createParameterList(baseline = FALSE)
+
+parameters <- setParameter(parName="muwt", parValue = muwt, parList = parameters)
+ITHIM.scenario <- list(
+  parameters = parameters <- parameters,
+  means = means <- computeMeanMatrices(parameters),
+  quintiles = quintiles <- getQuintiles(means)
+)
+comparitiveRisk <- compareModels(ITHIM.baseline,ITHIM.scenario)
+AF.sum[i] <- with(comparitiveRisk, sum(100*AF$BreastCancer))
+}
+D <- data.frame(mu.wt = muwt.vec,AF.sum=AF.sum)
+p <- ggplot(D, aes(x = mu.wt, y = AF.sum))
+p + geom_point()
+```
+
 ```{r AF, echo = FALSE}
 with(comparitiveRisk, as.data.frame(lapply(AF[c("BreastCancer","Depression")], function(x) 100*round(x[-(1:2),],4))))
 ```
