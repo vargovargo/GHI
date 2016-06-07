@@ -37,8 +37,8 @@
 \makeatother
 \renewcommand\footnoterule{}
 \def\newblock{\hskip .11em plus .33em minus .07em}
-\title[ITHIM]{A Discussion about ITHIM and Its Future Implementation}
-\author[Younkin et al.]{\small{Samuel Younkin, Jason Vargo, Maggie Grabow, Jonathan Patz}}
+\title[]{The Implementation of ITHIM in R}
+\author[]{\small{Samuel Younkin, Jason Vargo, Maggie Grabow, Jonathan Patz}}
 \institute{Global Health Institute\\University of Wisconsin-Madison}
 \date{\tiny{June 2016}}
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -62,7 +62,7 @@
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{frame}{Introduction}
 Samuel G. Younkin, Ph.D.
-\bi\item R programmer from the World of Biostats \& Epi.
+\bi\item R programmer from Biostats \& Genetic Epidemiology
 \item Contracting with GHI for Summer
 \item C.V.
 \bi \item Research Associate: UW-Madison, Department of Biostatistics
@@ -75,100 +75,33 @@ Samuel G. Younkin, Ph.D.
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\section{ITHIM}
+\section{Implementation}
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{frame}[fragile]
-\frametitle{ITHIM}
-\bi \item The ITHIM Model is composed of three exposures
-\bi \item Active Transport, $\mathrm{AT}$, $\frac{\mathrm{MET}\cdot\mathrm{hrs}}{\mathrm{week}}$
-\item Air Particulates, $\mathrm{PM}_{25}$, units?
-\item Road Exposure, $x_\mathrm{road}$, $\frac{\mathrm{person}\cdot\mathrm{miles}}{\mathrm{week}}$
-\ei
-\item ITHIM models a collection of responses (including road injuries)
-  and sums over disease to provide an overall burden of
-  disease
+\frametitle{Vision}
+\bi\item The ITHIM model will be implemented as an R package, \textit{ITHIM}
+\item Web-based user interface, \textit{shiny}, used to access \textit{ITHIM}
+\item Default model parameters are for Madison
+\bi\item Later we will include model parameters for other major cities\ei
+\item User may select a city or manually vary parameters in a ``point-and-click'' environment
 \ei
 \end{frame}
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\subsection{Active Transport}
+\subsection{R Package ITHIM}
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{frame}[fragile]
-\frametitle{Active Transport}
+\frametitle{R Package, ITHIM}
+\begin{center}\url{https://github.com/syounkin/ITHIM}\end{center}
+\bigskip
 \bi
-\item Breast Cancer, Colon Cancer, Depression, Dementia
-\bi\item How do we find good estimates for $\varphi_1$ and $k$?
-\bi\item See slide \ref{RR}\ei
-\item Do these estimates vary by region?
-\item Should we use disease-specific estimates for $k$?
-\ei 
-\ei
-\end{frame}
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\begin{frame}[fragile]
-\frametitle{Active Transport}
-\bi
-\item Diabetes, IHD, Hypertensive Heart Disease, Lung Cancer, Stroke
-\bi\item Why is non-Travel METs not included in the exposure variable
-for these diseases?\ei
-\ei
-\end{frame}
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\begin{frame}[fragile]
-\frametitle{Active Transport}
-\bi\item Why is cycling MET expenditure fixed at 6 across age
-group and sex while walking MET expenditure is a function of walking
-speed? 
-\bi\item See Slide \ref{METs}\ei
-\ei
-\end{frame}
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\subsection{Air Pollution}
-\begin{frame}[fragile]
-\frametitle{Air Pollution}
-\bi\item How do we estimate exposure (baseline and scenario)?
-\item How do we model risk to exposure relationship?
-\bi\item Does the exponential parameter $k$ vary by region or
-disease?\ei
-\item Is the $\mathrm{PM}_{25}$ exposure a function of $x_{\mathrm{road}}$?
-\ei
-\end{frame}
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\subsection{Road Injuries}
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\begin{frame}[fragile]
-\frametitle{Road Injuries}
-\bi\item Best source for regional data on road accidents? 
-\item How do we estimate mutipliers?\ei
-\end{frame}
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\section{R Implementation}
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\begin{frame}[fragile]
-\frametitle{R Package, \textit{ITHIM}}
-\bi
-\item \url{https://github.com/syounkin/ITHIM}
-\item Create a list that defines the scenario/baseline model
-\bi \item Define parameters \item Compute means, stratified by age and sex \item Retrieve quantiles of active transport time (lognormal with constant $c_v$)\ei
+\item The user creates a list that defines the scenario/baseline model
+\bi \item Set model parameters; \texttt{createParameterList}\item Compute means, stratified by age and sex; \texttt{computeMeanMatrices} \item Retrieve quantiles of active transport time (lognormal with constant $c_v$); \texttt{getQuintiles}\ei
 \ei
 \begin{semiverbatim}
 \begin{lstlisting}
@@ -185,6 +118,7 @@ disease?\ei
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{frame}[fragile]
 \frametitle{ITHIM Objects}
+We create one for the baseline and one for the scenario.
 \begin{semiverbatim}
 \begin{lstlisting}
 > ITHIM.baseline <- list(
@@ -206,11 +140,18 @@ disease?\ei
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{frame}[fragile]
 \frametitle{AF Breast Cancer}
+Then compare the two with \texttt{compareModels}.
 \begin{semiverbatim}
 \begin{lstlisting}
 > comparativeRisk <- compareModels(ITHIM.baseline,ITHIM.scenario)
 \end{lstlisting}
 \end{semiverbatim}
+\end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{frame}[fragile]
+\frametitle{AF for Breast Cancer and Depression}
 \begin{semiverbatim}
 \begin{lstlisting}
 > with(comparativeRisk, {
@@ -232,8 +173,129 @@ disease?\ei
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\section{Questions}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{frame}[fragile]
+\frametitle{Questions}
+\bi \item The ITHIM Model is composed of 4 exposure variables
+\bi \item Active Transport, $\mathrm{AT}$, $\frac{\mathrm{MET}\cdot\mathrm{hrs}}{\mathrm{week}}$
+\item Air Particulates, $\mathrm{PM}_{25}$, units?
+\item $\textrm{CO}_2$
+\item Road Exposure, $x_\mathrm{road}$, $\frac{\mathrm{person}\cdot\mathrm{miles}}{\mathrm{week}}$
+\ei\ei
+\end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\subsection{Active Transport}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{frame}[fragile]
+\frametitle{Active Transport}
+\bi
+\item Breast Cancer, Colon Cancer, Depression, Dementia
+\bi\item Should we use the same estimates for relative risk, e.g, $\varphi_1$ and $k$?
+\bi\item See slide \ref{RR}\ei
+\item Do these estimates vary by region?
+\item Should we use disease-specific estimates for $k$?
+\ei 
+\ei
+\end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{frame}[fragile]
+\frametitle{Active Transport}
+\bi
+\item Diabetes, IHD, Hypertensive Heart Disease, Stroke
+\bi\item Why is non-Travel METs not included in the exposure variable
+for these diseases?
+\item Diabetes does not include air pollution, the rest do
+\item Is it just my copy?
+\ei
+\ei
+\end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{frame}[fragile]
+\frametitle{Active Transport}
+\bi\item Cycling MET expenditure is fixed at 6 METs across age
+group and sex, while walking MET expenditure is a function of walking
+speed.
+\bi\item See Slide \ref{METs} \item Is this correct?\ei
+\ei
+\end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\subsection{Air Pollution}
+\begin{frame}[fragile]
+\frametitle{Air Pollution}
+Composed of air particulates, $\mathrm{PM}_{25}$, and vehicle emissions, $\mathrm{CO}_{2}$.
+\end{frame}
+\subsubsection{$\mathrm{PM}_{25}$}
+\begin{frame}[fragile]
+\frametitle{$\mathrm{PM}_{25}$}
+\bi
+\item How were these exposures estimated?
+\item The EXCEL spreadsheet had a table look-up for these values
+\bi\item $\mathrm{PM}_{25}$ is not a function of vehicle miles
+\item it is a characteristic of the region
+\item everyone has the same exposure \ei
+%% \item How do we estimate exposure (baseline and scenario)?
+%% \item How do we model risk to exposure relationship?
+%% \bi\item Does the exponential parameter $k$ vary by region or
+%% disease?\ei
+%% \item Is the $\mathrm{PM}_{25}$ exposure a function of $x_{\mathrm{road}}$?
+\ei
+\end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\subsubsection{$\mathrm{CO}_{2}$}
+\begin{frame}[fragile]
+\frametitle{$\mathrm{CO}_{2}$}
+\bi
+\item How do we attach a regional air pollution model?
+\bi\item EMFAC, BASSTEGG?\ei
+\bi\item Fixed values were used for exposure
+\item The EXCEL spreadsheet did not model exposure as a function of vehicle miles.\ei
+\bi \item $\mathrm{CO}_{2}$ is dependent on the regional vehicle fleet
+\item everyone in the region has the same exposure \ei
+%% \item How do we estimate exposure (baseline and scenario)?
+%% \item How do we model risk to exposure relationship?
+%% \bi\item Does the exponential parameter $k$ vary by region or
+%% disease?\ei
+%% \item Is the $\mathrm{PM}_{25}$ exposure a function of $x_{\mathrm{road}}$?
+\ei
+\end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\subsection{Road Injuries}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{frame}[fragile]
+\frametitle{Road Injuries}
+\bi\item Ask Maggie about how she constructed the one used for her study.\ei
+\end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \section{Appendix}
-\subsection{Relative Risk vs.\ Exposure}
+\begin{frame}[fragile]
+\frametitle{Appendix}
+\begin{center}Appendix\end{center}
+\end{frame}
+\subsection{RR vs.\ Exposure}
 \begin{frame}[fragile]
 \label{RR}
 \frametitle{Relative Risk vs.\ Exposure}
