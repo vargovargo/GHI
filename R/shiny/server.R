@@ -26,31 +26,41 @@ shinyServer(function(input, output) {
 
   # Generate a plot of the requested variable against mpg and only
                                         # include outliers if requested
-
+#browser()
+    
     parameters <- createParameterList(baseline = TRUE)
-    means <- computeMeanMatrices(parameters)
-    quintiles <- getQuintiles(means)
+    means1 <- computeMeanMatrices(parameters)
+    quintiles <- getQuintiles(means1)
 
-    ITHIM.baseline <- list( parameters = parameters, means = means, quintiles = quintiles )
+    ITHIM.baseline <- list( parameters = parameters, means = means1, quintiles = quintiles )
 
+
+
+
+ comparitiveRisk <- reactive({
     parameters <- createParameterList(baseline = FALSE)
-    means <- computeMeanMatrices(parameters)
-    quintiles <- getQuintiles(means)
-
-    ITHIM.scenario <- list( parameters = parameters, means = means, quintiles = quintiles )
-
-#)
-## ITHIM.scenario <- list(
-##   parameters = parameters <- createParameterList(baseline = FALSE),
-##   means = means <- computeMeanMatrices(parameters),
-##   quintiles = quintiles <- getQuintiles(means)
-## )
-    comparitiveRisk <- compareModels(ITHIM.baseline,ITHIM.scenario)
-
-
+    parameters <- setParameter(parName="muwt", parValue = input$muwt, parList = parameters)
+    parameters <- setParameter(parName="muct", parValue = input$muct, parList = parameters)
+    means2 <- computeMeanMatrices(parameters)
+    quintiles <- getQuintiles(means2)
+    ITHIM.scenario  <- list( parameters = parameters, means = means2, quintiles = quintiles )
+    compareModels(ITHIM.baseline,ITHIM.scenario)
+})
     output$ITHIMPlot <- renderPlot({
+    #        plot(input$muwt)
+            comparitiveRisk <- comparitiveRisk()
       #  hist(comparitiveRisk$RR.baseline[[as.character(input$variable)]]$M[,1])
       plotRR(comparitiveRisk$RR.baseline[[input$variable]],comparitiveRisk$RR.scenario[[input$variable]]) + coord_cartesian(ylim = c(0.75, 1.05))+ggtitle(as.character(input$variable))
 
   })
+
+
+data <- reactive({
+    foo <- comparitiveRisk()
+    data.frame(foo$AF[[input$variable]])
+    })
+    
+    output$values <- renderTable({
+            data()
+              })
 })
