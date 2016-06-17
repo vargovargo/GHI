@@ -14,10 +14,11 @@ library("ggplot2")
 library("reshape2")
 library("plyr")
 ```
+
 ```{r loadITHIM, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE}
 library("devtools")
 install("~/ITHIM/")
-# install_github("syounkin/ITHIM", ref = "devel", force = TRUE)
+# install_github("syounkin/ITHIM", force = TRUE)
 library("ITHIM")
 date()
 ```
@@ -26,14 +27,14 @@ date()
 
 ```{r instantiate}
 ITHIM.baseline <- list(
-  parameters = parameters <- createParameterList(baseline = TRUE),
+  parameters = parameters <- createParameterList(vision = "baseline", region = "national"),
   means = means <- computeMeanMatrices(parameters),
-  quintiles = quintiles <- getQuintiles(means)
+  quintiles = quintiles <- getQuintiles(means, region = "national")
 )
 ITHIM.scenario <- list(
-  parameters = parameters <- createParameterList(baseline = FALSE),
+  parameters = parameters <- createParameterList(vision = "scenario", region = "national"),
   means = means <- computeMeanMatrices(parameters),
-  quintiles = quintiles <- getQuintiles(means)
+  quintiles = quintiles <- getQuintiles(means, region = "national")
 )
 ```
 Now we can compute the attributable fraction (AF).
