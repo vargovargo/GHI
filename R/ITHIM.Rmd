@@ -82,6 +82,12 @@ matrix(unlist(lapply(comparativeRisk$yld.delta,function(x) lapply(x, function(x)
 matrix(unlist(lapply(comparativeRisk$yll.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
 ```
 
+### Example
+
+```{r example}
+example("ITHIM-package")
+```
+
 ### Creating Different Visions
 
 ```{r vision}
