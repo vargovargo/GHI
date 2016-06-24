@@ -79,3 +79,9 @@ tree ~/ITHIM/docs/
 9 directories, 18 files
 rsync -av syounkin@45.55.5.232:~/share/data/ ~/ITHIM/R/data/ &> ~/log/rsync.log 
 brew cask install mactex
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~ GitHub Stuff ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+http://kbroman.org/github_tutorial/pages/fork.html
