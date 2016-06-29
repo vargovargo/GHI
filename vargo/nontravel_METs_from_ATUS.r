@@ -9,14 +9,16 @@ library(plyr)
 
 # activity <- read.table("~/Box Documents/work/CoBenefits/MaggieShare/MET Analysis/AmerTimeUse/atusact_2003.dat", header=T, skip=0, sep=",")
 
-summary <- read.table("~/Box Documents/work/CoBenefits/MaggieShare/MET Analysis/AmerTimeUse/atussum_0311.dat", header=T, skip=0, sep=",")
+summaryFile <- "~/GHI/data/atussum_0311.dat" # ~/Box Documents/work/CoBenefits/MaggieShare/MET Analysis/AmerTimeUse/atussum_0311.dat
+summary <- read.table(summaryFile, header=T, skip=0, sep=",")
 
 # respondants <- read.table("~/Box Documents/work/CoBenefits/MaggieShare/MET Analysis/AmerTimeUse/atusresp_2003.dat", header=T, skip=0, sep=",")
 
 # roster <- read.table("~/Box Documents/work/CoBenefits/MaggieShare/MET Analysis/AmerTimeUse/atusrost_2003.dat", header=T, skip=0, sep=",")
 
+cpsFile <- "~/GHI/data/atuscps_0311.dat" #~/Box Documents/work/CoBenefits/MaggieShare/MET Analysis/AmerTimeUse/atuscps_0311.dat
 
-CPS <- read.table("~/Box Documents/work/CoBenefits/MaggieShare/MET Analysis/AmerTimeUse/atuscps_0311.dat", header=T, skip=0, sep=",")
+CPS <- read.table(cpsFile, header=T, skip=0, sep=",")
 
 CPS.2 <- CPS[,c("TUCASEID", "GESTFIPS", "GEREG","GEMETSTA")]
 CPS.2$IDCHAR <- as.character(CPS.2[,"TUCASEID"])
@@ -94,7 +96,6 @@ use.state2 <- ddply(use2, .(sexcat, agecat2, GESTFIPS), summarise,
               n = length(mets) 
 )
 
-
 use.region2 <- ddply(use2, .(sexcat, agecat2, regcat), summarise, 
               percentile10 <- quantile(mets, 0.10, na.rm=T), 
               percentile30 <- quantile(mets, 0.3, na.rm=T),  
@@ -110,17 +111,24 @@ use.region2 <- ddply(use2, .(sexcat, agecat2, regcat), summarise,
 
 
 state.table <- subset(use.state, metcat == "metro")
-write.csv(state.table, "~/Box Documents/work/CoBenefits/MaggieShare/MET Analysis/AmerTimeUse/stateresults.csv", row.names=F)
-write.csv(use.state2, "~/Box Documents/work/CoBenefits/MaggieShare/MET Analysis/AmerTimeUse/stateresults_quintile.csv", row.names=F)
-write.csv(use.region2, "~/Box Documents/work/CoBenefits/MaggieShare/MET Analysis/AmerTimeUse/regionresults_quintile.csv", row.names=F)
 
+stateResultFile <- "~/GHI/data/stateresults.csv" # ~/Box Documents/work/CoBenefits/MaggieShare/MET Analysis/AmerTimeUse/stateresults.csv
+write.csv(state.table, stateResultFile, row.names=F)
+
+stateResultFile2 <- "~/GHI/data/stateresults.csv" # ~/Box Documents/work/CoBenefits/MaggieShare/MET Analysis/AmerTimeUse/stateresults_quintile.csv"
+write.csv(use.state2, stateResultFile2, row.names=F)
+
+regionResultFile <- "~/GHI/data//regionresults_quintile.csv" #~/Box Documents/work/CoBenefits/MaggieShare/MET Analysis/AmerTimeUse/regionresults_quintile.csv
+
+write.csv(use.region2, regionResultFile, row.names=F)
 
 ggplot(use.region, aes(x=factor(sexcat), y=mean_mets, fill=factor(agecat2))) + geom_bar(stat="identity", alpha=1) +facet_grid(regcat ~ metcat)
 
 ggplot(subset(use.region, metcat != "unclassified"), aes(x=factor(sexcat), y=mean_mets, fill=factor(agecat2))) + geom_bar(stat="identity", alpha=1, position="dodge") +facet_grid(regcat ~ metcat)
 
-
 ggplot(subset(use.state, metcat != "unclassified" & GESTFIPS == 17), aes(x=factor(sexcat), y=mean_min, fill=factor(agecat2))) + geom_bar(stat="identity", alpha=1, position="dodge") +facet_grid(GESTFIPS ~ metcat)
 
 
+zeroMETs <- use$minutes == 0
 
+ggplot(use[!zeroMETs,], aes(x = mets, ..density.., colour = agecat2)) + geom_freqpoly(binwidth=200) + facet_grid(. ~ sexcat) + coord_cartesian(xlim = c(0, 1500))
