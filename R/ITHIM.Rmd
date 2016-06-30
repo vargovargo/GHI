@@ -151,21 +151,21 @@ summary.2c <- mapply(`*`,summary.2b,metkey)
 mets <- rowSums(summary.2c)
 summary.2a$mets <- mets
 
-summary.2a$agecat <- ifelse(summary.2a$TEAGE <5, 1, 
-                     ifelse(summary.2a$TEAGE > 4 & summary.2a$TEAGE < 15, 2, 
-                     ifelse(summary.2a$TEAGE > 14 & summary.2a$TEAGE < 30, 3, 
-                     ifelse(summary.2a$TEAGE > 29 & summary.2a$TEAGE < 45, 4, 
-                     ifelse(summary.2a$TEAGE > 44 & summary.2a$TEAGE < 60, 5, 
-                     ifelse(summary.2a$TEAGE > 59 & summary.2a$TEAGE < 70, 6, 
+summary.2a$agecat <- ifelse(summary.2a$TEAGE <5, 1,
+                     ifelse(summary.2a$TEAGE > 4 & summary.2a$TEAGE < 15, 2,
+                     ifelse(summary.2a$TEAGE > 14 & summary.2a$TEAGE < 30, 3,
+                     ifelse(summary.2a$TEAGE > 29 & summary.2a$TEAGE < 45, 4,
+                     ifelse(summary.2a$TEAGE > 44 & summary.2a$TEAGE < 60, 5,
+                     ifelse(summary.2a$TEAGE > 59 & summary.2a$TEAGE < 70, 6,
                      ifelse(summary.2a$TEAGE > 69 & summary.2a$TEAGE < 80, 7, 8
 )))))))
 
-summary.2a$agecat2 <- ifelse(summary.2a$TEAGE <5, "age0-4", 
-                     ifelse(summary.2a$TEAGE > 4 & summary.2a$TEAGE < 15, "age5-14", 
-                     ifelse(summary.2a$TEAGE > 14 & summary.2a$TEAGE < 30, "age15-29", 
-                     ifelse(summary.2a$TEAGE > 29 & summary.2a$TEAGE < 45, "age30-44", 
-                     ifelse(summary.2a$TEAGE > 44 & summary.2a$TEAGE < 60, "age45-59", 
-                     ifelse(summary.2a$TEAGE > 59 & summary.2a$TEAGE < 70, "age60-69", 
+summary.2a$agecat2 <- ifelse(summary.2a$TEAGE <5, "age0-4",
+                     ifelse(summary.2a$TEAGE > 4 & summary.2a$TEAGE < 15, "age5-14",
+                     ifelse(summary.2a$TEAGE > 14 & summary.2a$TEAGE < 30, "age15-29",
+                     ifelse(summary.2a$TEAGE > 29 & summary.2a$TEAGE < 45, "age30-44",
+                     ifelse(summary.2a$TEAGE > 44 & summary.2a$TEAGE < 60, "age45-59",
+                     ifelse(summary.2a$TEAGE > 59 & summary.2a$TEAGE < 70, "age60-69",
                      ifelse(summary.2a$TEAGE > 69 & summary.2a$TEAGE < 80, "age70-79", "age80+"
 )))))))
 
@@ -185,14 +185,14 @@ use <- use[,c("minutes","mets","agecat2","GESTFIPS","sexcat","regcat","metcat")]
 
 #head(use)
 
-use.region <- ddply(use, .(sexcat, agecat2, regcat, metcat), summarise, 
+use.region <- ddply(use, .(sexcat, agecat2, regcat, metcat), summarise,
              mean_min = mean(minutes, na.rm=T),
              mean_mets = mean(mets, na.rm=T),
              n = length(minutes)
 )
 
 
-use.state <- ddply(use, .(sexcat, agecat2, GESTFIPS, metcat), summarise, 
+use.state <- ddply(use, .(sexcat, agecat2, GESTFIPS, metcat), summarise,
              mean_min = mean(minutes, na.rm=T),
              mean_mets = mean(mets, na.rm=T),
              n = length(minutes)
@@ -201,24 +201,24 @@ use.state <- ddply(use, .(sexcat, agecat2, GESTFIPS, metcat), summarise,
 
 use2 <- subset(use, metcat == "metro")
 
-use.state2 <- ddply(use2, .(sexcat, agecat2, GESTFIPS), summarise, 
-              percentile10 <- quantile(mets, 0.10, na.rm=T), 
-              percentile30 <- quantile(mets, 0.3, na.rm=T),  
+use.state2 <- ddply(use2, .(sexcat, agecat2, GESTFIPS), summarise,
+              percentile10 <- quantile(mets, 0.10, na.rm=T),
+              percentile30 <- quantile(mets, 0.3, na.rm=T),
               percentile50 <- quantile(mets, 0.5, na.rm=T),
-              percentile70 <- quantile(mets, 0.7, na.rm=T), 
-              percentile90 <- quantile(mets, 0.9, na.rm=T), 
-              mean <- mean(mets, na.rm=T), 
-              n = length(mets) 
+              percentile70 <- quantile(mets, 0.7, na.rm=T),
+              percentile90 <- quantile(mets, 0.9, na.rm=T),
+              mean <- mean(mets, na.rm=T),
+              n = length(mets)
 )
 
-use.region2 <- ddply(use2, .(sexcat, agecat2, regcat), summarise, 
-              percentile10 <- quantile(mets, 0.10, na.rm=T), 
-              percentile30 <- quantile(mets, 0.3, na.rm=T),  
+use.region2 <- ddply(use2, .(sexcat, agecat2, regcat), summarise,
+              percentile10 <- quantile(mets, 0.10, na.rm=T),
+              percentile30 <- quantile(mets, 0.3, na.rm=T),
               percentile50 <- quantile(mets, 0.5, na.rm=T),
-              percentile70 <- quantile(mets, 0.7, na.rm=T), 
-              percentile90 <- quantile(mets, 0.9, na.rm=T), 
-              mean <- mean(mets, na.rm=T), 
-              n = length(mets) 
+              percentile70 <- quantile(mets, 0.7, na.rm=T),
+              percentile90 <- quantile(mets, 0.9, na.rm=T),
+              mean <- mean(mets, na.rm=T),
+              n = length(mets)
 )
 
 state.table <- subset(use.state, metcat == "metro")
@@ -273,6 +273,26 @@ foo <- melt(foo)
 foo <- data.frame(foo, x = seq(0,2000,length.out = 1e3), sex = c(matrix(c("F","M"),nrow= nrow(foo)/2, ncol = 2, byrow = TRUE)), agecat = c(matrix(c("15-29","30-44","45-59","60-69","70-79", "80+"),nrow= nrow(foo)/12, ncol = 12, byrow = TRUE)))
 
 ggplot(foo, aes(x,value, colour = agecat)) + geom_line() + facet_grid( . ~ sex) + coord_cartesian(xlim = c(0, 1500))
+
+```
+
+```{r matrices}
+nonTravelMETs <- rbind(0,rbind(0,cbind(parameters$mean_mets[7:12], parameters$mean_mets[1:6])))
+nonTravelMETsNormalized <- nonTravelMETs/nonTravelMETs[3,2]
+meanNonTravelMETs <- nonTravelMETs[3,2]
+
+```
+
+```{r plotMatrix}
+D <- melt(nonTravelMETsNormalized)
+ggplot(D, aes(Var2, value)) + geom_bar(aes(fill=Var1), stat = "identity", position = "dodge")
+```
+
+```{r fooFunction}
+
+probActive <- 0.15
+
+METQuintiles <- mapply(getMETQuintiles, nonTravelMETsNormalized*nonTravelMETs, MoreArgs = list(cv = cv0_mets, p = probActive, size = 1e4), SIMPLIFY = FALSE)
 
 ```
 
