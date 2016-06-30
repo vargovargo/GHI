@@ -249,6 +249,33 @@ Note that `r round(100*sum(zeroMETs)/length(zeroMETs),1)`% of the
 entries were zero minutes and the above densities are for non-zero
 METs only.
 
+```{r nonZeroMETsLogNormal, echo = FALSE, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE}
+parameters <- ddply(use[!zeroMETs,], .(sexcat, agecat2), summarise,
+             mean_min = mean(minutes, na.rm=T),
+             mean_mets = mean(mets, na.rm=T),
+             sd_min = sd(minutes, na.rm=T),
+             sd_mets = sd(mets, na.rm=T)
+)
+cv_mets <- with(parameters, sd_mets/mean_mets)
+cv_min <- with(parameters, sd_min/mean_min)
+cv0_mets<- mean(cv_mets)
+
+mean_mets <- parameters$mean_mets
+sd_mets <- cv0_mets*mean_mets
+
+getLogNormal <- function(mu,sd){
+    dlnorm(seq(0,2000,length.out=1e3), log(mu/sqrt(1+sd^2/mu^2)), sqrt(log(1+sd^2/mu^2)))
+}
+
+foo <- as.data.frame(mapply(getLogNormal, mean_mets, sd_mets))
+names(foo) <- paste0(parameters$sexcat,parameters$agecat2)
+foo <- melt(foo)
+foo <- data.frame(foo, x = seq(0,2000,length.out = 1e3), sex = c(matrix(c("F","M"),nrow= nrow(foo)/2, ncol = 2, byrow = TRUE)), agecat = c(matrix(c("15-29","30-44","45-59","60-69","70-79", "80+"),nrow= nrow(foo)/12, ncol = 12, byrow = TRUE)))
+
+ggplot(foo, aes(x,value, colour = agecat)) + geom_line() + facet_grid( . ~ sex) + coord_cartesian(xlim = c(0, 1500))
+
+```
+
 <!--
 
 # Code Graveyard
