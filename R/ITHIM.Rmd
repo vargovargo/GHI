@@ -296,6 +296,12 @@ METQuintiles <- mapply(getMETQuintiles, nonTravelMETsNormalized*nonTravelMETs, M
 
 ```
 
+### Total Distribution
+
+```{r total}
+foo <- mapply(getTotalDistribution, muTravel = rep(37,2), cvTravel = rep(1.72,2), muNonTravel = rep(10,2), cvNonTravel = rep(1,2), p = rep(0.5,2), pWalk = rep(54.4/64.2,2), vWalk = rep(2.88,2), size = 1e4, SIMPLIFY = FALSE)
+```
+
 <!--
 
 # Code Graveyard
