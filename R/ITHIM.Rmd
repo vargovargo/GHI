@@ -247,12 +247,6 @@ ggplot(use[!zeroMETs,], aes(x = mets, ..density.., colour = agecat2)) + geom_fre
 
 ```
 
-<!--
-     Note that `r round(100*sum(zeroMETs)/length(zeroMETs),1)`% of the
-entries were zero minutes and the above densities are for non-zero
-METs only.
--->
-
 ```{r nonZeroMETsLogNormal, echo = FALSE, message = FALSE, eval = FALSE, warning = FALSE, error = TRUE}
 parameters <- ddply(use[!zeroMETs,], .(sexcat, agecat2), summarise,
              mean_min = mean(minutes, na.rm=T),
@@ -307,6 +301,15 @@ newMETs <- list(Data = D, metaData = metaData)
 ```
 
 ```{r readnewMETs}
+cpsFile <- "~/GHI/data/atuscps_0311.dat"
+cps <- read.table(cpsFile, header=T, skip=0, sep="," )
+cps <- within(cps, {
+    TUCASEID <- as.character(TUCASEID)
+    TULINENO <- as.character(TULINENO)
+    GEREG <- as.factor(GEREG)
+    })
+cps <- subset(cps, TULINENO == "1")
+
 summaryFile <- "~/GHI/data/atussum_0311.dat"
 summary <- read.table(summaryFile, header=T, skip=0, sep=",")
 metaDataColumns <- 1:24
@@ -323,9 +326,15 @@ names(metKey)[!(names(metKey) %in% activities)]
 metKeyVector <- metKey[activities]/60*7
 names(metKeyVector) <- activities
 metKeyMatrix <- matrix(metKeyVector, nrow = nrow(summaryList$Data), ncol = length(metKeyVector), byrow = TRUE)
-METs <- rowSums(summaryList$Data * metKeyMatrix, na.rm = TRUE)
+METs <- data.frame(METs = rowSums(summaryList$Data * metKeyMatrix, na.rm = TRUE), AGE = summaryList$metaData$TEAGE, row.names = summaryList$metaData$TUCASEID)
 hist(METs, breaks = 75)
 ```
+
+```{r dists}
+D <- merge(cps, METs, by.y = "row.names", by.x = "TUCASEID")
+ggplot(D, aes(x = METs, ..density.., colour = GEREG)) + geom_freqpoly()
+```
+
 
 ### Total Distribution
 
