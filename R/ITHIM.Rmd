@@ -109,7 +109,7 @@ ITHIM.baseline$parameters$Rwt
 
 ## Non-Travel METs
 
-```{r vargo, echo = FALSE, eval = TRUE}
+```{r vargo, echo = FALSE, eval = FALSE}
 library(ggplot2)
 library(reshape2)
 library(plyr)
@@ -147,6 +147,8 @@ minutes <- rowSums(summary.2b)
 summary.2a$minutes <- minutes
 
 metkey <- as.matrix(c(3.0,7.3,5.0,6.5,7.5,3.5,5.8,7.8,6.0,8.0,3.8,7.8,8.0,5.3,7.3,9.8,6.3,7.0,7.0,5.0,6.8,3.0,3.5,5.5,6.0,4.0,6.0,3.0,3.0,3.0), nrow = 1, ncol=30)
+
+
 summary.2c <- mapply(`*`,summary.2b,metkey)
 mets <- rowSums(summary.2c)
 summary.2a$mets <- mets
@@ -237,7 +239,7 @@ state.table <- subset(use.state, metcat == "metro")
 #ggplot(subset(use.state, metcat != "unclassified" & GESTFIPS == 17), aes(x=factor(sexcat), y=mean_min, fill=factor(agecat2))) + geom_bar(stat="identity", alpha=1, position="dodge") +facet_grid(GESTFIPS ~ metcat)
 ```
 
-```{r figures, echo = FALSE, eval = TRUE}
+```{r figures, echo = FALSE, message = FALSE, eval = FALSE, warning = FALSE, error = TRUE}
 
 zeroMETs <- use$minutes == 0
 
@@ -245,11 +247,13 @@ ggplot(use[!zeroMETs,], aes(x = mets, ..density.., colour = agecat2)) + geom_fre
 
 ```
 
-Note that `r round(100*sum(zeroMETs)/length(zeroMETs),1)`% of the
+<!--
+     Note that `r round(100*sum(zeroMETs)/length(zeroMETs),1)`% of the
 entries were zero minutes and the above densities are for non-zero
 METs only.
+-->
 
-```{r nonZeroMETsLogNormal, echo = FALSE, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE}
+```{r nonZeroMETsLogNormal, echo = FALSE, message = FALSE, eval = FALSE, warning = FALSE, error = TRUE}
 parameters <- ddply(use[!zeroMETs,], .(sexcat, agecat2), summarise,
              mean_min = mean(minutes, na.rm=T),
              mean_mets = mean(mets, na.rm=T),
@@ -276,24 +280,51 @@ ggplot(foo, aes(x,value, colour = agecat)) + geom_line() + facet_grid( . ~ sex) 
 
 ```
 
-```{r matrices}
+```{r matrices, echo = FALSE, message = FALSE, eval = FALSE, warning = FALSE, error = TRUE}
 nonTravelMETs <- rbind(0,rbind(0,cbind(parameters$mean_mets[7:12], parameters$mean_mets[1:6])))
 nonTravelMETsNormalized <- nonTravelMETs/nonTravelMETs[3,2]
 meanNonTravelMETs <- nonTravelMETs[3,2]
 
 ```
 
-```{r plotMatrix}
+```{r plotMatrix, echo = FALSE, message = FALSE, eval = FALSE, warning = FALSE, error = TRUE}
 D <- melt(nonTravelMETsNormalized)
 ggplot(D, aes(Var2, value)) + geom_bar(aes(fill=Var1), stat = "identity", position = "dodge")
 ```
 
-```{r fooFunction}
-
+```{r fooFunction, echo = FALSE, message = FALSE, eval = FALSE, warning = FALSE, error = TRUE}
 probActive <- 0.15
-
 METQuintiles <- mapply(getMETQuintiles, nonTravelMETsNormalized*nonTravelMETs, MoreArgs = list(cv = cv0_mets, p = probActive, size = 1e4), SIMPLIFY = FALSE)
+```
 
+```{r newMETs}
+newMETsFile <- "~/GHI/data/ATUS_to_METS_key.csv"
+newMETs <- read.csv(file = newMETsFile, stringsAsFactors = FALSE, colClasses = c("character","character","character","character","numeric","character","character","character"))
+dataColumns <- c(1,5)
+D <- newMETs[,dataColumns]
+metaData <- newMETs[,-dataColumns]
+newMETs <- list(Data = D, metaData = metaData)
+```
+
+```{r readnewMETs}
+summaryFile <- "~/GHI/data/atussum_0311.dat"
+summary <- read.table(summaryFile, header=T, skip=0, sep=",")
+metaDataColumns <- 1:24
+summaryList <- list(Data = summary[,-metaDataColumns], metaData = summary[,metaDataColumns])
+activities <- colnames(summaryList$Data)
+metKey <- newMETs$Data$AinsworthMETS
+activityCode <- ifelse(nchar(newMETs$Data$X6.digit.activity.code)==5,paste0("t0",newMETs$Data$X6.digit.activity.code),paste0("t",newMETs$Data$X6.digit.activity.code))
+names(metKey) <- activityCode
+activities[!(activities %in% names(metKey))]
+names(metKey)[!(names(metKey) %in% activities)]
+```
+
+```{r metKey}
+metKeyVector <- metKey[activities]/60*7
+names(metKeyVector) <- activities
+metKeyMatrix <- matrix(metKeyVector, nrow = nrow(summaryList$Data), ncol = length(metKeyVector), byrow = TRUE)
+METs <- rowSums(summaryList$Data * metKeyMatrix, na.rm = TRUE)
+hist(METs, breaks = 75)
 ```
 
 <!--
