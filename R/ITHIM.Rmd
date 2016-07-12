@@ -316,6 +316,7 @@ metaDataColumns <- 1:24
 summaryList <- list(Data = summary[,-metaDataColumns], metaData = summary[,metaDataColumns])
 
 summaryList$metaData <- within(summaryList$metaData,{
+    TESEX <- as.factor(TESEX)
     AGECAT <- ifelse(TEAGE <5, "age0-4",
                      ifelse(TEAGE > 4 & TEAGE < 15, "age5-14",
                      ifelse(TEAGE > 14 & TEAGE < 30, "age15-29",
@@ -334,17 +335,22 @@ rownames(newMETs$metaData) <- activityCode
 ```
 
 ```{r metKey}
-metKeyVector <- metKey[activities]/60*7
+metKeyVector <- (metKey[activities] - min(metKey, na.rm = TRUE))/60*7
 names(metKeyVector) <- activities
 metKeyMatrix <- matrix(metKeyVector, nrow = nrow(summaryList$Data), ncol = length(metKeyVector), byrow = TRUE)
 
 METs <- data.frame(METs = rowSums(summaryList$Data * metKeyMatrix, na.rm = TRUE), AGE = summaryList$metaData$TEAGE, SEX = summaryList$metaData$TESEX, AGECAT = summaryList$metaData$AGECAT, row.names = summaryList$metaData$TUCASEID)
 
+D <- merge(cps, METs, by.y = "row.names", by.x = "TUCASEID")
+ggplot(D, aes(x = METs, ..density.., colour = AGECAT)) + geom_freqpoly() + facet_grid( SEX ~ .)
+#ggplot(D, aes(x = METs, ..density.., colour = SEX)) + geom_freqpoly()
 ```
 
-```{r dists}
-D <- merge(cps, METs, by.y = "row.names", by.x = "TUCASEID")
-ggplot(D, aes(x = METs, ..density.., colour = AGECAT)) + geom_freqpoly() + facet_grid( SEX ~ GEREG )
+```{r paameters}
+parameters <- ddply(D, .(SEX), summarise,
+             mean = mean(METs, na.rm=T),
+             sd = sd(METs, na.rm=T)
+             )
 ```
 
 
