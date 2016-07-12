@@ -314,31 +314,43 @@ summaryFile <- "~/GHI/data/atussum_0311.dat"
 summary <- read.table(summaryFile, header=T, skip=0, sep=",")
 metaDataColumns <- 1:24
 summaryList <- list(Data = summary[,-metaDataColumns], metaData = summary[,metaDataColumns])
+
+summaryList$metaData <- within(summaryList$metaData,{
+    AGECAT <- ifelse(TEAGE <5, "age0-4",
+                     ifelse(TEAGE > 4 & TEAGE < 15, "age5-14",
+                     ifelse(TEAGE > 14 & TEAGE < 30, "age15-29",
+                     ifelse(TEAGE > 29 & TEAGE < 45, "age30-44",
+                     ifelse(TEAGE > 44 & TEAGE < 60, "age45-59",
+                     ifelse(TEAGE > 59 & TEAGE < 70, "age60-69",
+                     ifelse(TEAGE > 69 & TEAGE < 80, "age70-79", "age80+"
+                            )))))))})
+
+
 activities <- colnames(summaryList$Data)
 metKey <- newMETs$Data$AinsworthMETS
 activityCode <- ifelse(nchar(newMETs$Data$X6.digit.activity.code)==5,paste0("t0",newMETs$Data$X6.digit.activity.code),paste0("t",newMETs$Data$X6.digit.activity.code))
 names(metKey) <- activityCode
-activities[!(activities %in% names(metKey))]
-names(metKey)[!(names(metKey) %in% activities)]
+rownames(newMETs$metaData) <- activityCode
 ```
 
 ```{r metKey}
 metKeyVector <- metKey[activities]/60*7
 names(metKeyVector) <- activities
 metKeyMatrix <- matrix(metKeyVector, nrow = nrow(summaryList$Data), ncol = length(metKeyVector), byrow = TRUE)
-METs <- data.frame(METs = rowSums(summaryList$Data * metKeyMatrix, na.rm = TRUE), AGE = summaryList$metaData$TEAGE, row.names = summaryList$metaData$TUCASEID)
-hist(METs, breaks = 75)
+
+METs <- data.frame(METs = rowSums(summaryList$Data * metKeyMatrix, na.rm = TRUE), AGE = summaryList$metaData$TEAGE, SEX = summaryList$metaData$TESEX, AGECAT = summaryList$metaData$AGECAT, row.names = summaryList$metaData$TUCASEID)
+
 ```
 
 ```{r dists}
 D <- merge(cps, METs, by.y = "row.names", by.x = "TUCASEID")
-ggplot(D, aes(x = METs, ..density.., colour = GEREG)) + geom_freqpoly()
+ggplot(D, aes(x = METs, ..density.., colour = AGECAT)) + geom_freqpoly() + facet_grid( SEX ~ GEREG )
 ```
 
 
 ### Total Distribution
 
-```{r total}
+```{r total, eval = FALSE, echo = FALSE}
 foo <- mapply(getTotalDistribution, muTravel = rep(37,2), cvTravel = rep(1.72,2), muNonTravel = rep(10,2), cvNonTravel = rep(1,2), p = rep(0.5,2), pWalk = rep(54.4/64.2,2), vWalk = rep(2.88,2), size = 1e4, SIMPLIFY = FALSE)
 ```
 
