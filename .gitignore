@@ -13,7 +13,6 @@ foo.R
 *.log
 *.toc
 *.pdf
-html
 *.tar.gz
 #*
 GitPrimer
