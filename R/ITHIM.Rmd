@@ -364,11 +364,14 @@ ggplot(D, aes(x = METs, ..density.., colour = AGECAT)) + geom_freqpoly(binwidth 
 
 ```
 
-```{r parameters}
-(parameters <- ddply(D, .(SEX, AGECAT), summarise,
+```{r paameters}
+parameters <- ddply(D, .(SEX, AGECAT), summarise,
              mean = mean(METs, na.rm=T),
              sd = sd(METs, na.rm=T)
-             ))
+             )
+
+METmatrix <- rbind(matrix(0,nrow = 2, ncol = 2), matrix(parameters$mean, ncol = 2))
+METmatrix <- METmatrix/METmatrix[3,2]
 ```
 
 
