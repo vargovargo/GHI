@@ -13,12 +13,13 @@ options(repos='http://cran.rstudio.com/')
 library("ggplot2")
 library("reshape2")
 library("plyr")
-#install("~/ITHIM/")
+
 ```
 
 ```{r loadITHIM, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE}
 library("devtools")
-install_github("syounkin/ITHIM")
+#install_github("syounkin/ITHIM", ref="devel")
+install("~/ITHIM/")
 library("ITHIM")
 ```
 
