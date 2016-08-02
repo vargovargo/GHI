@@ -12,7 +12,7 @@ results, questions, interpreations, notes, etc.-->
 options(repos='http://cran.rstudio.com/')
 library("ggplot2")
 library("reshape2")
-library("plyr")
+library("dplyr")
 ```
 
 ```{r loadITHIM, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE}
@@ -420,11 +420,6 @@ NHTS.trips <- data.frame(HOUSEID = DAYV2PUB$HOUSEID,
                    TRVLCMIN = as.numeric(DAYV2PUB$TRVLCMIN)
                    )
 
-convertToAgeClass <- function(age){
-  age <- as.numeric(age)
-  agecat <- ifelse( age <= 4, "00-04", ifelse( age <= 14, "05-14", ifelse( age <= 29, "15-29", ifelse( age <= 44, "30-44", ifelse( age <= 59, "45-59", ifelse( age <= 69, "60-69", ifelse( age <= 79, "70-79", ifelse( age > 80, "80+", NA))))))))
-  return(agecat)
-}
 
 NHTS.person <- with(PERV2PUB,{
                     data.frame(HOUSEID = HOUSEID,
@@ -438,14 +433,10 @@ NHTS <- merge(NHTS.person, NHTS.trips, by = c("HOUSEID","PERSONID"))
 
 NHTS <- subset(NHTS, !is.na(AGE) & !is.na(SEX))
 
-
-(foo <- ddply(NHTS, .(SEX, AGE, AT), summarise,
-             sum = sum(TRVL_MIN, na.rm=T)
-             ))
-
-
 ggplot(NHTS, aes(x = TRVL_MIN, ..density.., colour = AGE)) + geom_freqpoly(binwidth = 15) + facet_grid( SEX ~ AT) + labs(x = "Foo", colour = "Age") + coord_cartesian(xlim = c(0, 75))
 
+
+NHTS %>% group_by(SEX, AGE) %>% summarize(trips = n())
 
 countPeople <- function(data){
  nrow(data %>% group_by(HOUSEID, PERSONID) %>% summarize(n()))
