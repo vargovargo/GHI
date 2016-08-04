@@ -1,5 +1,5 @@
-
-setwd("~/Box Sync/work/CoBenefits/MaggieShare/VitalStats/CDCwonder/")
+library("plyr")
+#setwd("~/Box Sync/work/CoBenefits/MaggieShare/VitalStats/CDCwonder/")
 
 #######DETAILS ON WONDER QUERY#######
 # ---
@@ -23,7 +23,7 @@ setwd("~/Box Sync/work/CoBenefits/MaggieShare/VitalStats/CDCwonder/")
 # Other land transport accidents
 # (V01,V05-V06,V09.1,V09.3-V09.9,V10-V11,V15-V18,V19.3,V19.8-V19.9,V80.0-V80.2,V80.6-V80.9,V81.2-V81.9,V82.2-V82.9,V87.9,V88.9
 #  V89.1,V89.3,V89.9)
-# 
+#
 # Place of Death: All
 # Race: All
 # Weekday: All
@@ -94,8 +94,9 @@ setwd("~/Box Sync/work/CoBenefits/MaggieShare/VitalStats/CDCwonder/")
 #################################
 #wonder <- read.table("./ITHIM2014_HHS_urb_age_sex_16years.txt", header=T, sep="\t",colClasses=c("Notes"="null"), strip.white=T)
 
-wonder <- read.csv("./HHSmetro_Age_sex_2010-14.csv", header=T)
-names(wonder) <- c("HHSRegion", "HHSRegionCode", "gender", "genderCode","WONDERage","WONDERageCode","ICD10",  "ICD10Code", "deaths5yr", "population5yr", "crudeRate")    
+#wonder <- read.csv("./HHSmetro_Age_sex_2010-14.csv", header=T)
+wonder <- read.csv("./../data/burden/HHSmetro_Age_sex_2010-14.csv", header=T)
+names(wonder) <- c("HHSRegion", "HHSRegionCode", "gender", "genderCode","WONDERage","WONDERageCode","ICD10",  "ICD10Code", "deaths5yr", "population5yr", "crudeRate")
 
 foo <- unique(wonder$HHSRegion)
 foo2 <- unique(wonder$HHSRegionCode)
@@ -125,7 +126,7 @@ wonder$ITHIMage <- ITHIMageKey[as.character(wonder$WONDERage)]
 wonder <- wonder[, c("HHSRegion","gender","ITHIMage","ITHIMcause","deaths5yr","population5yr")]
 
 #depression was not in the WONDER data, since there are no deaths, have to add it manually
-depress <- expand.grid(HHSRegion=unique(wonder$HHSRegion), gender=unique(wonder$gender), 
+depress <- expand.grid(HHSRegion=unique(wonder$HHSRegion), gender=unique(wonder$gender),
                        ITHIMage = unique(wonder$ITHIMage), ITHIMcause = "Depression", deaths5yr = "0", population5yr = "0", stringsAsFactors=T)
 
 
@@ -144,21 +145,21 @@ class(wonder2$population5yr) = "numeric"
 
 
 #summarize by HHS>Urbanization>Gender<age<cause
-wonderSummary <- ddply(wonder2, .(HHSRegion, gender, ITHIMage, ITHIMcause), summarise, 
+wonderSummary <- ddply(wonder2, .(HHSRegion, gender, ITHIMage, ITHIMcause), summarise,
                        numberOfDeaths5yr = sum(as.numeric(as.character(newDeaths)), na.rm=T)
 )
 
-#read in data for single year population 
+#read in data for single year population
 #processed in Excel, to combine two WONDER queries, need to go back and script the processing of the raw WONDER output
-pop14 <- read.csv("./HHSmetro_Age_sex_2014_AllCause.csv", header=T)
+pop14 <- read.csv("./../data/burden/HHSmetro_Age_sex_2014_AllCause.csv", header=T)
 sum(as.numeric(as.character(pop14$Population)),na.rm=T)  #checking US 'Metro' population here 272,667,942
-sum(as.numeric(as.character(pop14$Deaths)),na.rm=T)  #checking US 'Metro' deaths here 2,125,273 
+sum(as.numeric(as.character(pop14$Deaths)),na.rm=T)  #checking US 'Metro' deaths here 2,125,273
 
-names(pop14) <- c("HHSRegion", "HHSRegionCode","gender", "genderCode","WONDERage","WONDERageCode", "deaths2014AllCause", "population2014", "crudeRate2014","random1","random2")  
+names(pop14) <- c("HHSRegion", "HHSRegionCode","gender", "genderCode","WONDERage","WONDERageCode", "deaths2014AllCause", "population2014", "crudeRate2014","random1","random2")
 
 #this is delicate(read sloppy), really need to check the order of age groups returned by the 'unique(pop14$WONDERage)' request
-ITHIMageKey2 <- c("ageClass8", "ageClass1", "ageClass7", "ageClass7", "ageClass6", "ageClass6", "ageClass1", "ageClass5", "ageClass5", 
-                 "ageClass5","ageClass4", "ageClass3", "ageClass4", "ageClass2", "ageClass2", "ageClass3", "ageClass4", "ageClass3", 
+ITHIMageKey2 <- c("ageClass8", "ageClass1", "ageClass7", "ageClass7", "ageClass6", "ageClass6", "ageClass1", "ageClass5", "ageClass5",
+                 "ageClass5","ageClass4", "ageClass3", "ageClass4", "ageClass2", "ageClass2", "ageClass3", "ageClass4", "ageClass3",
                  "ageClass8")
 names(ITHIMageKey2) <- unique(pop14$WONDERage)
 pop14$ITHIMage <- ITHIMageKey2[as.character(pop14$WONDERage)]
@@ -167,9 +168,9 @@ pop14 <-  pop14[, c("HHSRegion","gender","ITHIMage","deaths2014AllCause","popula
 pop14$deaths2014 <- as.numeric(ifelse(pop14$deaths2014 == "Suppressed", sample(0:9), as.numeric(as.character(pop14$deaths2014))))
 
 sum(as.numeric(as.character(pop14$population2014)),na.rm=T)    #checking US 'Metro' population here 272,667,942
-sum(as.numeric(as.character(pop14$deaths2014)),na.rm=T)     #checking US 'Metro' deaths here 2,125,273 
+sum(as.numeric(as.character(pop14$deaths2014)),na.rm=T)     #checking US 'Metro' deaths here 2,125,273
 
-popSummary <- ddply(pop14, .(HHSRegion, gender, ITHIMage), summarise, 
+popSummary <- ddply(pop14, .(HHSRegion, gender, ITHIMage), summarise,
                     population2014 = sum(as.numeric(as.character(population2014)), na.rm=T),
                    AllCauseDeaths2014 = sum(as.numeric(as.character(deaths2014AllCause)), na.rm=T)
 )
@@ -179,7 +180,7 @@ sum(popSummary$AllCauseDeaths2014)
 
 HHSmetroCauseSpecific <- merge(wonderSummary, popSummary)
 
-USGBD <- read.csv("./USGBD.csv", header=T)
+USGBD <- read.csv("./../data/burden/USGBD.csv", header=T)
 USGBD$ITHIMage <- as.character(USGBD$ITHIMage)
 USGBD$ITHIMcause <- as.character(USGBD$ITHIMcause)
 
@@ -200,11 +201,11 @@ levels(burden$sex)  <- c("M","F")
 
 
 burden$sex
-      
+
 burdenOut <- burden[,c("HHSRegion","ITHIMcause","sex","ITHIMage","deaths","YLL","YLD","DALY")]
 names(burdenOut) <- c("HHS","disease","sex","ageClass","dproj","yll","yld","daly")
 
-burdenOut <- burdenOut[order(burdenOut$HHS, burdenOut$disease, burdenOut$sex, burdenOut$ageClass),] 
+burdenOut <- burdenOut[order(burdenOut$HHS, burdenOut$disease, burdenOut$sex, burdenOut$ageClass),]
 
 write.csv(burdenOut, "./HHSburdens.csv", row.names=F)
 
