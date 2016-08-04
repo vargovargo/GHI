@@ -95,7 +95,7 @@ library("plyr")
 #wonder <- read.table("./ITHIM2014_HHS_urb_age_sex_16years.txt", header=T, sep="\t",colClasses=c("Notes"="null"), strip.white=T)
 
 #wonder <- read.csv("./HHSmetro_Age_sex_2010-14.csv", header=T)
-wonder <- read.csv("./../data/burden/HHSmetro_Age_sex_2010-14.csv", header=T)
+wonder <- read.csv("./../data/CDC/HHSmetro_Age_sex_2010-14.csv", header=T)
 names(wonder) <- c("HHSRegion", "HHSRegionCode", "gender", "genderCode","WONDERage","WONDERageCode","ICD10",  "ICD10Code", "deaths5yr", "population5yr", "crudeRate")
 
 foo <- unique(wonder$HHSRegion)
@@ -151,7 +151,7 @@ wonderSummary <- ddply(wonder2, .(HHSRegion, gender, ITHIMage, ITHIMcause), summ
 
 #read in data for single year population
 #processed in Excel, to combine two WONDER queries, need to go back and script the processing of the raw WONDER output
-pop14 <- read.csv("./../data/burden/HHSmetro_Age_sex_2014_AllCause.csv", header=T)
+pop14 <- read.csv("./../data/CDC/HHSmetro_Age_sex_2014_AllCause.csv", header=T)
 sum(as.numeric(as.character(pop14$Population)),na.rm=T)  #checking US 'Metro' population here 272,667,942
 sum(as.numeric(as.character(pop14$Deaths)),na.rm=T)  #checking US 'Metro' deaths here 2,125,273
 
@@ -180,7 +180,7 @@ sum(popSummary$AllCauseDeaths2014)
 
 HHSmetroCauseSpecific <- merge(wonderSummary, popSummary)
 
-USGBD <- read.csv("./../data/burden/USGBD.csv", header=T)
+USGBD <- read.csv("./../data/CDC/USGBD.csv", header=T)
 USGBD$ITHIMage <- as.character(USGBD$ITHIMage)
 USGBD$ITHIMcause <- as.character(USGBD$ITHIMcause)
 
@@ -208,4 +208,3 @@ names(burdenOut) <- c("HHS","disease","sex","ageClass","dproj","yll","yld","daly
 burdenOut <- burdenOut[order(burdenOut$HHS, burdenOut$disease, burdenOut$sex, burdenOut$ageClass),]
 
 write.csv(burdenOut, "./HHSburdens.csv", row.names=F)
-
