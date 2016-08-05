@@ -399,7 +399,7 @@ names(DAYV2PUB) <- c("HOUSEID","PERSONID","FRSTHM","OUTOFTWN","ONTD_P1","ONTD_P2
 
 DAYV2PUB <- within(DAYV2PUB, {
     URBRUR <- as.factor(URBRUR)
-    HHSTFIPS <- as.factor(HHSTFIPS)
+    HHSTATE <- as.factor(HHSTATE)
     MSACAT <- as.factor(MSACAT)
     TRPTRANS <- as.factor(TRPTRANS)
     })
@@ -422,14 +422,57 @@ NHTS.trips <- data.frame(HOUSEID = DAYV2PUB$HOUSEID,
                    )
 
 
+convertToHHS <- function(states){
+  HHSRegions <- matrix(c("CT","ME","MA","NH","RI","VT","NJ","NY","DE","DC","MD","PA","VA","WV","AL","FL","GA","KY","MS","NC","SC","TN","IL","IN","MI","MN","OH","WI","AR","LA","NM","OK","TX","IA","KS","MO","NE","CO","MT","ND","SD","UT","WY","AZ","CA","HI","NV","AK","ID","OR","WA",1,1,1,1,1,1,2,2,3,3,3,3,3,3,4,4,4,4,4,4,4,4,5,5,5,5,5,5,6,6,6,6,6,7,7,7,7,8,8,8,8,8,8,9,9,9,9,10,10,10,10,"HHS1","HHS1","HHS1","HHS1","HHS1","HHS1","HHS2","HHS2","HHS3","HHS3","HHS3","HHS3","HHS3","HHS3","HHS4","HHS4","HHS4","HHS4","HHS4","HHS4","HHS4","HHS4","HHS5","HHS5","HHS5","HHS5","HHS5","HHS5","HHS6","HHS6","HHS6","HHS6","HHS6","HHS7","HHS7","HHS7","HHS7","HHS8","HHS8","HHS8","HHS8","HHS8","HHS8","HHS9","HHS9","HHS9","HHS9","HHS10","HHS10","HHS10","HHS10"), nrow = 51, ncol = 3)
+  StateToHHS <- HHSRegions[,3]
+  names(StateToHHS) <- HHSRegions[,1]
+  return(StateToHHS[states])
+}
+
+countPeople <- function(data){
+ nrow(data %>% group_by(HOUSEID, PERSONID) %>% dplyr::summarize(n()))
+}
+
+tripTime <- function(data, mode = "walk"){
+ return(sum(subset(data, AT == mode)$TRVLCMIN, na.rm = TRUE))
+}
+
+reformatData <- function(data){
+foo <- matrix(unlist(data), nrow = 7, ncol = 2, dimnames = list(paste0("ageClass",2:8), c("F","M")))
+return(foo[,c("M","F")])
+}
+
 NHTS.person <- with(PERV2PUB,{
                     data.frame(HOUSEID = HOUSEID,
                                PERSONID = PERSONID,
                                SEX = as.factor(ifelse(R_SEX=="1", "M", ifelse(R_SEX=="2", "F", NA))),
-                               AGE = as.factor(convertToAgeClass(R_AGE))
+                               AGE = as.factor(convertToAgeClass(R_AGE)),
+                               MSA = ifelse(MSASIZE %in% 1:5, TRUE, FALSE),
+                               HHS = as.factor(convertToHHS(HHSTATE))
+
 )
 })
 
+NHTS.person <- subset( NHTS.person, MSA == TRUE )
+
+NHTS <- merge(NHTS.person, NHTS.trips, by = c("HOUSEID","PERSONID"))
+
+listOfLists <- lapply(split(NHTS, NHTS$HHS),function(x) lapply(split(x, x$SEX), function(x) split(x, x$AGE)))
+
+counts <- lapply(listOfLists, function(x) lapply(x, function(x) lapply(x, countPeople)))
+walkLength <- lapply(listOfLists, function(x) lapply(x, function(x) lapply( x, tripTime, mode = "walk")))
+cycleLength <- lapply(listOfLists, function(x) lapply(x, function(x) lapply( x, tripTime, mode = "cycle")))
+
+countMatrix <- lapply(counts, reformatData)
+walkMatrix <- lapply(walkLength, reformatData)
+cycleMatrix <- lapply(cycleLength, reformatData)
+
+meanWalkList <- mapply(walkMatrix, countMatrix, FUN = "/", SIMPLIFY = FALSE)
+meanCycleList <- mapply(cycleMatrix, countMatrix, FUN = "/", SIMPLIFY = FALSE)
+
+```
+
+```{r NHTSArchive, echo = FALSE, eval = FALSE}
 nMatrix <- ddply( subset(NHTS.person, !is.na(AGE) & !is.na(SEX)), .(SEX, AGE), summarise, count = length(PERSONID))
 sum(nMatrix$count) # 305649 number of people in the PERSON table
 
@@ -437,7 +480,7 @@ foo <- group_by(NHTS.trips, HOUSEID,PERSONID)
 foobar <- dplyr::summarise(foo, n = n())
 nrow(foobar) # 262,934 number of people with trip data
 
-NHTS <- merge(NHTS.person, NHTS.trips, by = c("HOUSEID","PERSONID"))
+
 
 NHTS %>% group_by(HOUSEID, PERSONID) %>% dplyr::summarise( n = n()) # 260,576 people in merged data
 
@@ -447,17 +490,8 @@ ggplot(NHTS, aes(x = TRVL_MIN, ..density.., colour = AGE)) + geom_freqpoly(binwi
 
 
 NHTS %>% group_by(SEX, AGE) %>% dplyr::summarize(count = countPeople(data.frame(HOUSEID = HOUSEID, PERSONID = PERSONID)))
-
-countPeople <- function(data){
- nrow(data %>% group_by(HOUSEID, PERSONID) %>% dplyr::summarize(n()))
-}
-
-
-foo <- lapply(split(NHTS, NHTS$SEX),function(x) split(x, x$AGE))
-counts <- lapply(foo, function(x) lapply(x, countPeople))
-
-
 ```
+
 
 ```{r CDC}
 #setwd("~/Box Sync/work/CoBenefits/MaggieShare/VitalStats/CDCwonder/")
