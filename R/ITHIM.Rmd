@@ -30,6 +30,30 @@ First we use NHTS to estimate mean walking and cycling times.
 
 ### NHTS
 
+#### Create a handful of functions to help parse data
+
+```{r parsely}
+convertToHHS <- function(states){
+  HHSRegions <- matrix(c("CT","ME","MA","NH","RI","VT","NJ","NY","DE","DC","MD","PA","VA","WV","AL","FL","GA","KY","MS","NC","SC","TN","IL","IN","MI","MN","OH","WI","AR","LA","NM","OK","TX","IA","KS","MO","NE","CO","MT","ND","SD","UT","WY","AZ","CA","HI","NV","AK","ID","OR","WA",1,1,1,1,1,1,2,2,3,3,3,3,3,3,4,4,4,4,4,4,4,4,5,5,5,5,5,5,6,6,6,6,6,7,7,7,7,8,8,8,8,8,8,9,9,9,9,10,10,10,10,"HHS1","HHS1","HHS1","HHS1","HHS1","HHS1","HHS2","HHS2","HHS3","HHS3","HHS3","HHS3","HHS3","HHS3","HHS4","HHS4","HHS4","HHS4","HHS4","HHS4","HHS4","HHS4","HHS5","HHS5","HHS5","HHS5","HHS5","HHS5","HHS6","HHS6","HHS6","HHS6","HHS6","HHS7","HHS7","HHS7","HHS7","HHS8","HHS8","HHS8","HHS8","HHS8","HHS8","HHS9","HHS9","HHS9","HHS9","HHS10","HHS10","HHS10","HHS10"), nrow = 51, ncol = 3)
+  StateToHHS <- HHSRegions[,3]
+  names(StateToHHS) <- HHSRegions[,1]
+  return(StateToHHS[states])
+}
+
+countPeople <- function(data){
+ nrow(data %>% group_by(HOUSEID, PERSONID) %>% dplyr::summarize(n()))
+}
+
+tripTime <- function(data, mode = "walk"){
+ return(sum(subset(data, AT == mode)$TRVLCMIN, na.rm = TRUE))
+}
+
+reformatData <- function(data){
+foo <- matrix(unlist(data), nrow = 7, ncol = 2, dimnames = list(paste0("ageClass",2:8), c("F","M")))
+return(foo[,c("M","F")])
+}
+```
+
 #### Read Two of the Four NHTS Data Tables
 
 ```{r NHTS}
@@ -67,35 +91,10 @@ NHTS.person <- with(PERV2PUB,{
 )
 })
 ```
-#### Create a handful of functions to help parse data
-
-```{r parsely}
-convertToHHS <- function(states){
-  HHSRegions <- matrix(c("CT","ME","MA","NH","RI","VT","NJ","NY","DE","DC","MD","PA","VA","WV","AL","FL","GA","KY","MS","NC","SC","TN","IL","IN","MI","MN","OH","WI","AR","LA","NM","OK","TX","IA","KS","MO","NE","CO","MT","ND","SD","UT","WY","AZ","CA","HI","NV","AK","ID","OR","WA",1,1,1,1,1,1,2,2,3,3,3,3,3,3,4,4,4,4,4,4,4,4,5,5,5,5,5,5,6,6,6,6,6,7,7,7,7,8,8,8,8,8,8,9,9,9,9,10,10,10,10,"HHS1","HHS1","HHS1","HHS1","HHS1","HHS1","HHS2","HHS2","HHS3","HHS3","HHS3","HHS3","HHS3","HHS3","HHS4","HHS4","HHS4","HHS4","HHS4","HHS4","HHS4","HHS4","HHS5","HHS5","HHS5","HHS5","HHS5","HHS5","HHS6","HHS6","HHS6","HHS6","HHS6","HHS7","HHS7","HHS7","HHS7","HHS8","HHS8","HHS8","HHS8","HHS8","HHS8","HHS9","HHS9","HHS9","HHS9","HHS10","HHS10","HHS10","HHS10"), nrow = 51, ncol = 3)
-  StateToHHS <- HHSRegions[,3]
-  names(StateToHHS) <- HHSRegions[,1]
-  return(StateToHHS[states])
-}
-
-countPeople <- function(data){
- nrow(data %>% group_by(HOUSEID, PERSONID) %>% dplyr::summarize(n()))
-}
-
-tripTime <- function(data, mode = "walk"){
- return(sum(subset(data, AT == mode)$TRVLCMIN, na.rm = TRUE))
-}
-
-reformatData <- function(data){
-foo <- matrix(unlist(data), nrow = 7, ncol = 2, dimnames = list(paste0("ageClass",2:8), c("F","M")))
-return(foo[,c("M","F")])
-}
-```
-
 #### Subset and Merge
 
 ```{r subset}
 NHTS.person <- subset( NHTS.person, MSA == TRUE )
-
 NHTS <- merge(NHTS.person, NHTS.trips, by = c("HOUSEID","PERSONID"))
 ```
 
@@ -111,14 +110,18 @@ listOfLists <- lapply(split(NHTS, NHTS$HHS),function(x) lapply(split(x, x$SEX), 
 counts <- lapply(listOfLists, function(x) lapply(x, function(x) lapply(x, countPeople)))
 walkLength <- lapply(listOfLists, function(x) lapply(x, function(x) lapply( x, tripTime, mode = "walk")))
 cycleLength <- lapply(listOfLists, function(x) lapply(x, function(x) lapply( x, tripTime, mode = "cycle")))
-
 countMatrix <- lapply(counts, reformatData)
 walkMatrix <- lapply(walkLength, reformatData)
 cycleMatrix <- lapply(cycleLength, reformatData)
+meanWalkList <- mapply(walkMatrix,   countMatrix, FUN = function(x,y) x/y*7, SIMPLIFY = FALSE)
+meanCycleList <- mapply(cycleMatrix, countMatrix, FUN = function(x,y) x/y*7, SIMPLIFY = FALSE)
+```
 
-(meanWalkList <- mapply(walkMatrix,   countMatrix, FUN = function(x,y) x/y*7, SIMPLIFY = FALSE))
-(meanCycleList <- mapply(cycleMatrix, countMatrix, FUN = function(x,y) x/y*7, SIMPLIFY = FALSE))
-
+```{r showMatrices}
+meanWalkList$HHS1
+meanWalkList$HHS2
+meanCycleList$HHS1
+meanCycleList$HHS2
 ```
 
 ### CDC Mortality
@@ -127,13 +130,11 @@ Next we parse the output of a CDC Wonder query to estimate mortality rates.
 
 The data files in ~/Box Sync/work/CoBenefits/MaggieShare/VitalStats/CDCwonder/.
 
-#### Query Results File
+#### Query Results File (HHSmetro_Age_sex_2010-14.csv)
 
 ```{r CDC}
-wonder <- read.csv("./../data/CDC/HHSmetro_Age_sex_2010-14.csv", header=T)
+wonder <- read.csv("./../data/CDCwonder/HHSmetro_Age_sex_2010-14.csv", header=T)
 names(wonder) <- c("HHSRegion", "HHSRegionCode", "gender", "genderCode","WONDERage","WONDERageCode","ICD10",  "ICD10Code", "deaths5yr", "population5yr", "crudeRate")
-
-#HHSRegions <- matrix(c("CT","ME","MA","NH","RI","VT","NJ","NY","DE","DC","MD","PA","VA","WV","AL","FL","GA","KY","MS","NC","SC","TN","IL","IN","MI","MN","OH","WI","AR","LA","NM","OK","TX","IA","KS","MO","NE","CO","MT","ND","SD","UT","WY","AZ","CA","HI","NV","AK","ID","OR","WA",1,1,1,1,1,1,2,2,3,3,3,3,3,3,4,4,4,4,4,4,4,4,5,5,5,5,5,5,6,6,6,6,6,7,7,7,7,8,8,8,8,8,8,9,9,9,9,10,10,10,10,"HHS1","HHS1","HHS1","HHS1","HHS1","HHS1","HHS2","HHS2","HHS3","HHS3","HHS3","HHS3","HHS3","HHS3","HHS4","HHS4","HHS4","HHS4","HHS4","HHS4","HHS4","HHS4","HHS5","HHS5","HHS5","HHS5","HHS5","HHS5","HHS6","HHS6","HHS6","HHS6","HHS6","HHS7","HHS7","HHS7","HHS7","HHS8","HHS8","HHS8","HHS8","HHS8","HHS8","HHS9","HHS9","HHS9","HHS9","HHS10","HHS10","HHS10","HHS10"), nrow=51,ncol=3)
 
 wonder <- subset(wonder, WONDERageCode != "NS") # remove 'Not stated' Age entries
 ```
@@ -171,46 +172,48 @@ wonder <- within( wonder, {
 10 HHS x 2 sex x 8 age x 13 disease = 2,080 strata.
 
 ```{r summary}
-wonderSummary <- ddply(wonder2, .(HHSRegion, gender, ITHIMage, ITHIMcause), summarise,
+wonderSummary <- ddply(wonder, .(HHSRegion, gender, ITHIMage, ITHIMcause), summarise,
                        numberOfDeaths5yr = sum(as.numeric(as.character(newDeaths)), na.rm=T)
 )
 ```
 
-#### Single Year Data File
+#### Single Year Data File (HHSmetro_Age_sex_2014_AllCause.csv)
+
+Read in data for single year population.  Processed in Excel, to
+combine two WONDER queries, need to go back and script the processing
+of the raw WONDER output
 
 ```{r singleyear}
-#read in data for single year population
-#processed in Excel, to combine two WONDER queries, need to go back and script the processing of the raw WONDER output
-pop14 <- read.csv("./../data/CDC/HHSmetro_Age_sex_2014_AllCause.csv", header=T)
-sum(as.numeric(as.character(pop14$Population)),na.rm=T)  #checking US 'Metro' population here 272,667,942
-sum(as.numeric(as.character(pop14$Deaths)),na.rm=T)  #checking US 'Metro' deaths here 2,125,273
+pop14 <- read.csv("./../data/CDCwonder/HHSmetro_Age_sex_2014_AllCause.csv", header=T)
+
 
 names(pop14) <- c("HHSRegion", "HHSRegionCode","gender", "genderCode","WONDERage","WONDERageCode", "deaths2014AllCause", "population2014", "crudeRate2014","random1","random2")
+```
+This is delicate(read sloppy), really need to check the order of age groups returned by the 'unique(pop14$WONDERage)' command.
 
-#this is delicate(read sloppy), really need to check the order of age groups returned by the 'unique(pop14$WONDERage)' request
-ITHIMageKey2 <- c("ageClass8", "ageClass1", "ageClass7", "ageClass7", "ageClass6", "ageClass6", "ageClass1", "ageClass5", "ageClass5",
-                 "ageClass5","ageClass4", "ageClass3", "ageClass4", "ageClass2", "ageClass2", "ageClass3", "ageClass4", "ageClass3",
-                 "ageClass8")
+```{r sloppy}
+ITHIMageKey2 <- c("ageClass8", "ageClass1", "ageClass7", "ageClass7", "ageClass6", "ageClass6", "ageClass1", "ageClass5", "ageClass5","ageClass5","ageClass4", "ageClass3", "ageClass4", "ageClass2", "ageClass2", "ageClass3", "ageClass4", "ageClass3","ageClass8")
 names(ITHIMageKey2) <- unique(pop14$WONDERage)
 pop14$ITHIMage <- ITHIMageKey2[as.character(pop14$WONDERage)]
+```
 
+```{r foop}
 pop14 <-  pop14[, c("HHSRegion","gender","ITHIMage","deaths2014AllCause","population2014")]
-pop14$deaths2014 <- as.numeric(ifelse(pop14$deaths2014 == "Suppressed", sample(0:9), as.numeric(as.character(pop14$deaths2014))))
-
-sum(as.numeric(as.character(pop14$population2014)),na.rm=T)    #checking US 'Metro' population here 272,667,942
-sum(as.numeric(as.character(pop14$deaths2014)),na.rm=T)     #checking US 'Metro' deaths here 2,125,273
+pop14$deaths2014 <- as.numeric(ifelse(pop14$deaths2014 == "Suppressed", sample(1:9), as.numeric(as.character(pop14$deaths2014))))
 
 popSummary <- ddply(pop14, .(HHSRegion, gender, ITHIMage), summarise,
                     population2014 = sum(as.numeric(as.character(population2014)), na.rm=T),
                    AllCauseDeaths2014 = sum(as.numeric(as.character(deaths2014AllCause)), na.rm=T)
 )
 
-sum(popSummary$population2014) #checking US population here 272,667,942
-sum(popSummary$AllCauseDeaths2014)
-
 HHSmetroCauseSpecific <- merge(wonderSummary, popSummary)
+```
+#### Read USGBD file (USGBD.csv)
 
-USGBD <- read.csv("./../data/CDC/USGBD.csv", header=T)
+Presumably this comes from an EXCEL file.
+
+```{r USGBD}
+USGBD <- read.csv("./../data/CDCwonder/USGBD.csv", header=T)
 USGBD$ITHIMage <- as.character(USGBD$ITHIMage)
 USGBD$ITHIMcause <- as.character(USGBD$ITHIMcause)
 
@@ -221,26 +224,23 @@ burden$YLL <- burden$ratio * (burden$GBDyll/burden$GBDpop) * burden$population20
 burden$YLD <- burden$ratio * (burden$GBDyld/burden$GBDpop) * burden$population2014
 burden$DALY <- burden$ratio * (burden$GBDdaly/burden$GBDpop) * burden$population2014
 
-#gah <- subset(burden, ITHIMcause == "RespiratoryDisease")
-
-#ggplot(gah, aes(x=ITHIMage, y=YLD, fill=factor(HHSRegion))) + geom_bar(stat="identity") + geom_point(aes(y=GBDyld)) + facet_grid(gender ~ .)
-#ggplot(gah, aes(x=ITHIMage, y=DALY)) + geom_bar(stat="identity") + geom_point(aes(y=GBDdaly)) + facet_grid(gender ~ HHSRegion)
-
 burden$sex <- factor(ifelse(burden$gender == "Male","M","F"))
 levels(burden$sex)  <- c("M","F")
-
-
-burden$sex
 
 burdenOut <- burden[,c("HHSRegion","ITHIMcause","sex","ITHIMage","deaths","YLL","YLD","DALY")]
 names(burdenOut) <- c("HHS","disease","sex","ageClass","dproj","yll","yld","daly")
 
 burdenOut <- burdenOut[order(burdenOut$HHS, burdenOut$disease, burdenOut$sex, burdenOut$ageClass),]
 
-write.csv(burdenOut, "./HHSburdens.csv", row.names=F)
-
+#write.csv(burdenOut, "./HHSburdens.csv", row.names=F)
 ```
 
+```{r burdenList}
+burdenList <- lapply(split(burdenOut, burdenOut$HHS),function(x) lapply(split(x, x$disease), function(x) split(x, x$sex)))
+burdenList[[10]][[10]][[1]]
+```
+
+<!--
 #### DETAILS ON WONDER QUERY
 
 Dataset: Underlying Cause of Death, 1999-2014
@@ -331,10 +331,11 @@ slightly from previously published reports, due to use of the population estimat
 10. The population figures used in the calculation of death rates for the age group 'under 1 year' are the estimates of the
 resident population that is under one year of age. More information: http://wonder.cdc.gov/wonder/help/ucd.html#Age Group.
 
+-->
+
 ## Non-Travel METs
 
-
-```{r newMETs, echo = FALSE}
+```{r newMETs, echo = TRUE}
 newMETsFile <- "~/GHI/data/ATUS/ATUS_to_METS_key.csv"
 newMETs <- read.csv(file = newMETsFile, stringsAsFactors = FALSE, colClasses = c("character","character","character","character","numeric","character","character","character"))
 dataColumns <- c(1,5)
@@ -356,7 +357,7 @@ names(metKey) <- activityCode
 
 ```
 
-```{r readnewMETs, echo = FALSE}
+```{r readnewMETs, echo = TRUE}
 cpsFile <- "~/GHI/data/ATUS/atuscps_0311.dat"
 cps <- read.table(cpsFile, header=T, skip=0, sep="," )
 cps <- within(cps, {
@@ -387,7 +388,7 @@ summaryList$metaData <- within(summaryList$metaData,{
 
 We shift the MET estimates by the minimum value so that the new minimum MET estimate is zero.
 
-```{r metKey, echo = FALSE}
+```{r metKey, echo = TRUE}
 allActivities <- colnames(summaryList$Data)
 nonTravelActivities <- rownames(newMETs$metaData)[which(newMETs$metaData$Travel.related..Y.N. == "N")]
 nonTravelActivities <- nonTravelActivities[which(nonTravelActivities %in% allActivities)]
@@ -407,7 +408,7 @@ ggplot(D, aes(x = METs, ..density.., colour = AGECAT)) + geom_freqpoly(binwidth 
 
 ```
 
-```{r paameters}
+```{r parameters}
 (parameters <- ddply(D, .(SEX, AGECAT), summarise,
              mean = mean(METs, na.rm=T),
              sd = sd(METs, na.rm=T)
@@ -417,9 +418,7 @@ METmatrix <- rbind(matrix(0,nrow = 2, ncol = 2), matrix(parameters$mean, ncol = 
 (METmatrix <- METmatrix/METmatrix[3,2])
 ```
 
-## Appendix
-
-### Bay Area
+## Bay Area
 
 First we define the baseline and scenario objects.
 
@@ -434,24 +433,24 @@ Next we compare the scenario to the baseline using compareModels().
 comparativeRisk <- compareModels(ITHIM.baseline,ITHIM.scenario)
 ```
 
-#### Deaths
+### Deaths
 ```{r show, echo = FALSE}
 matrix(unlist(lapply(comparativeRisk$dproj.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
 ```
-#### DALY
+### DALY
 ```{r show2, echo = FALSE}
 matrix(unlist(lapply(comparativeRisk$daly.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
 ```
-#### YLD
+### YLD
 ```{r show3, echo = FALSE}
 matrix(unlist(lapply(comparativeRisk$yld.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
 ```
-#### YLL
+### YLL
 ```{r show4, echo = FALSE}
 matrix(unlist(lapply(comparativeRisk$yll.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
 ```
 
-### National
+## National
 
 ```{r instantiate2}
 ITHIM.baseline <- createITHIM(vision = "baseline", region = "national")
@@ -462,15 +461,15 @@ ITHIM.scenario <- createITHIM(vision = "scenario", region = "national")
 comparativeRisk <- compareModels(ITHIM.baseline,ITHIM.scenario)
 ```
 
-#### Deaths
+### Deaths
 ```{r show222, echo = FALSE}
 matrix(unlist(lapply(comparativeRisk$dproj.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
 ```
-#### DALY
+### DALY
 ```{r show22, echo = FALSE}
 matrix(unlist(lapply(comparativeRisk$daly.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
 ```
-#### YLD
+### YLD
 ```{r show23, echo = FALSE}
 matrix(unlist(lapply(comparativeRisk$yld.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
 ```
@@ -479,7 +478,7 @@ matrix(unlist(lapply(comparativeRisk$yld.delta,function(x) lapply(x, function(x)
 matrix(unlist(lapply(comparativeRisk$yll.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
 ```
 
-### Example
+## Example
 
 ```{r example}
 example("ITHIM-package")
@@ -496,12 +495,19 @@ comparativeRisk <- compareModels(ITHIM.baseline,ITHIM.vision)
 matrix(unlist(lapply(comparativeRisk$yll.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
 ```
 
-### Interrogate Parameters
+## Interrogate Parameters
 
 ```{r params}
 names(ITHIM.baseline$parameters)
 ITHIM.baseline$parameters$NonTravelMETs
 ITHIM.baseline$parameters$Rwt
+```
+
+## Appendix
+
+```{r appendix}
+date()
+sessionInfo()
 ```
 
 <!--
@@ -1056,9 +1062,3 @@ saveRDS(object = Data.Mortality, file = "./data/Data.Mortality.rds")
 saveRDS(object = Data.Mortality.Table, file = "./data/Data.Mortality.Table.rds")
 ```
 -->
-### Appendix
-
-```{r appendix}
-date()
-sessionInfo()
-```
