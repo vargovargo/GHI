@@ -1,0 +1,48 @@
+* Model Input
+** Regional Parameters
+*** Tw, Tc
+**** Simplify
+ Replace F, Rws, Rct, Rws and cv with Tw and Tc.  Rws unecessary if we
+ treat walking METs like cycling METs and cv as constant or a function
+ of something
+**** Tw is the mean walking time matrix, likewise with Tc and cycling
+ So, it is simply a question of estimating the means per stratum.
+*** M
+**** A matrix of mean non-travel MET-hrs./week
+**** cv is assumed constant
+*** D
+**** An array of region-specific disease burdens
+** Model Parameters
+*** RR
+**** Relative risk vs. exposure curves
+**** This definition will affect the defintion of M
+**** Waiting on Woodcock
+
+
+
+* Database
+** Parameter Collections
+*** HHS metro-regions
+ We group all metro regions into one for each of ten non-overlapping
+ regions (HHS) across the U.S.
+**** ITHIM object
+ When a parameter is missing we use the national average defined by Jeff at CDC
+
+
+* Tw, Tc (Sam)
+** Average time walking or cycling as transport
+** Transportation Survey Data
+** Ask Vargo to describe what data we currently have access to.
+** Investigate Spak's methods
+*** Look like he can get tract, county and MSA data from ACS
+**** How does he do that?
+
+* M (Sam)
+** Use ATUS data at some regional level
+ Is this the same definition of region as with D?
+
+* D (Vargo)
+*** Query CDC Wonder to get mortality rates at the HHS regional level
+
+* RR (Vargo)
+** Follow up with Woodcock about availability of RR curves

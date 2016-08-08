@@ -15,6 +15,10 @@ R Packages
 - [ITHIM][ithim]
 - [manual][manual]
 
+Tableau
+-------
+- [Figures][tableau]
+
 Documentation
 -------------
 - [Tutorial][tut]
@@ -26,3 +30,4 @@ Documentation
 [shiny]: https://ithim.shinyapps.io/ITHIM-UI/
 [manual]: ./ITHIM.pdf
 [cedar]: http://www.cedar.iph.cam.ac.uk/research/modelling/ithim/
+[tableau]: ./tableau/tableau.html
