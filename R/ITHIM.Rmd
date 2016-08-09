@@ -49,7 +49,9 @@ tripTime <- function(data, mode = "walk"){
 }
 
 reformatData <- function(data){
-foo <- matrix(unlist(data), nrow = 7, ncol = 2, dimnames = list(paste0("ageClass",2:8), c("F","M")))
+foo <- matrix(unlist(data), nrow = 7, ncol = 2)
+foo <- rbind( c(0.1, 0.1), foo)
+dimnames(foo) <- list(paste0("ageClass",1:8), c("F","M"))
 return(foo[,c("M","F")])
 }
 ```
@@ -115,6 +117,12 @@ walkMatrix <- lapply(walkLength, reformatData)
 cycleMatrix <- lapply(cycleLength, reformatData)
 meanWalkList <- mapply(walkMatrix,   countMatrix, FUN = function(x,y) x/y*7, SIMPLIFY = FALSE)
 meanCycleList <- mapply(cycleMatrix, countMatrix, FUN = function(x,y) x/y*7, SIMPLIFY = FALSE)
+RwtList <- lapply( meanWalkList, function(x) ifelse(x == 0, 0.01, x) )
+RctList <- lapply( meanCycleList, function(x) ifelse(x == 0, 0.01, x) )
+RwtList <- lapply( RwtList, function(x) x/x[3,2] )
+RctList <- lapply( RctList, function(x) x/x[3,2] )
+muwtList <- lapply( meanWalkList, function(x) x[3,2] )
+muctList <- lapply( meanCycleList, function(x) x[3,2] )
 ```
 
 ```{r showMatrices}
@@ -156,8 +164,8 @@ wonder$ITHIMage <- ITHIMageKey[as.character(wonder$WONDERage)]
 Depression was not in the WONDER data, since there are no deaths, have to add it manually.
 
 ```{r wonder}
-wonder <- wonder[, c("HHSRegion","gender","ITHIMage","ITHIMcause","deaths5yr","population5yr")]
-depress <- expand.grid(HHSRegion=unique(wonder$HHSRegion), gender=unique(wonder$gender),ITHIMage = unique(wonder$ITHIMage), ITHIMcause = "Depression", deaths5yr = "0", population5yr = "0", stringsAsFactors=T)
+wonder <- wonder[, c("HHSRegionCode","gender","ITHIMage","ITHIMcause","deaths5yr","population5yr")]
+depress <- expand.grid(HHSRegionCode=unique(wonder$HHSRegionCode), gender=unique(wonder$gender),ITHIMage = unique(wonder$ITHIMage), ITHIMcause = "Depression", deaths5yr = "0", population5yr = "0", stringsAsFactors=T)
 wonder <- rbind(wonder, depress)
 ```
 
@@ -165,14 +173,14 @@ Replace suppressed values with random number 1-9
 
 ```{r suppressed}
 wonder <- within( wonder, {
-    newDeaths <- as.numeric(ifelse(deaths5yr == "Suppressed", sample(1:9), as.numeric(as.character(deaths5yr))))
+    newDeaths <- as.numeric(ifelse(deaths5yr == "Suppressed", sample(0:9), as.numeric(as.character(deaths5yr))))
     })
 ```
 
 10 HHS x 2 sex x 8 age x 13 disease = 2,080 strata.
 
 ```{r summary}
-wonderSummary <- ddply(wonder, .(HHSRegion, gender, ITHIMage, ITHIMcause), summarise,
+wonderSummary <- ddply(wonder, .(HHSRegionCode, gender, ITHIMage, ITHIMcause), summarise,
                        numberOfDeaths5yr = sum(as.numeric(as.character(newDeaths)), na.rm=T)
 )
 ```
@@ -198,10 +206,10 @@ pop14$ITHIMage <- ITHIMageKey2[as.character(pop14$WONDERage)]
 ```
 
 ```{r foop}
-pop14 <-  pop14[, c("HHSRegion","gender","ITHIMage","deaths2014AllCause","population2014")]
-pop14$deaths2014 <- as.numeric(ifelse(pop14$deaths2014 == "Suppressed", sample(1:9), as.numeric(as.character(pop14$deaths2014))))
+pop14 <-  pop14[, c("HHSRegionCode","gender","ITHIMage","deaths2014AllCause","population2014")]
+pop14$deaths2014 <- as.numeric(ifelse(pop14$deaths2014 == "Suppressed", sample(0:9), as.numeric(as.character(pop14$deaths2014))))
 
-popSummary <- ddply(pop14, .(HHSRegion, gender, ITHIMage), summarise,
+popSummary <- ddply(pop14, .(HHSRegionCode, gender, ITHIMage), summarise,
                     population2014 = sum(as.numeric(as.character(population2014)), na.rm=T),
                    AllCauseDeaths2014 = sum(as.numeric(as.character(deaths2014AllCause)), na.rm=T)
 )
@@ -227,17 +235,39 @@ burden$DALY <- burden$ratio * (burden$GBDdaly/burden$GBDpop) * burden$population
 burden$sex <- factor(ifelse(burden$gender == "Male","M","F"))
 levels(burden$sex)  <- c("M","F")
 
-burdenOut <- burden[,c("HHSRegion","ITHIMcause","sex","ITHIMage","deaths","YLL","YLD","DALY")]
+burdenOut <- burden[,c("HHSRegionCode","ITHIMcause","sex","ITHIMage","deaths","YLL","YLD","DALY")]
 names(burdenOut) <- c("HHS","disease","sex","ageClass","dproj","yll","yld","daly")
 
 burdenOut <- burdenOut[order(burdenOut$HHS, burdenOut$disease, burdenOut$sex, burdenOut$ageClass),]
-
-#write.csv(burdenOut, "./HHSburdens.csv", row.names=F)
+burdenOut <- burdenOut[,c("HHS", "disease","sex","dproj","yll","yld","daly")]
 ```
 
+Now we create an R list of GBD objects named by HHS region.
+
 ```{r burdenList}
-burdenList <- lapply(split(burdenOut, burdenOut$HHS),function(x) lapply(split(x, x$disease), function(x) split(x, x$sex)))
-burdenList[[10]][[10]][[1]]
+GBDList <- lapply(split(burdenOut, burdenOut$HHS),function(x) lapply(split(x, x$disease), function(x) split(x, x$sex)))
+#saveRDS(GBDList, file = "../data/GBD.rds")
+```
+
+## Create List of ITHIM Objects
+
+```{r ITHIMObjs}
+
+ITHIMList <- list()
+
+ITHIM.default <- createITHIM(vision = "baseline", region = "national")
+
+for (HHS in paste0("HHS",1:10)){
+  ITHIMList[[HHS]] <- ITHIM.default
+  ITHIMList[[HHS]] <- updateITHIM(ITHIMList[[HHS]], "muwt", muwtList[[HHS]])
+  ITHIMList[[HHS]] <- updateITHIM(ITHIMList[[HHS]], "muct", muctList[[HHS]])
+  ITHIMList[[HHS]] <- updateITHIM(ITHIMList[[HHS]], "Rwt", RwtList[[HHS]])
+  ITHIMList[[HHS]] <- updateITHIM(ITHIMList[[HHS]], "Rct", RctList[[HHS]])
+  ITHIMList[[HHS]] <- updateITHIM(ITHIMList[[HHS]], "GBD", GBDList[[HHS]])
+}
+
+
+
 ```
 
 <!--
@@ -331,11 +361,13 @@ slightly from previously published reports, due to use of the population estimat
 10. The population figures used in the calculation of death rates for the age group 'under 1 year' are the estimates of the
 resident population that is under one year of age. More information: http://wonder.cdc.gov/wonder/help/ucd.html#Age Group.
 
+
+
 -->
 
 ## Non-Travel METs
 
-```{r newMETs, echo = TRUE}
+```{r newMETs, echo = TRUE, eval = FALSE}
 newMETsFile <- "~/GHI/data/ATUS/ATUS_to_METS_key.csv"
 newMETs <- read.csv(file = newMETsFile, stringsAsFactors = FALSE, colClasses = c("character","character","character","character","numeric","character","character","character"))
 dataColumns <- c(1,5)
@@ -357,7 +389,7 @@ names(metKey) <- activityCode
 
 ```
 
-```{r readnewMETs, echo = TRUE}
+```{r readnewMETs, echo = TRUE, eval = FALSE}
 cpsFile <- "~/GHI/data/ATUS/atuscps_0311.dat"
 cps <- read.table(cpsFile, header=T, skip=0, sep="," )
 cps <- within(cps, {
@@ -388,7 +420,7 @@ summaryList$metaData <- within(summaryList$metaData,{
 
 We shift the MET estimates by the minimum value so that the new minimum MET estimate is zero.
 
-```{r metKey, echo = TRUE}
+```{r metKey, echo = TRUE, eval = FALSE}
 allActivities <- colnames(summaryList$Data)
 nonTravelActivities <- rownames(newMETs$metaData)[which(newMETs$metaData$Travel.related..Y.N. == "N")]
 nonTravelActivities <- nonTravelActivities[which(nonTravelActivities %in% allActivities)]
@@ -921,7 +953,7 @@ p + geom_boxplot()
 
 Who is the outlier?  Perhaps it is a cohort of laborers, e.g., a county of coal miners?
 
-```{r foo, eval = FALSE, echo = TRUE}
+```{r foo, eval = FALSE, echo = TRUE, eval = FALSE}
 nonTravelMETs[which.max(nonTravelMETs$x5),]
 ```
 
