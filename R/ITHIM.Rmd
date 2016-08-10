@@ -125,13 +125,6 @@ muwtList <- lapply( meanWalkList, function(x) x[3,2] )
 muctList <- lapply( meanCycleList, function(x) x[3,2] )
 ```
 
-```{r showMatrices}
-meanWalkList$HHS1
-meanWalkList$HHS2
-meanCycleList$HHS1
-meanCycleList$HHS2
-```
-
 ### CDC Mortality
 
 Next we parse the output of a CDC Wonder query to estimate mortality rates.
@@ -249,6 +242,91 @@ GBDList <- lapply(split(burdenOut, burdenOut$HHS),function(x) lapply(split(x, x$
 #saveRDS(GBDList, file = "../data/GBD.rds")
 ```
 
+## Non-Travel METs
+
+```{r newMETs, echo = TRUE, eval = TRUE}
+newMETsFile <- "~/GHI/data/ATUS/ATUS_to_METS_key.csv"
+newMETs <- read.csv(file = newMETsFile, stringsAsFactors = FALSE, colClasses = c("character","character","character","character","numeric","character","character","character"))
+dataColumns <- c(1,5)
+D <- newMETs[,dataColumns]
+metaData <- newMETs[,-dataColumns]
+newMETs <- list(Data = D, metaData = metaData)
+activityCode <- ifelse(nchar(newMETs$Data$X6.digit.activity.code)==5,paste0("t0",newMETs$Data$X6.digit.activity.code),paste0("t",newMETs$Data$X6.digit.activity.code))
+
+rownames(newMETs$Data) <- activityCode
+rownames(newMETs$metaData) <- activityCode
+
+newMETs$metaData <- within(newMETs$metaData, {
+  Travel.related..Y.N. <- as.factor(Travel.related..Y.N.)
+})
+
+metKey <- newMETs$Data$AinsworthMETS
+names(metKey) <- activityCode
+
+
+```
+
+```{r readnewMETs, echo = TRUE, eval = TRUE}
+cpsFile <- "~/GHI/data/ATUS/atuscps_0311.dat"
+cps <- read.table(cpsFile, header=T, skip=0, sep="," )
+cps <- within(cps, {
+    TUCASEID <- as.character(TUCASEID)
+    TULINENO <- as.character(TULINENO)
+    GEREG <- as.factor(GEREG)
+    })
+cps <- subset(cps, TULINENO == "1")
+
+summaryFile <- "~/GHI/data/ATUS/atussum_0311.dat"
+summary <- read.table(summaryFile, header=T, skip=0, sep=",")
+metaDataColumns <- 1:24
+summaryList <- list(Data = summary[,-metaDataColumns], metaData = summary[,metaDataColumns])
+
+summaryList$metaData <- within(summaryList$metaData,{
+    TESEX <- as.factor(ifelse(TESEX == 1, "male", ifelse(TESEX == 2, "female",NA)))
+    AGECAT <- ifelse(TEAGE <5, "00-04",
+                     ifelse(TEAGE > 4 & TEAGE < 15, "05-14",
+                     ifelse(TEAGE > 14 & TEAGE < 30, "15-29",
+                     ifelse(TEAGE > 29 & TEAGE < 45, "30-44",
+                     ifelse(TEAGE > 44 & TEAGE < 60, "45-59",
+                     ifelse(TEAGE > 59 & TEAGE < 70, "60-69",
+                     ifelse(TEAGE > 69 & TEAGE < 80, "70-79", "80+"
+                            )))))))})
+
+
+```
+
+We shift the MET estimates by the minimum value so that the new minimum MET estimate is zero.
+
+```{r metKey, echo = TRUE, eval = TRUE}
+allActivities <- colnames(summaryList$Data)
+nonTravelActivities <- rownames(newMETs$metaData)[which(newMETs$metaData$Travel.related..Y.N. == "N")]
+nonTravelActivities <- nonTravelActivities[which(nonTravelActivities %in% allActivities)]
+
+activities <- nonTravelActivities
+
+metKeyVector <- (metKey[activities] - min(metKey, na.rm = TRUE))/60*7
+names(metKeyVector) <- activities
+metKeyMatrix <- matrix(metKeyVector, nrow = nrow(summaryList$Data), ncol = length(metKeyVector), byrow = TRUE)
+dimnames(metKeyMatrix) <- list( NULL, activities)
+
+
+METs <- data.frame(METs = rowSums(summaryList$Data[,activities] * metKeyMatrix[,activities], na.rm = TRUE), AGE = summaryList$metaData$TEAGE, SEX = summaryList$metaData$TESEX, AGECAT = summaryList$metaData$AGECAT, row.names = summaryList$metaData$TUCASEID )
+
+D <- merge(cps, METs, by.y = "row.names", by.x = "TUCASEID")
+ggplot(D, aes(x = METs, ..density.., colour = AGECAT)) + geom_freqpoly(binwidth = 10) + facet_grid( SEX ~ .) + labs(x = "Non-Travel Marginal MET-hrs./week", colour = "Age") + coord_cartesian(xlim = c(0, 400))
+
+```
+
+```{r parameters, eval = TRUE}
+(parameters <- ddply(D, .(SEX, AGECAT), summarise,
+             mean = mean(METs, na.rm=T),
+             sd = sd(METs, na.rm=T)
+             ))
+
+METmatrix <- rbind(matrix(0,nrow = 2, ncol = 2), matrix(parameters$mean, ncol = 2))
+(METmatrix <- METmatrix/METmatrix[3,2])
+```
+
 ## Create List of ITHIM Objects
 
 ```{r ITHIMObjs}
@@ -266,12 +344,30 @@ for (HHS in paste0("HHS",1:10)){
   ITHIMList[[HHS]] <- updateITHIM(ITHIMList[[HHS]], "GBD", GBDList[[HHS]])
 }
 
+```
 
+```{r CRA}
+
+CRA.fn <- function(i, j){
+  foo <- compareModels( ITHIMList[[i]], ITHIMList[[j]])
+  sum(unlist(foo$AF))
+}
+
+CRAMatrix <- matrix(NA, nrow = 10, ncol = 10)
+
+for( i in 1:10 ){
+  CRA <- c()
+  for( j in 1:10 ){
+    CRA <- c( CRA, CRA.fn(i, j))
+  }
+  CRAMatrix[i,] <- CRA
+}
+
+which(CRAMatrix == max(CRAMatrix), arr.ind = TRUE)
 
 ```
 
-<!--
-#### DETAILS ON WONDER QUERY
+## DETAILS ON WONDER QUERY
 
 Dataset: Underlying Cause of Death, 1999-2014
 Query Parameters:
@@ -361,96 +457,7 @@ slightly from previously published reports, due to use of the population estimat
 10. The population figures used in the calculation of death rates for the age group 'under 1 year' are the estimates of the
 resident population that is under one year of age. More information: http://wonder.cdc.gov/wonder/help/ucd.html#Age Group.
 
-
-
--->
-
-## Non-Travel METs
-
-```{r newMETs, echo = TRUE, eval = FALSE}
-newMETsFile <- "~/GHI/data/ATUS/ATUS_to_METS_key.csv"
-newMETs <- read.csv(file = newMETsFile, stringsAsFactors = FALSE, colClasses = c("character","character","character","character","numeric","character","character","character"))
-dataColumns <- c(1,5)
-D <- newMETs[,dataColumns]
-metaData <- newMETs[,-dataColumns]
-newMETs <- list(Data = D, metaData = metaData)
-activityCode <- ifelse(nchar(newMETs$Data$X6.digit.activity.code)==5,paste0("t0",newMETs$Data$X6.digit.activity.code),paste0("t",newMETs$Data$X6.digit.activity.code))
-
-rownames(newMETs$Data) <- activityCode
-rownames(newMETs$metaData) <- activityCode
-
-newMETs$metaData <- within(newMETs$metaData, {
-  Travel.related..Y.N. <- as.factor(Travel.related..Y.N.)
-})
-
-metKey <- newMETs$Data$AinsworthMETS
-names(metKey) <- activityCode
-
-
-```
-
-```{r readnewMETs, echo = TRUE, eval = FALSE}
-cpsFile <- "~/GHI/data/ATUS/atuscps_0311.dat"
-cps <- read.table(cpsFile, header=T, skip=0, sep="," )
-cps <- within(cps, {
-    TUCASEID <- as.character(TUCASEID)
-    TULINENO <- as.character(TULINENO)
-    GEREG <- as.factor(GEREG)
-    })
-cps <- subset(cps, TULINENO == "1")
-
-summaryFile <- "~/GHI/data/ATUS/atussum_0311.dat"
-summary <- read.table(summaryFile, header=T, skip=0, sep=",")
-metaDataColumns <- 1:24
-summaryList <- list(Data = summary[,-metaDataColumns], metaData = summary[,metaDataColumns])
-
-summaryList$metaData <- within(summaryList$metaData,{
-    TESEX <- as.factor(ifelse(TESEX == 1, "male", ifelse(TESEX == 2, "female",NA)))
-    AGECAT <- ifelse(TEAGE <5, "00-04",
-                     ifelse(TEAGE > 4 & TEAGE < 15, "05-14",
-                     ifelse(TEAGE > 14 & TEAGE < 30, "15-29",
-                     ifelse(TEAGE > 29 & TEAGE < 45, "30-44",
-                     ifelse(TEAGE > 44 & TEAGE < 60, "45-59",
-                     ifelse(TEAGE > 59 & TEAGE < 70, "60-69",
-                     ifelse(TEAGE > 69 & TEAGE < 80, "70-79", "80+"
-                            )))))))})
-
-
-```
-
-We shift the MET estimates by the minimum value so that the new minimum MET estimate is zero.
-
-```{r metKey, echo = TRUE, eval = FALSE}
-allActivities <- colnames(summaryList$Data)
-nonTravelActivities <- rownames(newMETs$metaData)[which(newMETs$metaData$Travel.related..Y.N. == "N")]
-nonTravelActivities <- nonTravelActivities[which(nonTravelActivities %in% allActivities)]
-
-activities <- nonTravelActivities
-
-metKeyVector <- (metKey[activities] - min(metKey, na.rm = TRUE))/60*7
-names(metKeyVector) <- activities
-metKeyMatrix <- matrix(metKeyVector, nrow = nrow(summaryList$Data), ncol = length(metKeyVector), byrow = TRUE)
-dimnames(metKeyMatrix) <- list( NULL, activities)
-
-
-METs <- data.frame(METs = rowSums(summaryList$Data[,activities] * metKeyMatrix[,activities], na.rm = TRUE), AGE = summaryList$metaData$TEAGE, SEX = summaryList$metaData$TESEX, AGECAT = summaryList$metaData$AGECAT, row.names = summaryList$metaData$TUCASEID )
-
-D <- merge(cps, METs, by.y = "row.names", by.x = "TUCASEID")
-ggplot(D, aes(x = METs, ..density.., colour = AGECAT)) + geom_freqpoly(binwidth = 10) + facet_grid( SEX ~ .) + labs(x = "Non-Travel Marginal MET-hrs./week", colour = "Age") + coord_cartesian(xlim = c(0, 400))
-
-```
-
-```{r parameters}
-(parameters <- ddply(D, .(SEX, AGECAT), summarise,
-             mean = mean(METs, na.rm=T),
-             sd = sd(METs, na.rm=T)
-             ))
-
-METmatrix <- rbind(matrix(0,nrow = 2, ncol = 2), matrix(parameters$mean, ncol = 2))
-(METmatrix <- METmatrix/METmatrix[3,2])
-```
-
-## Bay Area
+## Example (Bay Area)
 
 First we define the baseline and scenario objects.
 
@@ -482,7 +489,7 @@ matrix(unlist(lapply(comparativeRisk$yld.delta,function(x) lapply(x, function(x)
 matrix(unlist(lapply(comparativeRisk$yll.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
 ```
 
-## National
+## Example (National)
 
 ```{r instantiate2}
 ITHIM.baseline <- createITHIM(vision = "baseline", region = "national")
