@@ -59,25 +59,33 @@ return(foo[,c("M","F")])
 #### Read Two of the Four NHTS Data Tables
 
 ```{r NHTS}
-DAYV2PUB <- read.csv(file = "~/GHI/data/NHTS/Ascii/DAYV2PUB.CSV", na.strings = "-9")
+DAYV2PUB <- read.csv(file = "~/GHI/data/NHTS/Ascii/DAYV2PUB.CSV", na.strings = c("-9","-8", "-7", "-1"))
 names(DAYV2PUB) <- c("HOUSEID","PERSONID","FRSTHM","OUTOFTWN","ONTD_P1","ONTD_P2","ONTD_P3","ONTD_P4","ONTD_P5","ONTD_P6","ONTD_P7","ONTD_P8","ONTD_P9","ONTD_P10","ONTD_P11","ONTD_P12","ONTD_P13","ONTD_P14","ONTD_P15","TDCASEID","HH_HISP","HH_RACE","DRIVER","R_SEX","WORKER","DRVRCNT","HHFAMINC","HHSIZE","HHVEHCNT","NUMADLT","FLAG100","LIF_CYC","TRIPPURP","AWAYHOME","CDIVMSAR","CENSUS_D","CENSUS_R","DROP_PRK","DRVR_FLG","EDUC","ENDTIME","HH_ONTD","HHMEMDRV","HHRESP","HHSTATE","HHSTFIPS","INTSTATE","MSACAT","MSASIZE","NONHHCNT","NUMONTRP","PAYTOLL","PRMACT","PROXY","PSGR_FLG","R_AGE","RAIL","STRTTIME","TRACC1","TRACC2","TRACC3","TRACC4","TRACC5","TRACCTM","TRAVDAY","TREGR1","TREGR2","TREGR3","TREGR4","TREGR5","TREGRTM","TRPACCMP","TRPHHACC","TRPHHVEH","TRPTRANS","TRVL_MIN","TRVLCMIN","TRWAITTM","URBAN","URBANSIZE","URBRUR","USEINTST","USEPUBTR","VEHID","WHODROVE","WHYFROM","WHYTO","WHYTRP1S","WRKCOUNT","DWELTIME","WHYTRP90","TDTRPNUM","TDWKND","TDAYDATE","TRPMILES","WTTRDFIN","VMT_MILE","PUBTRANS","HOMEOWN","HOMETYPE","HBHUR","HTRESDN","HTHTNRNT","HTPPOPDN","HTEEMPDN","HBRESDN","HBHTNRNT","HBPPOPDN","GASPRICE","VEHTYPE","HH_CBSA","HHC_MSA")
 
-DAYV2PUB <- within(DAYV2PUB, {
-    URBRUR <- as.factor(URBRUR)
-    HHSTATE <- as.factor(HHSTATE)
-    MSACAT <- as.factor(MSACAT)
-    TRPTRANS <- as.factor(TRPTRANS)
-})
+## DAYV2PUB <- within(DAYV2PUB, {
+##     URBRUR <- as.factor(URBRUR)
+##     HHSTATE <- as.factor(HHSTATE)
+##     MSACAT <- as.factor(MSACAT)
+##     TRPTRANS <- as.factor(TRPTRANS)
+##     TRPMILES <- as.numeric(TRPMILES)
+## })
 
-NHTS.trips <- data.frame(HOUSEID = DAYV2PUB$HOUSEID,
-                   PERSONID = DAYV2PUB$PERSONID,
-                   TDCASEID = DAYV2PUB$TDCASEID,
-                   AT = ifelse(DAYV2PUB$TRPTRANS == "22", "cycle",
-                        ifelse(DAYV2PUB$TRPTRANS == "23", "walk",
-                        ifelse(!is.na(DAYV2PUB$TRPTRANS), "other", NA))),
-                   TRVL_MIN = as.numeric(DAYV2PUB$TRVL_MIN),
-                   TRVLCMIN = as.numeric(DAYV2PUB$TRVLCMIN)
-                   )
+
+NHTS.trips <- with(DAYV2PUB,{
+    data.frame(HOUSEID = HOUSEID,
+                   PERSONID = PERSONID,
+                   TDCASEID = TDCASEID,
+                   AT = ifelse(TRPTRANS == "22", "cycle",
+                        ifelse(TRPTRANS == "23", "walk",
+                        ifelse(!is.na(TRPTRANS), "other", NA))),
+                   TRVL_MIN = as.numeric(TRVL_MIN),
+                   TRVLCMIN = ifelse(as.numeric(TRVLCMIN) != 0, as.numeric(TRVLCMIN), NA),
+                   URBRUR  = as.factor(URBRUR),
+                   HHSTATE = as.factor(HHSTATE),
+                   MSACAT = as.factor(MSACAT),
+                   TRPTRANS = as.factor(TRPTRANS),
+                   TRPMILES = as.numeric(TRPMILES)
+)})
 
 PERV2PUB <- read.csv(file = "~/GHI/data/NHTS/Ascii/PERV2PUB.CSV", na.strings = "-9")
 names(PERV2PUB) <- c("HOUSEID","PERSONID","VARSTRAT","WTPERFIN","SFWGT","HH_HISP","HH_RACE","DRVRCNT","HHFAMINC","HHSIZE","HHVEHCNT","NUMADLT","WRKCOUNT","FLAG100","LIF_CYC","CNTTDTR","BORNINUS","CARRODE","CDIVMSAR","CENSUS_D","CENSUS_R","CONDNIGH","CONDPUB","CONDRIDE","CONDRIVE","CONDSPEC","CONDTAX","CONDTRAV","DELIVER","DIARY","DISTTOSC","DRIVER","DTACDT","DTCONJ","DTCOST","DTRAGE","DTRAN","DTWALK","EDUC","EVERDROV","FLEXTIME","FMSCSIZE","FRSTHM","FXDWKPL","GCDWORK","GRADE","GT1JBLWK","HHRESP","HHSTATE","HHSTFIPS","ISSUE","OCCAT","LSTTRDAY","MCUSED","MEDCOND","MEDCOND6","MOROFTEN","MSACAT","MSASIZE","NBIKETRP","NWALKTRP","OUTCNTRY","OUTOFTWN","PAYPROF","PRMACT","PROXY","PTUSED","PURCHASE","R_AGE","R_RELAT","R_SEX","RAIL","SAMEPLC","SCHCARE","SCHCRIM","SCHDIST","SCHSPD","SCHTRAF","SCHTRN1","SCHTRN2","SCHTYP","SCHWTHR","SELF_EMP","TIMETOSC","TIMETOWK","TOSCSIZE","TRAVDAY","URBAN","URBANSIZE","URBRUR","USEINTST","USEPUBTR","WEBUSE","WKFMHMXX","WKFTPT","WKRMHM","WKSTFIPS","WORKER","WRKTIME","WRKTRANS","YEARMILE","YRMLCAP","YRTOUS","DISTTOWK","TDAYDATE","HOMEOWN","HOMETYPE","HBHUR","HTRESDN","HTHTNRNT","HTPPOPDN","HTEEMPDN","HBRESDN","HBHTNRNT","HBPPOPDN","HH_CBSA","HHC_MSA")
@@ -93,6 +101,19 @@ NHTS.person <- with(PERV2PUB,{
 )
 })
 ```
+
+#### Investigate Trip Data
+
+```{r summary}
+summary(with(subset(NHTS.trips, AT == "walk"), TRPMILES))
+summary(with(subset(NHTS.trips, AT == "cycle"), TRPMILES))
+summary(with(subset(NHTS.trips, AT == "other"), TRPMILES))
+summary(with(subset(NHTS.trips, AT == "walk"), TRVLCMIN))
+summary(with(subset(NHTS.trips, AT == "cycle"), TRVLCMIN))
+summary(with(subset(NHTS.trips, AT == "other"), TRVLCMIN))
+
+```
+
 #### Subset and Merge
 
 ```{r subset}
@@ -172,7 +193,7 @@ wonder <- within( wonder, {
 
 10 HHS x 2 sex x 8 age x 13 disease = 2,080 strata.
 
-```{r summary}
+```{r summary2}
 wonderSummary <- ddply(wonder, .(HHSRegionCode, gender, ITHIMage, ITHIMcause), summarise,
                        numberOfDeaths5yr = sum(as.numeric(as.character(newDeaths)), na.rm=T)
 )
