@@ -58,7 +58,7 @@ return(foo[,c("M","F")])
 
 #### Read Two of the Four NHTS Data Tables
 
-```{r NHTS}
+```{r NHTS, eval = FALSE}
 DAYV2PUB <- read.csv(file = "~/GHI/data/NHTS/Ascii/DAYV2PUB.CSV", na.strings = c("-9","-8", "-7", "-1"))
 names(DAYV2PUB) <- c("HOUSEID","PERSONID","FRSTHM","OUTOFTWN","ONTD_P1","ONTD_P2","ONTD_P3","ONTD_P4","ONTD_P5","ONTD_P6","ONTD_P7","ONTD_P8","ONTD_P9","ONTD_P10","ONTD_P11","ONTD_P12","ONTD_P13","ONTD_P14","ONTD_P15","TDCASEID","HH_HISP","HH_RACE","DRIVER","R_SEX","WORKER","DRVRCNT","HHFAMINC","HHSIZE","HHVEHCNT","NUMADLT","FLAG100","LIF_CYC","TRIPPURP","AWAYHOME","CDIVMSAR","CENSUS_D","CENSUS_R","DROP_PRK","DRVR_FLG","EDUC","ENDTIME","HH_ONTD","HHMEMDRV","HHRESP","HHSTATE","HHSTFIPS","INTSTATE","MSACAT","MSASIZE","NONHHCNT","NUMONTRP","PAYTOLL","PRMACT","PROXY","PSGR_FLG","R_AGE","RAIL","STRTTIME","TRACC1","TRACC2","TRACC3","TRACC4","TRACC5","TRACCTM","TRAVDAY","TREGR1","TREGR2","TREGR3","TREGR4","TREGR5","TREGRTM","TRPACCMP","TRPHHACC","TRPHHVEH","TRPTRANS","TRVL_MIN","TRVLCMIN","TRWAITTM","URBAN","URBANSIZE","URBRUR","USEINTST","USEPUBTR","VEHID","WHODROVE","WHYFROM","WHYTO","WHYTRP1S","WRKCOUNT","DWELTIME","WHYTRP90","TDTRPNUM","TDWKND","TDAYDATE","TRPMILES","WTTRDFIN","VMT_MILE","PUBTRANS","HOMEOWN","HOMETYPE","HBHUR","HTRESDN","HTHTNRNT","HTPPOPDN","HTEEMPDN","HBRESDN","HBHTNRNT","HBPPOPDN","GASPRICE","VEHTYPE","HH_CBSA","HHC_MSA")
 
@@ -83,6 +83,7 @@ NHTS.trips <- with(DAYV2PUB,{
                    URBRUR  = as.factor(URBRUR),
                    HHSTATE = as.factor(HHSTATE),
                    MSACAT = as.factor(MSACAT),
+                   MSA = ifelse(MSASIZE %in% 1:5, TRUE, FALSE),
                    TRPTRANS = as.factor(TRPTRANS),
                    TRPMILES = as.numeric(TRPMILES)
 )})
@@ -100,11 +101,18 @@ NHTS.person <- with(PERV2PUB,{
 
 )
 })
+saveRDS(NHTS.trips, file = "./data/NHTS.trips.rds")
+saveRDS(NHTS.person, file = "./data/NHTS.person.rds")
+```
+
+```{r loadData}
+NHTS.person <- readRDS(file = "./data/NHTS.person.rds")
+NHTS.trips <- readRDS(file = "./data/NHTS.trips.rds")
 ```
 
 #### Investigate Trip Data
 
-```{r summary}
+```{r summary, fig.width = 15}
 summary(with(subset(NHTS.trips, AT == "walk"), TRPMILES))
 summary(with(subset(NHTS.trips, AT == "cycle"), TRPMILES))
 summary(with(subset(NHTS.trips, AT == "other"), TRPMILES))
@@ -112,6 +120,35 @@ summary(with(subset(NHTS.trips, AT == "walk"), TRVLCMIN))
 summary(with(subset(NHTS.trips, AT == "cycle"), TRVLCMIN))
 summary(with(subset(NHTS.trips, AT == "other"), TRVLCMIN))
 
+
+walkHours <- with(subset(NHTS.trips, {
+    AT == "walk" #& TRVLCMIN > 5 & TRPMILES > 2/9
+}), TRVLCMIN/60)
+
+walkMiles <- with(subset(NHTS.trips, {
+    AT == "walk" #& TRVLCMIN > 5 & TRPMILES > 2/9
+}), TRPMILES)
+
+cycleHours <- with(subset(NHTS.trips, {
+      AT == "cycle" #& TRVLCMIN > 5 & TRPMILES > 2/9
+}), TRVLCMIN/60)
+
+cycleMiles <- with(subset(NHTS.trips, {
+      AT == "cycle" #& TRVLCMIN > 5 & TRPMILES > 2/9
+}), TRPMILES)
+
+walkSpeed <- median(walkMiles/walkHours, na.rm = TRUE)
+cycleSpeed <- median(cycleMiles/cycleHours, na.rm = TRUE)
+
+Dwalk <- data.frame(Hours = walkHours, Miles = walkMiles, mode = "walk")
+Dcycle <- data.frame(Hours = cycleHours, Miles = cycleMiles, mode = "cycle")
+D <- rbind(Dwalk,Dcycle)
+
+Dspeed <- data.frame(speed = c(1,1), intercept = log10(c(walkSpeed,cycleSpeed)), mode = c("walk","cycle"))
+
+g <- ggplot(D, aes(Hours, Miles, colour = mode)) + geom_point()
+g <- g + geom_abline(aes(slope = speed, intercept = intercept, colour = mode), Dspeed) + facet_grid(. ~ mode)
+g + scale_y_log10() + scale_x_log10() + theme_bw()
 ```
 
 #### Subset and Merge
@@ -154,7 +191,7 @@ The data files in ~/Box Sync/work/CoBenefits/MaggieShare/VitalStats/CDCwonder/.
 
 #### Query Results File (HHSmetro_Age_sex_2010-14.csv)
 
-```{r CDC}
+```{r CDC, eval = FALSE}
 wonder <- read.csv("./../data/CDCwonder/HHSmetro_Age_sex_2010-14.csv", header=T)
 names(wonder) <- c("HHSRegion", "HHSRegionCode", "gender", "genderCode","WONDERage","WONDERageCode","ICD10",  "ICD10Code", "deaths5yr", "population5yr", "crudeRate")
 
@@ -164,12 +201,12 @@ wonder <- subset(wonder, WONDERageCode != "NS") # remove 'Not stated' Age entrie
 The following two recoding chunks should probably be redone.  They
 depend on the ordering of the factors which seems dangerous.
 
-```{r ITHIMCause}
+```{r ITHIMCause, eval = FALSE}
 ITHIMcauseKey <- c("ColonCancer","LungCancer","BreastCancer","Diabetes","Dementia","IHD","InflammatoryHD","InflammatoryHD","HHD","Stroke","AcuteRespInfections","AcuteRespInfections","RespiratoryDisease","RespiratoryDisease","RTIs","RTIs")
 names(ITHIMcauseKey) <- unique(wonder$ICD10)
 wonder$ITHIMcause <- ITHIMcauseKey[as.character(wonder$ICD10)]
 ```
-```{r recodeAge}
+```{r recodeAge, eval = FALSE}
 ITHIMageKey <- c("ageClass1", "ageClass1", "ageClass2", "ageClass2", "ageClass3", "ageClass3", "ageClass3", "ageClass4", "ageClass4", "ageClass4", "ageClass5", "ageClass5", "ageClass5", "ageClass6", "ageClass6", "ageClass7", "ageClass7", "ageClass8", "ageClass8","ageClass8", "ageClass8", "ageClass8")
 names(ITHIMageKey) <- unique(wonder$WONDERage)
 wonder$ITHIMage <- ITHIMageKey[as.character(wonder$WONDERage)]
@@ -177,7 +214,7 @@ wonder$ITHIMage <- ITHIMageKey[as.character(wonder$WONDERage)]
 
 Depression was not in the WONDER data, since there are no deaths, have to add it manually.
 
-```{r wonder}
+```{r wonder, eval = FALSE}
 wonder <- wonder[, c("HHSRegionCode","gender","ITHIMage","ITHIMcause","deaths5yr","population5yr")]
 depress <- expand.grid(HHSRegionCode=unique(wonder$HHSRegionCode), gender=unique(wonder$gender),ITHIMage = unique(wonder$ITHIMage), ITHIMcause = "Depression", deaths5yr = "0", population5yr = "0", stringsAsFactors=T)
 wonder <- rbind(wonder, depress)
@@ -185,7 +222,7 @@ wonder <- rbind(wonder, depress)
 
 Replace suppressed values with random number 1-9
 
-```{r suppressed}
+```{r suppressed, eval = FALSE}
 wonder <- within( wonder, {
     newDeaths <- as.numeric(ifelse(deaths5yr == "Suppressed", sample(0:9), as.numeric(as.character(deaths5yr))))
     })
@@ -193,7 +230,7 @@ wonder <- within( wonder, {
 
 10 HHS x 2 sex x 8 age x 13 disease = 2,080 strata.
 
-```{r summary2}
+```{r summary2, eval = FALSE}
 wonderSummary <- ddply(wonder, .(HHSRegionCode, gender, ITHIMage, ITHIMcause), summarise,
                        numberOfDeaths5yr = sum(as.numeric(as.character(newDeaths)), na.rm=T)
 )
@@ -205,7 +242,7 @@ Read in data for single year population.  Processed in Excel, to
 combine two WONDER queries, need to go back and script the processing
 of the raw WONDER output
 
-```{r singleyear}
+```{r singleyear, eval = FALSE}
 pop14 <- read.csv("./../data/CDCwonder/HHSmetro_Age_sex_2014_AllCause.csv", header=T)
 
 
@@ -213,13 +250,13 @@ names(pop14) <- c("HHSRegion", "HHSRegionCode","gender", "genderCode","WONDERage
 ```
 This is delicate(read sloppy), really need to check the order of age groups returned by the 'unique(pop14$WONDERage)' command.
 
-```{r sloppy}
+```{r sloppy, eval = FALSE}
 ITHIMageKey2 <- c("ageClass8", "ageClass1", "ageClass7", "ageClass7", "ageClass6", "ageClass6", "ageClass1", "ageClass5", "ageClass5","ageClass5","ageClass4", "ageClass3", "ageClass4", "ageClass2", "ageClass2", "ageClass3", "ageClass4", "ageClass3","ageClass8")
 names(ITHIMageKey2) <- unique(pop14$WONDERage)
 pop14$ITHIMage <- ITHIMageKey2[as.character(pop14$WONDERage)]
 ```
 
-```{r foop}
+```{r foop, eval = FALSE}
 pop14 <-  pop14[, c("HHSRegionCode","gender","ITHIMage","deaths2014AllCause","population2014")]
 pop14$deaths2014 <- as.numeric(ifelse(pop14$deaths2014 == "Suppressed", sample(0:9), as.numeric(as.character(pop14$deaths2014))))
 
@@ -234,7 +271,7 @@ HHSmetroCauseSpecific <- merge(wonderSummary, popSummary)
 
 Presumably this comes from an EXCEL file.
 
-```{r USGBD}
+```{r USGBD, eval = FALSE}
 USGBD <- read.csv("./../data/CDCwonder/USGBD.csv", header=T)
 USGBD$ITHIMage <- as.character(USGBD$ITHIMage)
 USGBD$ITHIMcause <- as.character(USGBD$ITHIMcause)
@@ -258,14 +295,14 @@ burdenOut <- burdenOut[,c("HHS", "disease","sex","dproj","yll","yld","daly")]
 
 Now we create an R list of GBD objects named by HHS region.
 
-```{r burdenList}
+```{r burdenList, eval = FALSE}
 GBDList <- lapply(split(burdenOut, burdenOut$HHS),function(x) lapply(split(x, x$disease), function(x) split(x, x$sex)))
 #saveRDS(GBDList, file = "../data/GBD.rds")
 ```
 
 ## Non-Travel METs
 
-```{r newMETs, echo = TRUE, eval = TRUE}
+```{r newMETs, echo = TRUE, eval = FALSE}
 newMETsFile <- "~/GHI/data/ATUS/ATUS_to_METS_key.csv"
 newMETs <- read.csv(file = newMETsFile, stringsAsFactors = FALSE, colClasses = c("character","character","character","character","numeric","character","character","character"))
 dataColumns <- c(1,5)
@@ -287,7 +324,7 @@ names(metKey) <- activityCode
 
 ```
 
-```{r readnewMETs, echo = TRUE, eval = TRUE}
+```{r readnewMETs, echo = TRUE, eval = FALSE}
 cpsFile <- "~/GHI/data/ATUS/atuscps_0311.dat"
 cps <- read.table(cpsFile, header=T, skip=0, sep="," )
 cps <- within(cps, {
@@ -318,7 +355,7 @@ summaryList$metaData <- within(summaryList$metaData,{
 
 We shift the MET estimates by the minimum value so that the new minimum MET estimate is zero.
 
-```{r metKey, echo = TRUE, eval = TRUE}
+```{r metKey, echo = TRUE, eval = FALSE}
 allActivities <- colnames(summaryList$Data)
 nonTravelActivities <- rownames(newMETs$metaData)[which(newMETs$metaData$Travel.related..Y.N. == "N")]
 nonTravelActivities <- nonTravelActivities[which(nonTravelActivities %in% allActivities)]
@@ -338,7 +375,7 @@ ggplot(D, aes(x = METs, ..density.., colour = AGECAT)) + geom_freqpoly(binwidth 
 
 ```
 
-```{r parameters, eval = TRUE}
+```{r parameters, eval = FALSE}
 (parameters <- ddply(D, .(SEX, AGECAT), summarise,
              mean = mean(METs, na.rm=T),
              sd = sd(METs, na.rm=T)
@@ -350,7 +387,7 @@ METmatrix <- rbind(matrix(0,nrow = 2, ncol = 2), matrix(parameters$mean, ncol = 
 
 ## Create List of ITHIM Objects
 
-```{r ITHIMObjs}
+```{r ITHIMObjs, eval = FALSE}
 
 ITHIMList <- list()
 
@@ -367,7 +404,7 @@ for (HHS in paste0("HHS",1:10)){
 
 ```
 
-```{r CRA}
+```{r CRA, eval = FALSE}
 
 CRA.fn <- function(i, j){
   foo <- compareModels( ITHIMList[[i]], ITHIMList[[j]])
@@ -482,82 +519,82 @@ resident population that is under one year of age. More information: http://wond
 
 First we define the baseline and scenario objects.
 
-```{r instantiate}
+```{r instantiate, eval = FALSE}
 ITHIM.baseline <- createITHIM(vision = "baseline", region = "SFBayArea")
 ITHIM.scenario <- createITHIM(vision = "scenario", region = "SFBayArea")
 ```
 
 Next we compare the scenario to the baseline using compareModels().
 
-```{r RRs}
+```{r RRs, eval = FALSE}
 comparativeRisk <- compareModels(ITHIM.baseline,ITHIM.scenario)
 ```
 
 ### Deaths
-```{r show, echo = FALSE}
+```{r show, echo = FALSE, eval = FALSE}
 matrix(unlist(lapply(comparativeRisk$dproj.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
 ```
 ### DALY
-```{r show2, echo = FALSE}
+```{r show2, echo = FALSE, eval = FALSE}
 matrix(unlist(lapply(comparativeRisk$daly.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
 ```
 ### YLD
-```{r show3, echo = FALSE}
+```{r show3, echo = FALSE, eval = FALSE}
 matrix(unlist(lapply(comparativeRisk$yld.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
 ```
 ### YLL
-```{r show4, echo = FALSE}
+```{r show4, echo = FALSE, eval = FALSE}
 matrix(unlist(lapply(comparativeRisk$yll.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
 ```
 
 ## Example (National)
 
-```{r instantiate2}
+```{r instantiate2, eval = FALSE}
 ITHIM.baseline <- createITHIM(vision = "baseline", region = "national")
 ITHIM.scenario <- createITHIM(vision = "scenario", region = "national")
 ```
 
-```{r RRs2}
+```{r RRs2, eval = FALSE}
 comparativeRisk <- compareModels(ITHIM.baseline,ITHIM.scenario)
 ```
 
 ### Deaths
-```{r show222, echo = FALSE}
+```{r show222, echo = FALSE, eval = FALSE}
 matrix(unlist(lapply(comparativeRisk$dproj.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
 ```
 ### DALY
-```{r show22, echo = FALSE}
+```{r show22, echo = FALSE, eval = FALSE}
 matrix(unlist(lapply(comparativeRisk$daly.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
 ```
 ### YLD
-```{r show23, echo = FALSE}
+```{r show23, echo = FALSE, eval = FALSE}
 matrix(unlist(lapply(comparativeRisk$yld.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
 ```
 #### YLL
-```{r show24, echo = FALSE}
+```{r show24, echo = FALSE, eval = FALSE}
 matrix(unlist(lapply(comparativeRisk$yll.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
 ```
 
 ## Example
 
-```{r example}
+```{r example, eval = FALSE}
 example("ITHIM-package")
 ```
 
 ### Creating Different Visions
 
-```{r vision}
+```{r vision, eval = FALSE}
 ITHIM.vision <- updateITHIM(ITHIM.scenario, "muwt", 2*ITHIM.scenario$parameters$muwt) # Double the mean walking time
 comparativeRisk <- compareModels(ITHIM.baseline,ITHIM.vision)
 ```
 #### YLL
-```{r show233, echo = FALSE}
+```{r show233, echo = FALSE, eval = FALSE}
 matrix(unlist(lapply(comparativeRisk$yll.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
 ```
 
 ## Interrogate Parameters
 
-```{r params}
+```{r params, eval = FALSE}
 names(ITHIM.baseline$parameters)
 ITHIM.baseline$parameters$NonTravelMETs
 ITHIM.baseline$parameters$Rwt
@@ -772,7 +809,7 @@ METQuintiles <- mapply(getMETQuintiles, nonTravelMETsNormalized*nonTravelMETs, M
 ```
 
 
-```{r NHTSTables}
+```{r NHTSTables, eval = FALSE}
 HHV2PUB <- read.csv(file = "~/GHI/data/NHTS/Ascii/HHV2PUB.CSV", na.strings = "-9")
 names(HHV2PUB) <- c("HOUSEID","VARSTRAT","WTHHFIN","DRVRCNT","CDIVMSAR","CENSUS_D","CENSUS_R","HH_HISP","HH_RACE","HHFAMINC","HHRELATD","HHRESP","HHSIZE","HHSTATE","HHSTFIPS","HHVEHCNT","HOMEOWN","HOMETYPE","MSACAT","MSASIZE","NUMADLT","RAIL","RESP_CNT","SCRESP","TRAVDAY","URBAN","URBANSIZE","URBRUR","WRKCOUNT","TDAYDATE","FLAG100","LIF_CYC","CNTTDHH","HBHUR","HTRESDN","HTHTNRNT","HTPPOPDN","HTEEMPDN","HBRESDN","HBHTNRNT","HBPPOPDN","HH_CBSA","HHC_MSA")
 
@@ -801,10 +838,10 @@ NHTS %>% group_by(SEX, AGE) %>% dplyr::summarize(count = countPeople(data.frame(
 ```
 
 ### Relative Risk Model
-```{r explore}
+```{r explore, eval = FALSE}
 names(ITHIM.baseline$parameters)
 ```
-```{r RRFigure, echo = FALSE}
+```{r RRFigure, echo = FALSE, eval = FALSE}
 phi <- function(x,k=0.5,phi0=comparativeRisk$RR.baseline$BreastCancer$F[1,1]) phi0^{x^k}
 plot(x = xvec <- seq(0,xmax <- 10,length.out=1e3), y = phi(xvec, k = 0.25), main = "Relative Risk Models for MET Exposure", xlab = "METs per week", ylab = "Breast Cancer Relative Risk", type = "l", lwd = 2, col = 1, ylim = c(0.9,1),xlim=c(0,xmax))
 lines(x = xvec <- seq(0,xmax,length.out=1e3), y = phi(x = xvec, k = 0.375), lwd = 2, col = 3)
@@ -819,7 +856,7 @@ Note that some of the AF values will disagree with the EXCEL
 spreadsheet because Diabetes, HHD_Air, CVD_Air and Stroke_Air do not
 combine travel METs with non-travel METs.
 
-```{r parlist}
+```{r parlist, eval = FALSE}
 AF.sum <- numeric(1e3); i <- 0;
 muwt.vec <- seq(107.1,150,length.out=length(AF.sum))
 #muct.vec <- seq(2.7,3.0,length.out=length(AF.sum))
@@ -841,7 +878,7 @@ p <- ggplot(D, aes(x = mu.wt, y = AF.sum))
 p + geom_point()
 ```
 
-```{r AF, echo = FALSE}
+```{r AF, echo = FALSE, eval = FALSE}
 with(comparativeRisk, as.data.frame(lapply(AF[c("BreastCancer","Depression")], function(x) 100*round(x[-(1:2),],4))))
 ```
 
@@ -858,7 +895,7 @@ example("ITHIM-package")
 ```
 ### Figures
 
-```{r plot2, echo = FALSE, fig.width = 12}
+```{r plot2, echo = FALSE, fig.width = 12, eval = FALSE}
 plotRR(comparativeRisk$RR.baseline$Depression,comparativeRisk$RR.scenario$Depression) + coord_cartesian(ylim = c(0.75, 1.05))+ggtitle("Depression")
 ```
 
@@ -866,14 +903,14 @@ plotRR(comparativeRisk$RR.baseline$Depression,comparativeRisk$RR.scenario$Depres
 plotRR(comparativeRisk$RR.baseline$BreastCancer,comparativeRisk$RR.scenario$BreastCancer) + coord_cartesian(ylim = c(0.75, 1.05)) + ggtitle("Breast Cancer")
 ```
 
-```{r plot4, echo = FALSE, fig.height = 12}
+```{r plot4, echo = FALSE, fig.height = 12, eval = FALSE}
 D<-melt(comparativeRisk$AF)
 names(D)<- c("age","sex","AF","disease")
 p <- ggplot(D, aes(age,AF)) + geom_bar(aes(fill=sex), stat = "identity") + facet_grid( disease ~ .) + coord_cartesian(ylim = c(0, 0.1))
 p
 ```
 ### Road Injury Array
-```{r road}
+```{r road, eval = FALSE}
 baselineInjuries <- array(dim=c(6,7,3,2))
 injury <- c("fatal","serious")
 road <- c("minor road","major road","motorway")
