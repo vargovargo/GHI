@@ -433,7 +433,11 @@ ITHIM.national <- updateITHIM(ITHIM.national, "muct", 2.50)
 DALYs <- lapply(ITHIMList, sumDALY, ITHIM.baseline = ITHIM.national)
 ```
 
+### Visualization of trip time matrices
+
 ```{r eval = TRUE}
+
+ITHIMList <- c(ITHIMList, list(ITHIM.national))
 
 meanMatrix <- function(ITHIM, mode = "walk"){
    if(mode == "walk"){
