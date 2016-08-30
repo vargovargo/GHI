@@ -14,6 +14,9 @@ library("ggplot2")
 library("reshape2")
 library("plyr")
 library("dplyr")
+library("cowplot")
+library("grid")
+library("scales")
 ```
 
 ```{r loadITHIM, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE}
@@ -32,7 +35,7 @@ First we use NHTS to estimate mean walking and cycling times.
 
 #### Create a handful of functions to help parse data
 
-```{r parsely}
+```{r parsely, eval = TRUE}
 convertToHHS <- function(states){
   HHSRegions <- matrix(c("CT","ME","MA","NH","RI","VT","NJ","NY","DE","DC","MD","PA","VA","WV","AL","FL","GA","KY","MS","NC","SC","TN","IL","IN","MI","MN","OH","WI","AR","LA","NM","OK","TX","IA","KS","MO","NE","CO","MT","ND","SD","UT","WY","AZ","CA","HI","NV","AK","ID","OR","WA",1,1,1,1,1,1,2,2,3,3,3,3,3,3,4,4,4,4,4,4,4,4,5,5,5,5,5,5,6,6,6,6,6,7,7,7,7,8,8,8,8,8,8,9,9,9,9,10,10,10,10,"HHS1","HHS1","HHS1","HHS1","HHS1","HHS1","HHS2","HHS2","HHS3","HHS3","HHS3","HHS3","HHS3","HHS3","HHS4","HHS4","HHS4","HHS4","HHS4","HHS4","HHS4","HHS4","HHS5","HHS5","HHS5","HHS5","HHS5","HHS5","HHS6","HHS6","HHS6","HHS6","HHS6","HHS7","HHS7","HHS7","HHS7","HHS8","HHS8","HHS8","HHS8","HHS8","HHS8","HHS9","HHS9","HHS9","HHS9","HHS10","HHS10","HHS10","HHS10"), nrow = 51, ncol = 3)
   StateToHHS <- HHSRegions[,3]
@@ -58,7 +61,7 @@ return(foo[,c("M","F")])
 
 #### Read Two of the Four NHTS Data Tables
 
-```{r NHTS, eval = FALSE}
+```{r NHTS, eval = TRUE}
 DAYV2PUB <- read.csv(file = "~/GHI/data/NHTS/Ascii/DAYV2PUB.CSV", na.strings = c("-9","-8", "-7", "-1"))
 names(DAYV2PUB) <- c("HOUSEID","PERSONID","FRSTHM","OUTOFTWN","ONTD_P1","ONTD_P2","ONTD_P3","ONTD_P4","ONTD_P5","ONTD_P6","ONTD_P7","ONTD_P8","ONTD_P9","ONTD_P10","ONTD_P11","ONTD_P12","ONTD_P13","ONTD_P14","ONTD_P15","TDCASEID","HH_HISP","HH_RACE","DRIVER","R_SEX","WORKER","DRVRCNT","HHFAMINC","HHSIZE","HHVEHCNT","NUMADLT","FLAG100","LIF_CYC","TRIPPURP","AWAYHOME","CDIVMSAR","CENSUS_D","CENSUS_R","DROP_PRK","DRVR_FLG","EDUC","ENDTIME","HH_ONTD","HHMEMDRV","HHRESP","HHSTATE","HHSTFIPS","INTSTATE","MSACAT","MSASIZE","NONHHCNT","NUMONTRP","PAYTOLL","PRMACT","PROXY","PSGR_FLG","R_AGE","RAIL","STRTTIME","TRACC1","TRACC2","TRACC3","TRACC4","TRACC5","TRACCTM","TRAVDAY","TREGR1","TREGR2","TREGR3","TREGR4","TREGR5","TREGRTM","TRPACCMP","TRPHHACC","TRPHHVEH","TRPTRANS","TRVL_MIN","TRVLCMIN","TRWAITTM","URBAN","URBANSIZE","URBRUR","USEINTST","USEPUBTR","VEHID","WHODROVE","WHYFROM","WHYTO","WHYTRP1S","WRKCOUNT","DWELTIME","WHYTRP90","TDTRPNUM","TDWKND","TDAYDATE","TRPMILES","WTTRDFIN","VMT_MILE","PUBTRANS","HOMEOWN","HOMETYPE","HBHUR","HTRESDN","HTHTNRNT","HTPPOPDN","HTEEMPDN","HBRESDN","HBHTNRNT","HBPPOPDN","GASPRICE","VEHTYPE","HH_CBSA","HHC_MSA")
 
@@ -105,14 +108,14 @@ saveRDS(NHTS.trips, file = "./data/NHTS.trips.rds")
 saveRDS(NHTS.person, file = "./data/NHTS.person.rds")
 ```
 
-```{r loadData}
+```{r loadData, eval = TRUE}
 NHTS.person <- readRDS(file = "./data/NHTS.person.rds")
 NHTS.trips <- readRDS(file = "./data/NHTS.trips.rds")
 ```
 
 #### Investigate Trip Data
 
-```{r summary, fig.width = 15}
+```{r summary, fig.width = 15, eval = TRUE}
 summary(with(subset(NHTS.trips, AT == "walk"), TRPMILES))
 summary(with(subset(NHTS.trips, AT == "cycle"), TRPMILES))
 summary(with(subset(NHTS.trips, AT == "other"), TRPMILES))
@@ -158,20 +161,20 @@ g
 
 #### Subset and Merge
 
-```{r subset}
+```{r subset, eval = TRUE}
 NHTS.person <- subset( NHTS.person, MSA == TRUE )
 NHTS <- merge(NHTS.person, NHTS.trips, by = c("HOUSEID","PERSONID"))
 ```
 
 #### Split into strata by region
 
-```{r split}
+```{r split, eval = TRUE}
 listOfLists <- lapply(split(NHTS, NHTS$HHS),function(x) lapply(split(x, x$SEX), function(x) split(x, x$AGE)))
 ```
 
 #### Compute Mean Trip Lengths
 
-```{r count}
+```{r count, eval = TRUE}
 counts <- lapply(listOfLists, function(x) lapply(x, function(x) lapply(x, countPeople)))
 walkLength <- lapply(listOfLists, function(x) lapply(x, function(x) lapply( x, tripTime, mode = "walk")))
 cycleLength <- lapply(listOfLists, function(x) lapply(x, function(x) lapply( x, tripTime, mode = "cycle")))
@@ -196,7 +199,7 @@ The data files in ~/Box Sync/work/CoBenefits/MaggieShare/VitalStats/CDCwonder/.
 
 #### Query Results File (HHSmetro_Age_sex_2010-14.csv)
 
-```{r CDC, eval = FALSE}
+```{r CDC, eval = TRUE}
 wonder <- read.csv("./../data/CDCwonder/HHSmetro_Age_sex_2010-14.csv", header=T)
 names(wonder) <- c("HHSRegion", "HHSRegionCode", "gender", "genderCode","WONDERage","WONDERageCode","ICD10",  "ICD10Code", "deaths5yr", "population5yr", "crudeRate")
 
@@ -206,12 +209,12 @@ wonder <- subset(wonder, WONDERageCode != "NS") # remove 'Not stated' Age entrie
 The following two recoding chunks should probably be redone.  They
 depend on the ordering of the factors which seems dangerous.
 
-```{r ITHIMCause, eval = FALSE}
+```{r ITHIMCause, eval = TRUE}
 ITHIMcauseKey <- c("ColonCancer","LungCancer","BreastCancer","Diabetes","Dementia","IHD","InflammatoryHD","InflammatoryHD","HHD","Stroke","AcuteRespInfections","AcuteRespInfections","RespiratoryDisease","RespiratoryDisease","RTIs","RTIs")
 names(ITHIMcauseKey) <- unique(wonder$ICD10)
 wonder$ITHIMcause <- ITHIMcauseKey[as.character(wonder$ICD10)]
 ```
-```{r recodeAge, eval = FALSE}
+```{r recodeAge, eval = TRUE}
 ITHIMageKey <- c("ageClass1", "ageClass1", "ageClass2", "ageClass2", "ageClass3", "ageClass3", "ageClass3", "ageClass4", "ageClass4", "ageClass4", "ageClass5", "ageClass5", "ageClass5", "ageClass6", "ageClass6", "ageClass7", "ageClass7", "ageClass8", "ageClass8","ageClass8", "ageClass8", "ageClass8")
 names(ITHIMageKey) <- unique(wonder$WONDERage)
 wonder$ITHIMage <- ITHIMageKey[as.character(wonder$WONDERage)]
@@ -219,7 +222,7 @@ wonder$ITHIMage <- ITHIMageKey[as.character(wonder$WONDERage)]
 
 Depression was not in the WONDER data, since there are no deaths, have to add it manually.
 
-```{r wonder, eval = FALSE}
+```{r wonder, eval = TRUE}
 wonder <- wonder[, c("HHSRegionCode","gender","ITHIMage","ITHIMcause","deaths5yr","population5yr")]
 depress <- expand.grid(HHSRegionCode=unique(wonder$HHSRegionCode), gender=unique(wonder$gender),ITHIMage = unique(wonder$ITHIMage), ITHIMcause = "Depression", deaths5yr = "0", population5yr = "0", stringsAsFactors=T)
 wonder <- rbind(wonder, depress)
@@ -227,7 +230,7 @@ wonder <- rbind(wonder, depress)
 
 Replace suppressed values with random number 1-9
 
-```{r suppressed, eval = FALSE}
+```{r suppressed, eval = TRUE}
 wonder <- within( wonder, {
     newDeaths <- as.numeric(ifelse(deaths5yr == "Suppressed", sample(0:9), as.numeric(as.character(deaths5yr))))
     })
@@ -235,7 +238,7 @@ wonder <- within( wonder, {
 
 10 HHS x 2 sex x 8 age x 13 disease = 2,080 strata.
 
-```{r summary2, eval = FALSE}
+```{r summary2, eval = TRUE}
 wonderSummary <- ddply(wonder, .(HHSRegionCode, gender, ITHIMage, ITHIMcause), summarise,
                        numberOfDeaths5yr = sum(as.numeric(as.character(newDeaths)), na.rm=T)
 )
@@ -247,7 +250,7 @@ Read in data for single year population.  Processed in Excel, to
 combine two WONDER queries, need to go back and script the processing
 of the raw WONDER output
 
-```{r singleyear, eval = FALSE}
+```{r singleyear, eval = TRUE}
 pop14 <- read.csv("./../data/CDCwonder/HHSmetro_Age_sex_2014_AllCause.csv", header=T)
 
 
@@ -255,13 +258,13 @@ names(pop14) <- c("HHSRegion", "HHSRegionCode","gender", "genderCode","WONDERage
 ```
 This is delicate(read sloppy), really need to check the order of age groups returned by the 'unique(pop14$WONDERage)' command.
 
-```{r sloppy, eval = FALSE}
+```{r sloppy, eval = TRUE}
 ITHIMageKey2 <- c("ageClass8", "ageClass1", "ageClass7", "ageClass7", "ageClass6", "ageClass6", "ageClass1", "ageClass5", "ageClass5","ageClass5","ageClass4", "ageClass3", "ageClass4", "ageClass2", "ageClass2", "ageClass3", "ageClass4", "ageClass3","ageClass8")
 names(ITHIMageKey2) <- unique(pop14$WONDERage)
 pop14$ITHIMage <- ITHIMageKey2[as.character(pop14$WONDERage)]
 ```
 
-```{r foop, eval = FALSE}
+```{r foop, eval = TRUE}
 pop14 <-  pop14[, c("HHSRegionCode","gender","ITHIMage","deaths2014AllCause","population2014")]
 pop14$deaths2014 <- as.numeric(ifelse(pop14$deaths2014 == "Suppressed", sample(0:9), as.numeric(as.character(pop14$deaths2014))))
 
@@ -276,7 +279,7 @@ HHSmetroCauseSpecific <- merge(wonderSummary, popSummary)
 
 Presumably this comes from an EXCEL file.
 
-```{r USGBD, eval = FALSE}
+```{r USGBD, eval = TRUE}
 USGBD <- read.csv("./../data/CDCwonder/USGBD.csv", header=T)
 USGBD$ITHIMage <- as.character(USGBD$ITHIMage)
 USGBD$ITHIMcause <- as.character(USGBD$ITHIMcause)
@@ -300,7 +303,7 @@ burdenOut <- burdenOut[,c("HHS", "disease","sex","dproj","yll","yld","daly")]
 
 Now we create an R list of GBD objects named by HHS region.
 
-```{r burdenList, eval = FALSE}
+```{r burdenList, eval = TRUE}
 GBDList <- lapply(split(burdenOut, burdenOut$HHS),function(x) lapply(split(x, x$disease), function(x) split(x, x$sex)))
 #saveRDS(GBDList, file = "../data/GBD.rds")
 ```
@@ -392,7 +395,7 @@ METmatrix <- rbind(matrix(0,nrow = 2, ncol = 2), matrix(parameters$mean, ncol = 
 
 ## Create List of ITHIM Objects
 
-```{r ITHIMObjs, eval = FALSE}
+```{r ITHIMObjs, eval = TRUE}
 
 ITHIMList <- list()
 
@@ -405,11 +408,56 @@ for (HHS in paste0("HHS",1:10)){
   ITHIMList[[HHS]] <- updateITHIM(ITHIMList[[HHS]], "Rwt", RwtList[[HHS]])
   ITHIMList[[HHS]] <- updateITHIM(ITHIMList[[HHS]], "Rct", RctList[[HHS]])
   ITHIMList[[HHS]] <- updateITHIM(ITHIMList[[HHS]], "GBD", GBDList[[HHS]])
+  ITHIMList[[HHS]] <- updateITHIM(ITHIMList[[HHS]], "muNonTravel", 15)
 }
+
+saveRDS(ITHIMList, file = "./data/ITHIMList.rds")
 
 ```
 
-```{r CRA, eval = FALSE}
+```{r readRDS, eval = TRUE}
+ITHIMlist <- readRDS(file = "./data/ITHIMList.rds")
+```
+
+```{r fooba}
+sumDALY <- function(ITHIM.baseline, ITHIM.scenario){
+    return(sum(unlist(compareModels(ITHIM.baseline, ITHIM.scenario)$daly.delta)))
+    }
+```
+
+```{r sumDALY}
+ITHIM.national <- createITHIM(vision = "baseline", region = "national")
+ITHIM.national <- updateITHIM(ITHIM.national, "muNonTravel", 15)
+ITHIM.national <- updateITHIM(ITHIM.national, "muwt", 49.63)
+ITHIM.national <- updateITHIM(ITHIM.national, "muct", 2.50)
+DALYs <- lapply(ITHIMList, sumDALY, ITHIM.baseline = ITHIM.national)
+```
+
+```{r eval = TRUE}
+
+meanMatrix <- function(ITHIM, mode = "walk"){
+   if(mode == "walk"){
+      return(with(ITHIM$parameters, data.frame(ageClass = factor(1:8), mode = mode, Rwt*muwt)))
+}else{
+      return(with(ITHIM$parameters, data.frame(ageClass = factor(1:8), mode = mode, Rct*muct)))
+}
+}
+
+meanMatrixListWalk <- lapply(ITHIMList, meanMatrix, mode = "walk")
+meanMatrixListCycle <- lapply(ITHIMList, meanMatrix, mode = "cycle")
+
+D <- melt(c(meanMatrixListWalk,meanMatrixListCycle))
+
+names(D) <- c("ageClass", "mode", "sex", "time", "HHS")
+
+p1 <- ggplot(D, aes(x = ageClass, y = time, fill = sex)) + geom_bar(stat= "identity", position = "dodge") + facet_grid( mode ~ HHS)
+
+p1
+
+```
+
+
+```{r CRA, eval = TRUE}
 
 CRA.fn <- function(i, j){
   foo <- compareModels( ITHIMList[[i]], ITHIMList[[j]])
