@@ -100,7 +100,8 @@ NHTS.person <- with(PERV2PUB,{
                                SEX = as.factor(ifelse(R_SEX=="1", "M", ifelse(R_SEX=="2", "F", NA))),
                                AGE = as.factor(convertToAgeClass(R_AGE)),
                                MSA = ifelse(MSASIZE %in% 1:5, TRUE, FALSE),
-                               HHS = as.factor(convertToHHS(HHSTATE))
+                               HHSTATE = as.character(HHSTATE),
+                               HHS = as.character(convertToHHS(as.character(HHSTATE))), stringsAsFactors = FALSE
 
 )
 })
@@ -122,8 +123,6 @@ summary(with(subset(NHTS.trips, AT == "other"), TRPMILES))
 summary(with(subset(NHTS.trips, AT == "walk"), TRVLCMIN))
 summary(with(subset(NHTS.trips, AT == "cycle"), TRVLCMIN))
 summary(with(subset(NHTS.trips, AT == "other"), TRVLCMIN))
-
-
 
 walkHours <- with(subset(NHTS.trips, {
     AT == "walk" & TRPMILES < 10 & TRPMILES/TRVLCMIN*60 < 8 & TRVLCMIN > 5 #& TRPMILES/TRVLCMIN*60 > 0.5
@@ -289,6 +288,7 @@ USGBD$ITHIMcause <- as.character(USGBD$ITHIMcause)
 
 burden <- merge(HHSmetroCauseSpecific, USGBD, all.x=T)
 burden$deaths <- burden$numberOfDeaths5yr/5
+## neil uses 10, and if deaths<10 sets ratio to 1
 burden$ratio <- ifelse(burden$GBDdeaths == 0, 1, ((burden$deaths/burden$population2014)/(burden$GBDdeaths/burden$GBDpop)))
 burden$YLL <- burden$ratio * (burden$GBDyll/burden$GBDpop) * burden$population2014
 burden$YLD <- burden$ratio * (burden$GBDyld/burden$GBDpop) * burden$population2014
@@ -467,7 +467,7 @@ names(D) <- c("ageClass", "mode", "sex", "time", "HHS")
 
 #D <- within(D, HHS <- factor(HHS, levels = c(paste0("HHS",1:10),"Natl")))
 
-p1 <- ggplot(D, aes(x = ageClass, y = time, fill = sex)) + geom_bar(stat= "identity", position = "dodge") + facet_grid( mode ~ HHS)
+p1 <- ggplot(D, aes(x = ageClass, y = time, fill = sex)) + geom_bar(stat= "identity", position = "dodge") + facet_grid( mode ~ HHS, scales = "free_y")
 
 p1
 
