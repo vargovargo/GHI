@@ -1,0 +1,18 @@
+
+* ITHIM Regional Evaluation
+** R Package and UI
+** Will include road injuries and air pollution
+
+* Estimating Physical Activity (METs)
+** ATUS vs. NHANES
+The use of the Ainsworth codes to estimate overall energy expenditure
+distrubution may be of interest to some.  A comparison of
+distruibutions derived from NHANEs could be illuminating too.
+** Regional variation
+** RR dose-response curves
+Woodcocks or published?
+
+* Estimating Active Travel Distribution
+** GPS devices
+** NHTS
+** Regional differences

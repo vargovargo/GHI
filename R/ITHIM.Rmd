@@ -48,7 +48,7 @@ countPeople <- function(data){
 }
 
 tripTime <- function(data, mode = "walk"){
- return(sum(subset(data, AT == mode)$TRVLCMIN, na.rm = TRUE))
+ return(sum(subset(data, AT == mode)$TRVL_MIN, na.rm = TRUE))
 }
 
 reformatData <- function(data){
@@ -57,6 +57,14 @@ foo <- rbind( c(0.1, 0.1), foo)
 dimnames(foo) <- list(paste0("ageClass",1:8), c("F","M"))
 return(foo[,c("M","F")])
 }
+
+reformatData2 <- function(data){
+foo <- matrix(unlist(data), nrow = 7, ncol = 2)
+foo <- rbind( c(0.1, 0.1), foo)
+dimnames(foo) <- list(paste0("ageClass",1:8), c("F","M"))
+return(foo[,c("M","F")])
+}
+
 ```
 
 #### Read Two of the Four NHTS Data Tables
@@ -120,24 +128,24 @@ NHTS.trips <- readRDS(file = "./data/NHTS.trips.rds")
 summary(with(subset(NHTS.trips, AT == "walk"), TRPMILES))
 summary(with(subset(NHTS.trips, AT == "cycle"), TRPMILES))
 summary(with(subset(NHTS.trips, AT == "other"), TRPMILES))
-summary(with(subset(NHTS.trips, AT == "walk"), TRVLCMIN))
-summary(with(subset(NHTS.trips, AT == "cycle"), TRVLCMIN))
-summary(with(subset(NHTS.trips, AT == "other"), TRVLCMIN))
+summary(with(subset(NHTS.trips, AT == "walk"), TRVL_MIN))
+summary(with(subset(NHTS.trips, AT == "cycle"), TRVL_MIN))
+summary(with(subset(NHTS.trips, AT == "other"), TRVL_MIN))
 
 walkHours <- with(subset(NHTS.trips, {
-    AT == "walk" & TRPMILES < 10 & TRPMILES/TRVLCMIN*60 < 8 & TRVLCMIN > 5 #& TRPMILES/TRVLCMIN*60 > 0.5
-}), TRVLCMIN/60)
+    AT == "walk" & TRPMILES < 10 & TRPMILES/TRVL_MIN*60 < 8 & TRVL_MIN > 5 #& TRPMILES/TRVL_MIN*60 > 0.5
+}), TRVL_MIN/60)
 
 walkMiles <- with(subset(NHTS.trips, {
-    AT == "walk" & TRPMILES < 10 & TRPMILES/TRVLCMIN*60 < 8 & TRVLCMIN > 5 #& TRPMILES/TRVLCMIN*60 > 0.5
+    AT == "walk" & TRPMILES < 10 & TRPMILES/TRVL_MIN*60 < 8 & TRVL_MIN > 5 #& TRPMILES/TRVL_MIN*60 > 0.5
 }), TRPMILES)
 
 cycleHours <- with(subset(NHTS.trips, {
-      AT == "cycle" & TRPMILES < 25 & TRPMILES/TRVLCMIN*60 < 25 & TRVLCMIN > 5 #& TRPMILES/TRVLCMIN*60 > 1
-}), TRVLCMIN/60)
+      AT == "cycle" & TRPMILES < 25 & TRPMILES/TRVL_MIN*60 < 25 & TRVL_MIN > 5 #& TRPMILES/TRVL_MIN*60 > 1
+}), TRVL_MIN/60)
 
 cycleMiles <- with(subset(NHTS.trips, {
-      AT == "cycle" & TRPMILES < 25 & TRPMILES/TRVLCMIN*60 < 25 & TRVLCMIN > 5 #& TRPMILES/TRVLCMIN*60 > 1
+      AT == "cycle" & TRPMILES < 25 & TRPMILES/TRVL_MIN*60 < 25 & TRVL_MIN > 5 #& TRPMILES/TRVL_MIN*60 > 1
 }), TRPMILES)
 
 walkSpeed <- median(walkMiles/walkHours, na.rm = TRUE)
@@ -168,15 +176,36 @@ NHTS <- merge(NHTS.person, NHTS.trips, by = c("HOUSEID","PERSONID"))
 barplot(with(NHTS,table(HHS)))
 ```
 
-#### Split into strata by region
+#### Compute Natioal Metro Average
 
-```{r split, eval = TRUE, echo = FALSE}
-listOfLists <- lapply(split(NHTS, NHTS$HHS),function(x) lapply(split(x, x$SEX), function(x) split(x, x$AGE)))
+```{r natl}
+listOfLists <- lapply(split(NHTS, NHTS$SEX),function(x) split(x, x$AGE))
+counts <- lapply(listOfLists, function(x) lapply(x, countPeople))
+walkLength <- lapply(listOfLists, function(x) lapply( x, tripTime, mode = "walk"))
+cycleLength <- lapply(listOfLists, function(x) lapply( x, tripTime, mode = "cycle"))
+
+countMatrix <- reformatData(counts)
+walkMatrix <- reformatData(walkLength)
+cycleMatrix <- reformatData(cycleLength)
+
+meanWalkList <- walkMatrix/countMatrix*7
+meanCycleList <- cycleMatrix/countMatrix*7
+
+RwtList <- ifelse(meanWalkList == 0, 1e-4, meanWalkList)
+RctList <- ifelse(meanCycleList == 0, 1e-4, meanCycleList)
+
+RwtNational <- RwtList/RwtList[3,2]
+RctNational <- RctList/RctList[3,2]
+muwtNational <- meanWalkList[3,2]
+muctNational <- meanCycleList[3,2]
+
+rm("listOfLists","counts","walkLength","cycleLength","countMatrix","walkMatrix","cycleMatrix","meanWalkList","meanCycleList","RwtList","RctList","muwtList","muctList")
 ```
 
 #### Compute Mean Trip Lengths
 
 ```{r count, eval = TRUE, echo = FALSE}
+listOfLists <- lapply(split(NHTS, NHTS$HHS),function(x) lapply(split(x, x$SEX), function(x) split(x, x$AGE)))
 counts <- lapply(listOfLists, function(x) lapply(x, function(x) lapply(x, countPeople)))
 walkLength <- lapply(listOfLists, function(x) lapply(x, function(x) lapply( x, tripTime, mode = "walk")))
 cycleLength <- lapply(listOfLists, function(x) lapply(x, function(x) lapply( x, tripTime, mode = "cycle")))
@@ -185,8 +214,8 @@ walkMatrix <- lapply(walkLength, reformatData)
 cycleMatrix <- lapply(cycleLength, reformatData)
 meanWalkList <- mapply(walkMatrix,   countMatrix, FUN = function(x,y) x/y*7, SIMPLIFY = FALSE)
 meanCycleList <- mapply(cycleMatrix, countMatrix, FUN = function(x,y) x/y*7, SIMPLIFY = FALSE)
-RwtList <- lapply( meanWalkList, function(x) ifelse(x == 0, 0.01, x) )
-RctList <- lapply( meanCycleList, function(x) ifelse(x == 0, 0.01, x) )
+RwtList <- lapply( meanWalkList, function(x) ifelse(x == 0, 1e-4, x) )
+RctList <- lapply( meanCycleList, function(x) ifelse(x == 0, 1e-4, x) )
 RwtList <- lapply( RwtList, function(x) x/x[3,2] )
 RctList <- lapply( RctList, function(x) x/x[3,2] )
 muwtList <- lapply( meanWalkList, function(x) x[3,2] )
@@ -412,7 +441,7 @@ if(compute){
 
 DALYsTotal <- data.frame()
 
-for( muNonTravel in seq(1,75,length.out = 20) ){
+for( muNonTravel in seq(1,75,length.out = 3) ){
 
   ITHIMList <- list()
   rm(DALYs)
@@ -430,8 +459,10 @@ for( muNonTravel in seq(1,75,length.out = 20) ){
 
   ITHIM.national <- createITHIM(vision = "baseline", region = "national")
   ITHIM.national <- updateITHIM(ITHIM.national, "muNonTravel", muNonTravel)
-  ITHIM.national <- updateITHIM(ITHIM.national, "muwt", 49.63)
-  ITHIM.national <- updateITHIM(ITHIM.national, "muct", 2.50)
+  ITHIM.national <- updateITHIM(ITHIM.national, "muwt", muwtNational)
+  ITHIM.national <- updateITHIM(ITHIM.national, "muct", muctNational)
+  ITHIM.national <- updateITHIM(ITHIM.national, "Rwt", RwtNational)
+  ITHIM.national <- updateITHIM(ITHIM.national, "Rct", RctNational)
   DALYs <- lapply(ITHIMList, sumDALY, ITHIM.baseline = ITHIM.national)
   DALYs <- data.frame(HHS = names(DALYs), muNonTravel = muNonTravel, DALY = unlist(DALYs))
   DALYsTotal <- rbind(DALYsTotal, DALYs)
