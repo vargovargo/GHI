@@ -4,7 +4,7 @@ docs
 data
 .Rhistory
 *.html
-figure/
+R/figure/
 .#*
 foo
 log
@@ -35,4 +35,4 @@ credentials
 R.css
 lib/
 *.rds
-figures/
+hhsmap.png
