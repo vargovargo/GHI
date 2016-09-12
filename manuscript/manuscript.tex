@@ -184,10 +184,10 @@ magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
 ullamco laboris nisi ut aliquip ex ea commodo consequat.
 
 \begin{figure}[t]
-    \centerline{\includegraphics[width=0.4\textwidth]{./figures/hhsmap}}\centerline{\includegraphics[width=0.4\textwidth]{./figures/fig2}}
-    \caption{Change in total national DALYs for each regional transportation
-estimates.
-}\label{dalyFigure}
+    \centerline{\includegraphics[width=0.4\textwidth]{./figures/hhsmap}}
+    \centerline{\includegraphics[width=0.4\textwidth]{./figures/fig2}}
+    \caption{Change in total national DALYs for each regional
+      transportation estimates.}\label{dalyFigure}
 \end{figure}
 
 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
@@ -216,131 +216,3 @@ ullamco laboris nisi ut aliquip ex ea commodo consequat.
 %\bibliographystyle{mypapers}
 \bibliography{ITHIM}
 \end{document}
-
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%\bibliographystyle{achemnat}
-%\bibliographystyle{plainnat}
-%\bibliographystyle{abbrv}
-%\bibliographystyle{bioinformatics}
-%
-%\bibliographystyle{plain}
-%
-% RNA-seq is a powerful technology used to measure genome-wide
-% transcription and dozens of statistical methods have been developed
-% recently to facilitate its use, including methods for estimating
-% expression and identifying differential expression (DE)
-% \cite{Oshlack2010}. The ability to evaluate these methods and compare
-% their performance in various settings is essential to ensure that
-% reliable information is obtained. The Microarray Quality Control
-% (MAQC) \cite{shi2006} data sets have proven useful toward this
-% end. However, they are limited by small sample sizes and old
-% protocol. Evaluation of DE analysis methods can be performed with
-% simulated data, and a handful of methods to simulate RNA-seq reads
-% have been developed including FluxSimulator and BEERS
-% \cite{Griebel2012, Grant2011}.  BEERS is slower than \package{} and,
-% as with FluxSimulator, does not allow specification of read count
-% means and are therefore not useful for DE-based read simulation.
-
-% We have developed \package{} to simulate reads efficiently under a
-% realistic model of DE across two treatment groups, and to use these
-% reads to estimate expression levels for downstream analyses, all
-% within the \R{} environment. \package{} is built on the software
-% package \rsem{} used primarily for transcript quantification
-% \cite{li2011}.  To induce differential expression of transcripts we
-% adjust the relative transcript abundance across treatment groups in
-% the empirical model used by the \rsem{} simulator.  The reads will be
-% simulated under the same design as the sample data.  If the sample
-% data are paired-end then the simulate reads will also be paired-end.
-
-% Transcript abundances vary substantially across \rnaseq{} experiments.
-% Factors such as cell type, organism, and experimental protocol affect
-% the expected transcript abundances.  \package{} builds its model with
-% sample data from an \rnaseq{} experiment, and uses the empirical read
-% count distributions to select a realistic distribution for mean and
-% dispersion parameters.  The total expression and fold change
-% relationship for the simulated data is also modeled from these data
-% and fold change levels are selected to mimic this
-% relationship. \package{} also takes advantage of the transcript
-% quantification provided by \rsem{} by allowing the user to estimate
-% read counts from the simulated reads.  Both the read-based simulation
-% and differential expression analysis may be performed within \R{}
-% using any of the many \R{} packages available for DE analysis, e.g.,
-% DESeq2, EdgeR, EBSeq \cite{love2014, Robinson2010, leng2013}.
-% \package{} implements a two stage simulation.  First, it simulates
-% read counts per transcript under a negative binomial distribution
-% using empirical mean and dispersion estimates.  Second, it calculates
-% relative transcript abundance using estimates of transcript length and
-% read-count, updates the sample model, and executes the \rsem{} read
-% simulator.
-
-% In the first step, read counts for the untreated group are drawn from
-% a negative binomial distribution with mean and dispersion parameters
-% $\hat{\mu_0}$, $\hat{\varphi_0}$ estimated from the untreated
-% group. In the treated group, differentially expressed transcripts are
-% simulated using $\mu_1 = \gamma\mu_0$, $\varphi_1=\varphi_0$.  The
-% parameter $\gamma$ is chosen to mimic the fold-change vs.\ total
-% expression relationship observed empirically, see Figure
-% \ref{ma-transcript}.  \sgy{Observed fold-change values decrease with
-% expression level.  If fold-change was assigned independently of
-% expression level then transcripts with high levels of expression would
-% be assigned\ldots}
-
-% Fold change among DE transcripts is chosen by binning the transcripts
-% by overall expression into equally sized bins, and using the bin-wise
-% standard deviation of the log fold-change to construct an appropriate
-% interval for the fold-change, from which a value is sampled randomly.
-% The interval is defined as $I_{\textrm{bin}} =
-% (k_1\sigma_{\textrm{bin}}, k_2\sigma_{\textrm{bin}})$, where
-% $\sigma_{\textrm{bin}}$ is the bin-wise standard deviation of log
-% fold-change, and $k_1$ and $k_2$ are chosen by the user.  In the
-% following chromosome 22 example, values of $k_1=?$ and $k_2=?$ were
-% used with $B=?$ bins.  By tuning parameters $k_1$ and $k_2$ the user
-% can control the signal strength while preserving the relationship
-% between fold-change and total expression. \sgy{\package{} could
-%   easily be adapted to allow user-defined values for $\gamma$, $\mu_i$
-%   and $\varphi_i$.}
-
-% Three files are needed for \package{}; a transcript template, the
-% read-count estimates for all samples, and a sample model file.  All of
-% these are easily created using \rsem{} utilities. A GTF file,
-% transcript-to-gene file such as ``knownIsoforms.txt'' from the UCSC
-% Genome Browser, and a FASTA reference sequence, or a Multi-FASTA file
-% containing transcript sequences, may be used to create the reference
-% files.
-
-% In the second stage, the simulated read counts are used to compute the
-% relative transcript abundance needed for the read simulation.
-% \package{} can return either the gene or isoform level estimated read
-% counts from \rsem{}, or simply write the fastq read file.  The
-% software package \bowtie{} is used for the alignment
-% \cite{langmead2009}.
-
-% We simulated 1,000,000 reads for each of ten samples from two
-% treatment groups, and performed DE analysis on all transcripts from
-% chromosome 22 using \ebseq{} \cite{leng2013}.  One hundred genes (288
-% transcripts) were selected at random to be DE.  In the top of Figure
-% \ref{ma-transcript} the log fold-change is plotted versus total
-% expression given the simulated counts.  Beneath it is the same figure,
-% bottom of Figure \ref{ma-transcript}, but using the estimate counts of
-% the simulated reads.  The reads are simulated in such a way as to
-% preserve the relationship between fold-change and total expression.
-
-% Using the transcript-wise estimated read counts from the simulated
-% data, we performed DE analysis using \ebseq{}.  Of the 288
-% differentially expressed transcripts, 179 (62\%) were correctly
-% identified by \ebseq{}, with 29 false discoveries.
-
-% %% In this example several of the DE transcripts were assigned a
-% %% posterior probability of DE to be zero.  This is due to one of the
-% %% treatment groups having zero count.  Also, some of the DE genes are
-% %% removed by \ebseq{} because the read count is too low.  Thus some of
-% %% the DE transcripts are unidentifiable.  If we remove them we have a
-% %% true positive rate of $x$\%.
-
-% Unaligned read data from twenty RNA-seq chips, along with a set of
-% chromosome 22 reference files were used to simulate the reads in this
-% example.  The example takes about 3 hours to run and may be found in
-% the compendium package \compendium{}, available at
-% \url{http://www.biostat.wisc.edu/~syounkin/}.
