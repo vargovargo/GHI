@@ -7,20 +7,11 @@
 \newcommand{\bi}{\begin{itemize}}
 \newcommand{\ei}{\end{itemize}}
 \newcommand{\package}{\emph{ITHIM}}
-\newcommand{\compendium}{\emph{ReadSimCompendium}}
 \newcommand{\ithim}{\emph{ITHIM}}
-\renewcommand{\bowtie}{\emph{bowtie}}
-\newcommand{\ebseq}{\emph{EBSeq}}
-\newcommand{\deseq}{\emph{DESeq2}}
 \newcommand{\R}{\emph{R}}
-\newcommand{\rnaseq}{RNA-seq}
-\newcommand{\gi}{gene/isoform}
-\newcommand{\gis}{genes/isoforms}
-\newcommand{\pest}{\texttt{ParamEstimation}}
-\newcommand{\csimu}{\texttt{CountSimu}}
-\newcommand{\writeRSEM}{\texttt{writeRSEMFiles}}
 \newcommand{\sgy}[1]{{\itshape\col{#1}}}
 \newcommand{\XX}{\sgy{XX}}
+\newcommand{\webpage}{\url{http://www.ithim.ghi.wisc.edu}}
 
 \begin{document}
 \firstpage{1}
@@ -43,40 +34,32 @@ University of Wisconsin{\textendash}Madison, Madison, WI USA\\
 \begin{abstract}
 
 \section{Summary:}
-
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-aliquip ex ea commodo consequat. Duis aute irure dolor in
-reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum
-dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
-occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur
-adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore
-magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-ullamco laboris nisi ut aliquip ex ea commodo consequat.
+We divided the U.S. metropolitan regions into 10 regions defined by
+the Department of Health and Human Services (HHS1-10).  We performed a
+comparative risk analysis for each of the regions using national
+averages as the baseline.  We investigated the active transport
+component of the ITHIM model by estimating regional travel parameters
+using the National Household Transportation Survey.  The West coast
+and the Northeast of the U.S. have travel patterns that, if mirrored
+by the nation, would save the U.S. thousands to hundreds of thousands
+DALYs.
 
 \section{Availability:}
-The source code and data files for \package{} are publicly available
-on GitHub at \url{https://github.com/syounkin/ITHIM}.
+\package{} may be explored using the user interface avaiable
+at \webpage{}.  The source code and data files for \package{} are
+publicly available on GitHub at \webpage{}.
 
 \section{Supplementary information:}
 
-\url{http://www.ithim.ghi.wisc.edu}.
+See \webpage{} for links to the source code, manual, tutorial and
+links for more information about the ITHIM model.
 
 \section{Contact:}
-\href{patz@wisc.edu}{patz@wisc.edu}
+\href{javargo@wisc.edu}{javargo@wisc.edu}
 \end{abstract}
 
 \section{Introduction}
-
-ITHIM is a mathematical model that integrates data on travel patterns,
+ITHIM is a statistical model that integrates data on travel patterns,
 physical activity, fine particulate matter, GHG emissions, and disease
 and injuries. Based on population and travel scenarios. The model has
 been used to calculate the health impacts of walking and bicycling
@@ -88,21 +71,42 @@ a change in the disease burden, resulting from the shift in the
 exposure distribution from a baseline scenario to an alternative
 scenario.
 
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+aliquip ex ea commodo consequat. Duis aute irure dolor in
+reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum
+dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
+incididunt ut labore et dolore magna aliqua.
+
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+aliquip ex ea commodo consequat. Duis aute irure dolor in
+reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+culpa qui officia deserunt mollit anim id est laborum.
+
 \begin{methods}
-\section{Method}
-
+\section{Methods}
 \begin{itemize}
-\item NHTS data
-\item GBD data
-\item ITHIM model parameters
+\item The coefficient of variation was fixed at ??? for all models.
+  Earlier ITHIM models estimated this as a function of total active
+  tranpsort time to model the decrease in variance of active transport
+  time that occurs for increasing means, i.e., fitter communities have
+  less variance in active transport time.
+\item The mean non-travel activity for the referent group was modeled
+  as a variable.  The relative means across age-sex strata were fixed,
+  and estimated using ATUS.
+\item The national DALYs were stimated using the attributable fraction
+  provided by the comparitive risk assesment.  The estimates for
+  disease burned came from WHO and their GBD study.
+\item Not all of the regions had the same sample size.  In fact a few
+  of the regions have relativel low sample size.  Maybe we should put
+  confidence intervals on our estimates.
 \end{itemize}
-
-\end{methods}
-
-\section{Regional Example}
-
-
-
 
 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
 eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
@@ -122,6 +126,62 @@ adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore
 magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
 ullamco laboris nisi ut aliquip ex ea commodo consequat.
 
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+aliquip ex ea commodo consequat. Duis aute irure dolor in
+reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum
+dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
+incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
+velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
+occaecat cupidatat non proident, sunt in culpa qui officia deserunt
+mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur
+adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore
+magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+ullamco laboris nisi ut aliquip ex ea commodo consequat.
+
+\end{methods}
+
+\section{Regional Example}
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+aliquip ex ea commodo consequat. Duis aute irure dolor in
+reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum
+dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
+incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
+velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
+occaecat cupidatat non proident, sunt in culpa qui officia deserunt
+mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur
+adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore
+magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+ullamco laboris nisi ut aliquip ex ea commodo consequat.
+
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+aliquip ex ea commodo consequat. Duis aute irure dolor in
+reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum
+dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
+incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
+velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
+occaecat cupidatat non proident, sunt in culpa qui officia deserunt
+mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur
+adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore
+magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+ullamco laboris nisi ut aliquip ex ea commodo consequat.
 
 \begin{figure}[t]
     \centerline{\includegraphics[width=0.4\textwidth]{./figures/hhsmap}}\centerline{\includegraphics[width=0.4\textwidth]{./figures/fig2}}
@@ -130,13 +190,30 @@ estimates.
 }\label{dalyFigure}
 \end{figure}
 
-\section*{Acknowledgment}
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+aliquip ex ea commodo consequat. Duis aute irure dolor in
+reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum
+dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
+incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
+velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
+occaecat cupidatat non proident, sunt in culpa qui officia deserunt
+mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur
+adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore
+magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+ullamco laboris nisi ut aliquip ex ea commodo consequat.
 
+\section*{Acknowledgment}
 \paragraph{Funding\textcolon} SGY is supported by$\ldots$ , JV, JP, $\ldots$
 
-%\bibliographystyle{natbib}
+\bibliographystyle{natbib}
 %\bibliographystyle{bmc_article}
-\bibliographystyle{mypapers}
+%\bibliographystyle{mypapers}
 \bibliography{ITHIM}
 \end{document}
 
