@@ -420,7 +420,7 @@ sumDALY <- function(ITHIM.baseline, ITHIM.scenario){
     }
 ```
 
-```{r ITHIMObjs, eval = TRUE, fig.width = 10, fig.height = 5, echo = FALSE, warning = FALSE}
+```{r ITHIMObjs, eval = TRUE, fig.width = 8, fig.height = 5, echo = FALSE, warning = FALSE}
 compute <- TRUE
 
 if(compute){

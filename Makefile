@@ -8,4 +8,4 @@ report: ./R/ITHIM.Rmd ./R/ITHIM.R
 	cd R; R --vanilla -e 'source("ITHIM.R")'
 
 manuscript: ./manuscript/manuscript.tex ./manuscript/ITHIM.bib
-	cd manuscript; make manuscript
+	cd manuscript; make manuscript.pdf
