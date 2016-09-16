@@ -47,16 +47,17 @@ University of Wisconsin{\textendash}Madison, Madison, WI USA\\
   by the Department of Health and Human Services (HHS1-10) we perform
   a comparative risk analysis between each regions and national
   averages as the baseline.  We investigated the reduced chronic
-  disease burden of (x,y,z outcomes) from increased physical activity
-  from population shifts in the amount of biking and walking doen for
-  transport.  Our methods employ the Integrated Transport and Health
-  Impacts Model (ITHIM) informed by regional travel parameters using
-  the National Household Transportation Survey, non-travel activity
-  metircs from the American Time Use Survey, and baseline Disease
-  burden from the Centers for Disease Control and Prevention's WONDER
-  database.  Our findings show that the West coast and the Northeast
-  of the U.S. have travel patterns that, if mirrored by the nation,
-  would save the U.S. thousands to hundreds of thousands DALYs.}
+  disease burden of ($x$, $y$, $z$ outcomes) from increased physical
+  activity from population shifts in the amount of biking and walking
+  doen for transport.  Our methods employ the Integrated Transport and
+  Health Impacts Model (ITHIM) informed by regional travel parameters
+  using the National Household Transportation Survey, non-travel
+  activity metircs from the American Time Use Survey, and baseline
+  Disease burden from the Centers for Disease Control and Prevention's
+  WONDER database.  Our findings show that the West coast and the
+  Northeast of the U.S. have travel patterns that, if mirrored by the
+  nation, would save the U.S. thousands to hundreds of thousands
+  DALYs.}
 
 \section{Availability:}
 \col[blue]{\package{} may be explored using the user interface
@@ -110,26 +111,31 @@ University of Wisconsin{\textendash}Madison, Madison, WI USA\\
 
 \section{Methods}
 
-The ITHIM model uses the comparative risk assesment framework to
-estimate the population attributable fraction, $\af$.  In our case
-$\af$ represents the proportional change in mortality and morbidity if
-the physical activity levels were adjusted to represent an alternate
-scenario.
+\col[blue]{\textit{
+    The ITHIM model uses the comparative risk
+    assesment framework to estimate the population attributable
+    fraction, $\af$.  In our case $\af$ represents the proportional
+    change in mortality and morbidity if the physical activity levels
+    were adjusted to represent an alternate scenario.
+}}
 
 \begin{equation}
 \af = \frac{\int R(x)P(x) dx  - \int R(x)Q(x) dx }{\int R(x)P(x) dx}
 \end{equation}
 
-Here $R(x)$ represents the risk when the individual has exposure $x$,
+\col[blue]{\textit{
+    Here $R(x)$ represents the risk when the individual has exposure $x$,
 in our case physical activity (\mets).  $P(x)$ and $Q(x)$ denote the
 population density of individuals with exposure $x$, in the baseline
 and alternate scenarios, respectively.  The exposure variable, $x$, is
 modeled as the sum of travel-related exposure and non-travel-related
 exposure.
+}}
 
 \subsection{Active Transport}
 
-The time spent walking or cycling, i.e., active transport time, is
+\col[blue]{\textit{
+    The time spent walking or cycling, i.e., active transport time, is
 modeled as a log-normal random variable with means defined for each
 age-sex stratum.  The non-travel-related physical activity is also
 modeled as log-normal with stratum-specific means.  Estimates for
@@ -138,7 +144,9 @@ American Time Use Survey data to estimate the relative means for each
 of the age-sex strata.  We then treat the mean of the referent group
 as a variable and compute results over a grid of values for this
 variable.  See Figure \ref{dalyFigure}.
+}}
 
+\col[blue]{\textit{
 The travel-related exposure is estimated using active transport time
 along with assumptions about how much physical activity is required
 for cycling and walking.  Active transport time and non-travel-related
@@ -147,10 +155,11 @@ fixed value was used as the coefficient of variation for the
 distributin of active transport time. A different, but also fixed,
 value was used for the non-travel-related physical activity
 distribution.
+}}
 
 \subsection{Road Injuries}
 
-\col[red]{\textit{
+\col[blue]{\textit{
 We chose to model road injuries in a more simplifed manner than the
 authors of ITHIM.  The original ITHIM requires information about the
 transportational infrastructure that cannot be accurately modeled on a
@@ -161,22 +170,20 @@ estimate road fatalaties in U.S. metropolitan areas given the percent
 of travel by walking. \cite{UWTechReport}
 }}
 
-\col[red]{\textit{
+\col[blue]{\textit{
 We need to estimate the increase/decrease in road injuries/fatalaties
 nation-wide as walking/cycling time increases.  We need a relative
 risk of road fatalaty as a function of active transport time...
 }}
 
-\col[red]{\textit{
-
-}}
-
 \subsection{Air Pollution}
 
-Can we model the decrease in \pEm{2.5} nationally as a function of
+\col[blue]{\textit{
+    Can we model the decrease in \pEm{2.5} nationally as a function of
 decrease in driving time?  The original plan was to use a baseline
 value for \pEm{2.5} and a linear relationship bewteen change in
 \pEm{2.5} and change in \vmt{}.
+}}
 
 \end{methods}
 
