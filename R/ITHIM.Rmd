@@ -427,7 +427,7 @@ if(compute){
 
 DALYsTotal <- data.frame()
 
-for( muNonTravel in seq(1,50,length.out = 20) ){
+for( muNonTravel in seq(1,10,length.out = 100) ){
 
   ITHIMList <- list()
   rm(DALYs)
@@ -459,8 +459,8 @@ for( muNonTravel in seq(1,50,length.out = 20) ){
 }
 
 barplot(with(NHTS,table(HHS)))
-p <- ggplot(DALYsTotal, aes(x = muNonTravel, y = DALY, colour = HHS))
-p  + geom_line(size = 2) + theme_bw() + scale_x_continuous(name="Non-Travel METs mean") + scale_y_continuous(name="Change in DALY (National)") + facet_grid(. ~ HHS)
+p <- ggplot(DALYsTotal, aes(x = muNonTravel, y = DALY/1e3, colour = HHS))
+p  + geom_line(size = 2) + theme_bw() + scale_x_continuous(name="Non-Travel METs mean (MET-hrs./week)") + scale_y_continuous(name="Change in National DALYs (Thousands)") + coord_cartesian(xlim = c(0, 10)) #+ facet_grid(. ~ HHS)
 ```
 
 ### Visualization of trip time matrices
