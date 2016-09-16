@@ -14,6 +14,9 @@
 \newcommand{\webpage}{\url{http://www.ithim.ghi.wisc.edu}}
 \newcommand{\af}{\rho}
 \newcommand{\mets}{MET-hrs./week}
+\newcommand{\pEm}[1]{$\mathrm{PM}_{#1}$}
+\newcommand{\vmt}{$\mathrm{VMT}$}
+
 \begin{document}
 \firstpage{1}
 
@@ -124,6 +127,8 @@ and alternate scenarios, respectively.  The exposure variable, $x$, is
 modeled as the sum of travel-related exposure and non-travel-related
 exposure.
 
+\subsection{Active Transport}
+
 The time spent walking or cycling, i.e., active transport time, is
 modeled as a log-normal random variable with means defined for each
 age-sex stratum.  The non-travel-related physical activity is also
@@ -143,9 +148,40 @@ distributin of active transport time. A different, but also fixed,
 value was used for the non-travel-related physical activity
 distribution.
 
-\subsection{Data Sources}
+\subsection{Road Injuries}
 
-\col[red]{Lorem ipsum dolor sit amet, consectetur adipisicing)) elit, sed do
+\col[red]{\textit{
+We chose to model road injuries in a more simplifed manner than the
+authors of ITHIM.  The original ITHIM requires information about the
+transportational infrastructure that cannot be accurately modeled on a
+regional level, and is more well-suited to say a collection of
+counties as a case study. \cite{maizlish2013}  We use the overall percent
+of travel by walking and road fatalities per U.S. metropolitan area to
+estimate road fatalaties in U.S. metropolitan areas given the percent
+of travel by walking. \cite{UWTechReport}
+}}
+
+\col[red]{\textit{
+We need to estimate the increase/decrease in road injuries/fatalaties
+nation-wide as walking/cycling time increases.  We need a relative
+risk of road fatalaty as a function of active transport time...
+}}
+
+\col[red]{\textit{
+
+}}
+
+\subsection{Air Pollution}
+
+Can we model the decrease in \pEm{2.5} nationally as a function of
+decrease in driving time?  The original plan was to use a baseline
+value for \pEm{2.5} and a linear relationship bewteen change in
+\pEm{2.5} and change in \vmt{}.
+
+\end{methods}
+
+\section{U.S. Metro-Regional Analysis}
+\col[blue]{Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
 eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
 minim veniam, quis nostrud exercitation ullamco laboris nisi ut
 aliquip ex ea commodo consequat. Duis aute irure dolor in
@@ -163,11 +199,9 @@ adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore
 magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
 ullamco laboris nisi ut aliquip ex ea commodo consequat.}
 
+\subsection{Data Sources}
 
-\end{methods}
-
-\section{U.S. Metro-Regional Analysis}
-\col[blue]{Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+\col[red]{Lorem ipsum dolor sit amet, consectetur adipisicing)) elit, sed do
 eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
 minim veniam, quis nostrud exercitation ullamco laboris nisi ut
 aliquip ex ea commodo consequat. Duis aute irure dolor in
@@ -198,36 +232,7 @@ ullamco laboris nisi ut aliquip ex ea commodo consequat.}
 \paragraph{Funding\textcolon} SGY is supported by$\ldots$ , JV, JP, $\ldots$
 
 %\bibliographystyle{natbib}
-%\bibliographystyle{bmc_article}
-\bibliographystyle{mypapers}
+\bibliographystyle{bmc_article}
+%\bibliographystyle{mypapers}
 \bibliography{ITHIM}
 \end{document}
-
-%   \begin{itemize}
-%   \item The coefficient of variation was fixed at ??? for all strata
-% and models.  Earlier ITHIM models estimated this as a function of
-% total active tranpsort time to model the decrease in variance of
-% active transport time that occurs for increasing means, i.e., fitter
-% communities have less variance in active transport time.
-%   \item The mean non-travel activity for the referent group was
-% modeled as a variable.  The relative means across age-sex strata were
-% fixed, and estimated using ATUS.
-%   \item The national DALYs were stimated using the attributable
-% fraction provided by the comparitive risk assesment.  The estimates
-% for disease burned came from WHO and their GBD study.
-%   \item Not all of the regions had the same sample size.  In fact a
-% few of the regions have relativel low sample size.  Maybe we should
-% put confidence intervals on our estimates.
-%   \item The ITHIM model stratifies the population by sex and age using
-% eight age classes.  Within each stratum active transport time is
-% modeled as log-normal with mean $\hat{\mu}_{i,j}$ which is estimated
-% from the National Household Transportation Survey.
-%   \item Quintiles, in this case the quantiles for percentages
-% $(0.1,0.3,0.5,0.7,0.9)$, are used to discretize the integral defined
-% in the Comparative Risk Assesment (CRA)
-%   \item
-% \end{itemize}
-%  ``the proportional reduction in population
-% disease or mortality that would occur if exposure to a risk factor
-% were reduced to an alternative ideal exposure scenario (eg. no tobacco
-% use).'' \url{http://www.who.int/healthinfo/global_burden_disease/metrics_paf/en/}
