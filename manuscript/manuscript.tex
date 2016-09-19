@@ -20,8 +20,8 @@
 \begin{document}
 \firstpage{1}
 
-\title[\package{}]{\package{}: an \R{} package for implemetation of
-  the ITHIM model}
+\title[\package{}]{A comparative risk assesment of U.S. regional
+  active transport using the ITHIM model}
 \author[Younkin \textit{et~al}]{Samuel G. Younkin$^{1}$,
   Jason Vargo$^{1}$\footnote{to whom correspondence should be addressed},
   $\ldots$
@@ -134,17 +134,11 @@ exposure.
 
 \subsection{Active Transport}
 
-\col[blue]{\textit{
-    The time spent walking or cycling, i.e., active transport time, is
-modeled as a log-normal random variable with means defined for each
-age-sex stratum.  The non-travel-related physical activity is also
-modeled as log-normal with stratum-specific means.  Estimates for
-non-travel-related physical activity are diffiuclt.  We used the
-American Time Use Survey data to estimate the relative means for each
-of the age-sex strata.  We then treat the mean of the referent group
-as a variable and compute results over a grid of values for this
-variable.  See Figure \ref{dalyFigure}.
-}}
+\col[blue]{\textit{The time spent walking or cycling, i.e., active
+    transport time, is modeled as a log-normal random variable with
+    means defined for each age-sex stratum.  The non-travel-related
+    physical activity is also modeled as log-normal with
+    stratum-specific means.}}
 
 \col[blue]{\textit{
 The travel-related exposure is estimated using active transport time
@@ -159,7 +153,7 @@ distribution.
 
 \subsection{Road Injuries}
 
-\col[blue]{\textit{
+\col[red]{\textit{
 We chose to model road injuries in a more simplifed manner than the
 authors of ITHIM.  The original ITHIM requires information about the
 transportational infrastructure that cannot be accurately modeled on a
@@ -170,7 +164,7 @@ estimate road fatalaties in U.S. metropolitan areas given the percent
 of travel by walking. \cite{UWTechReport}
 }}
 
-\col[blue]{\textit{
+\col[red]{\textit{
 We need to estimate the increase/decrease in road injuries/fatalaties
 nation-wide as walking/cycling time increases.  We need a relative
 risk of road fatalaty as a function of active transport time...
@@ -178,7 +172,7 @@ risk of road fatalaty as a function of active transport time...
 
 \subsection{Air Pollution}
 
-\col[blue]{\textit{
+\col[red]{\textit{
     Can we model the decrease in \pEm{2.5} nationally as a function of
 decrease in driving time?  The original plan was to use a baseline
 value for \pEm{2.5} and a linear relationship bewteen change in
@@ -188,43 +182,32 @@ value for \pEm{2.5} and a linear relationship bewteen change in
 \end{methods}
 
 \section{U.S. Metro-Regional Analysis}
-\col[blue]{Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-aliquip ex ea commodo consequat. Duis aute irure dolor in
-reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum
-dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
-occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur
-adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore
-magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-ullamco laboris nisi ut aliquip ex ea commodo consequat.}
 
-\subsection{Data Sources}
+\begin{figure}[t]
+    \centerline{\includegraphics[width=0.4\textwidth]{./figures/fig3}}
+    \caption{Foo}\label{meanMatrices}
+\end{figure}
 
-\col[red]{Lorem ipsum dolor sit amet, consectetur adipisicing)) elit, sed do
-eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-aliquip ex ea commodo consequat. Duis aute irure dolor in
-reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum
-dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
-occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur
-adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore
-magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-ullamco laboris nisi ut aliquip ex ea commodo consequat.}
+\col[blue]{\begin{itemize}
+\item We used the National Household Transportation Survey \cite{NHTS} to
+  estimate the mean walk and cycle times for individuals that live in
+  metropolitan areas ($\textrm{DAYV2PUB.MSA} \in (1,2,\ldots,5)$ which
+  corresponds to individuals whose homes are in an MSA or cMSA)
+  \bi\item Data quality issues along with assumptions about travel speed
+created mirky data.  The median values of trip time were used to avoid
+undue influence by outliers.\ei
+\item We then divided these into the 10 regions of the U.S. defined by
+  the Department of Health and Human Services (HH1-10)
+\item Using only the active transport component of the ITHIM model we
+  ran comparative analyses for each of the ten regions, using the
+  national averages as the baseline.
+\item We used data from the American Time Use Survey \cite{ATUS} to
+  estimate the relative means for each of the age-sex strata.  We then
+  treat the mean of the referent group as a variable and compute
+  results over a grid of values for this variable.  See Figure
+  \ref{dalyFigure}.
+\item Values for DALYs were found using the CDC Wonder database \cite{CDCWonder}
+\end{itemize}}
 
 
 \begin{figure}[t]
@@ -234,9 +217,8 @@ ullamco laboris nisi ut aliquip ex ea commodo consequat.}
       transportation estimates.}\label{dalyFigure}
 \end{figure}
 
-
 \section*{Acknowledgment}
-\paragraph{Funding\textcolon} SGY is supported by$\ldots$ , JV, JP, $\ldots$
+\paragraph{Funding\textcolon} \col[red]{SGY is supported by$\ldots$ , JV, JP, $\ldots$}
 
 %\bibliographystyle{natbib}
 \bibliographystyle{bmc_article}
