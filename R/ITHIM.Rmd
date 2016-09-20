@@ -425,8 +425,8 @@ sumDALY <- function(ITHIM.baseline, ITHIM.scenario){
 ```
 
 ```{r ITHIMObjs, eval = TRUE, fig.width = 8, fig.height = 5, echo = FALSE, warning = FALSE}
-upper <- 10
-length <- 100
+upper <- 20
+length <- 200
 
 DALYsTotal <- data.frame()
 ITHIMList <- list()
