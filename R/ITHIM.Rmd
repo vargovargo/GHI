@@ -421,51 +421,56 @@ sumDALY <- function(ITHIM.baseline, ITHIM.scenario){
 ```
 
 ```{r ITHIMObjs, eval = TRUE, fig.width = 8, fig.height = 5, echo = FALSE, warning = FALSE}
-compute <- TRUE
-
-if(compute){
+upper <- 8
+length <- 100
 
 DALYsTotal <- data.frame()
+ITHIMList <- list()
+ITHIM.default <- createITHIM(vision = "baseline", region = "national")
 
-for( muNonTravel in seq(1,10,length.out = 100) ){
-
-  ITHIMList <- list()
-  rm(DALYs)
-  ITHIM.default <- createITHIM(vision = "baseline", region = "national")
-
-  for (HHS in c(paste0("HHS0",1:9),"HHS10")){
+for (HHS in c(paste0("HHS0",1:9),"HHS10")){
     ITHIMList[[HHS]] <- ITHIM.default
     ITHIMList[[HHS]] <- updateITHIM(ITHIMList[[HHS]], "muwt", muwtList[[HHS]])
     ITHIMList[[HHS]] <- updateITHIM(ITHIMList[[HHS]], "muct", muctList[[HHS]])
     ITHIMList[[HHS]] <- updateITHIM(ITHIMList[[HHS]], "Rwt", RwtList[[HHS]])
     ITHIMList[[HHS]] <- updateITHIM(ITHIMList[[HHS]], "Rct", RctList[[HHS]])
     ITHIMList[[HHS]] <- updateITHIM(ITHIMList[[HHS]], "GBD", GBDList[[HHS]])
-    ITHIMList[[HHS]] <- updateITHIM(ITHIMList[[HHS]], "muNonTravel", muNonTravel)
   }
 
-  ITHIM.national <- createITHIM(vision = "baseline", region = "national")
+ITHIM.national <- createITHIM(vision = "baseline", region = "national")
+ITHIM.national <- updateITHIM(ITHIM.national, "muwt", muwtNational)
+ITHIM.national <- updateITHIM(ITHIM.national, "muct", muctNational)
+ITHIM.national <- updateITHIM(ITHIM.national, "Rwt", RwtNational)
+ITHIM.national <- updateITHIM(ITHIM.national, "Rct", RctNational)
+
+for( muNonTravel in seq(0.01,upper,length.out = length) ){
+
+  rm(DALYs)
+
+  for (HHS in c(paste0("HHS0",1:9),"HHS10")){
+    ITHIMList[[HHS]] <- updateITHIM(ITHIMList[[HHS]], "muNonTravel", muNonTravel)
+  }
+  
   ITHIM.national <- updateITHIM(ITHIM.national, "muNonTravel", muNonTravel)
-  ITHIM.national <- updateITHIM(ITHIM.national, "muwt", muwtNational)
-  ITHIM.national <- updateITHIM(ITHIM.national, "muct", muctNational)
-  ITHIM.national <- updateITHIM(ITHIM.national, "Rwt", RwtNational)
-  ITHIM.national <- updateITHIM(ITHIM.national, "Rct", RctNational)
+
   DALYs <- lapply(ITHIMList, sumDALY, ITHIM.baseline = ITHIM.national)
   DALYs <- data.frame(HHS = names(DALYs), muNonTravel = muNonTravel, DALY = unlist(DALYs))
   DALYsTotal <- rbind(DALYsTotal, DALYs)
 }
 
-}else{
-  DALYsTotal <- readRDS(file = "./data/DALYsTotal.rds")
-}
-
 barplot(with(NHTS,table(HHS)))
+
 p <- ggplot(DALYsTotal, aes(x = muNonTravel, y = DALY/1e3, colour = HHS))
-p  + geom_line(size = 2) + theme_bw() + scale_x_continuous(name="Non-Travel METs mean (MET-hrs./week)") + scale_y_continuous(name="Change in National DALYs (Thousands)") + coord_cartesian(xlim = c(0, 10)) #+ facet_grid(. ~ HHS)
+
+p + stat_smooth( method = loess) + theme_bw() + scale_x_continuous(name="Non-Travel METs mean (MET-hrs./week)") + scale_y_continuous(name="Change in National DALYs (Thousands)") + coord_cartesian(xlim = c(0, upper))
+
+p + stat_smooth( method = loess) + theme_bw() + scale_x_continuous(name="Non-Travel METs mean (MET-hrs./week)") + scale_y_continuous(name="Change in National DALYs (Thousands)") + coord_cartesian(xlim = c(0, upper)) + geom_point()
+
 ```
 
 ### Visualization of trip time matrices
 
-```{r meanMatrices, eval = TRUE, fig.width = 20, fig.height = 10, warning = FALSE, message = FALSE, echo = FALSE}
+```{r meanMatrices, eval = TRUE, fig.width = 10, fig.height = 5, warning = FALSE, message = FALSE, echo = FALSE}
 
 
 ITHIMList <- c(ITHIMList, list("Natl" = ITHIM.national))
@@ -482,14 +487,10 @@ meanMatrixListWalk <- lapply(ITHIMList, meanMatrix, mode = "walk")
 meanMatrixListCycle <- lapply(ITHIMList, meanMatrix, mode = "cycle")
 
 D <- melt(c(meanMatrixListWalk,meanMatrixListCycle))
-
 names(D) <- c("ageClass", "mode", "sex", "time", "HHS")
 
-#D <- within(D, HHS <- factor(HHS, levels = c(paste0("HHS",1:10),"Natl")))
-
-p1 <- ggplot(D, aes(x = ageClass, y = time, fill = sex)) + geom_bar(stat= "identity", position = "dodge") + facet_grid( mode ~ HHS, scales = "free_y")
-
-p1
+p1 <- ggplot(D, aes(x = ageClass, y = time, fill = sex)) + geom_bar(stat= "identity", position = "dodge") 
+p1 + theme_bw() + scale_x_discrete(name="Age Class", breaks = c(2,4,6,8)) + scale_y_continuous(name="Travel Minutes per Week") + facet_grid( mode ~ HHS, scales = "free_y")
 
 ```
 # Appendix
