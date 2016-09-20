@@ -53,7 +53,7 @@ tripTime <- function(data, mode = "walk"){
 
 reformatData <- function(data){
 foo <- matrix(unlist(data), nrow = 7, ncol = 2)
-foo <- rbind( c(0.1, 0.1), foo)
+foo <- rbind( c(0, 0), foo)
 dimnames(foo) <- list(paste0("ageClass",1:8), c("F","M"))
 return(foo[,c("M","F")])
 }
@@ -97,13 +97,7 @@ NHTS.person <- with(PERV2PUB,{
 
 )
 })
-saveRDS(NHTS.trips, file = "./data/NHTS.trips.rds")
-saveRDS(NHTS.person, file = "./data/NHTS.person.rds")
-```
 
-```{r loadData, eval = FALSE, echo = FALSE}
-NHTS.person <- readRDS(file = "./data/NHTS.person.rds")
-NHTS.trips <- readRDS(file = "./data/NHTS.trips.rds")
 ```
 
 #### Investigate Trip Data
@@ -162,7 +156,7 @@ NHTS.person <- subset( NHTS.person, MSA == TRUE )
 NHTS <- merge(NHTS.person, NHTS.trips, by = c("HOUSEID","PERSONID"))
 ```
 
-#### Compute Natioal Metro Average
+#### Compute National Metro Average
 
 ```{r natl, eval = TRUE, echo = FALSE, warning = FALSE}
 listOfLists <- lapply(split(NHTS, NHTS$SEX),function(x) split(x, x$AGE))
@@ -198,14 +192,24 @@ cycleLength <- lapply(listOfLists, function(x) lapply(x, function(x) lapply( x, 
 countMatrix <- lapply(counts, reformatData)
 walkMatrix <- lapply(walkLength, reformatData)
 cycleMatrix <- lapply(cycleLength, reformatData)
-meanWalkList <- mapply(walkMatrix,   countMatrix, FUN = function(x,y) x/y*7, SIMPLIFY = FALSE)
-meanCycleList <- mapply(cycleMatrix, countMatrix, FUN = function(x,y) x/y*7, SIMPLIFY = FALSE)
-RwtList <- lapply( meanWalkList, function(x) ifelse(x == 0, 1e-4, x) )
-RctList <- lapply( meanCycleList, function(x) ifelse(x == 0, 1e-4, x) )
-RwtList <- lapply( RwtList, function(x) x/x[3,2] )
-RctList <- lapply( RctList, function(x) x/x[3,2] )
-muwtList <- lapply( meanWalkList, function(x) x[3,2] )
-muctList <- lapply( meanCycleList, function(x) x[3,2] )
+meanWalkList <- mapply(walkMatrix,   countMatrix, FUN = function(x,y) ifelse(y == 0, 0, x/y*7), SIMPLIFY = FALSE)
+meanCycleList <- mapply(cycleMatrix, countMatrix, FUN = function(x,y) ifelse(y == 0, 0, x/y*7), SIMPLIFY = FALSE)
+
+#RwtList <- lapply( , function(x) ifelse(x == 0, 0, x) )
+#RctList <- lapply( , function(x) ifelse(x == 0, 0, x) )
+
+zeroReferentCase <- function(x){
+  if(x[3,2]==0){
+    return(matrix(1e-3,nrow=nrow(x),ncol=ncol(x), dimnames = dimnames(x)))
+  }else{
+    return(ifelse(x==0, 1e-3, x/x[3,2]))    
+  }
+}
+
+RwtList <- lapply( meanWalkList, zeroReferentCase)
+RctList <- lapply( meanCycleList, zeroReferentCase)
+muwtList <- lapply( meanWalkList, function(x) ifelse(x[3,2]==0,1e-3, x[3,2]))
+muctList <- lapply( meanCycleList, function(x) ifelse(x[3,2]==0,1e-3, x[3,2]))
 ```
 
 ### CDC Mortality
@@ -421,12 +425,15 @@ sumDALY <- function(ITHIM.baseline, ITHIM.scenario){
 ```
 
 ```{r ITHIMObjs, eval = TRUE, fig.width = 8, fig.height = 5, echo = FALSE, warning = FALSE}
-upper <- 8
+upper <- 10
 length <- 100
 
 DALYsTotal <- data.frame()
 ITHIMList <- list()
 ITHIM.default <- createITHIM(vision = "baseline", region = "national")
+ITHIM.default <- updateITHIM(ITHIMList[[HHS]], "cvNonTravel", 3)
+ITHIM.default <- updateITHIM(ITHIMList[[HHS]], "cv", 3.0288)
+ITHIM.default <- updateITHIM(ITHIMList[[HHS]], "pWalk", 0.85)
 
 for (HHS in c(paste0("HHS0",1:9),"HHS10")){
     ITHIMList[[HHS]] <- ITHIM.default
@@ -437,7 +444,7 @@ for (HHS in c(paste0("HHS0",1:9),"HHS10")){
     ITHIMList[[HHS]] <- updateITHIM(ITHIMList[[HHS]], "GBD", GBDList[[HHS]])
   }
 
-ITHIM.national <- createITHIM(vision = "baseline", region = "national")
+ITHIM.national <- ITHIM.default
 ITHIM.national <- updateITHIM(ITHIM.national, "muwt", muwtNational)
 ITHIM.national <- updateITHIM(ITHIM.national, "muct", muctNational)
 ITHIM.national <- updateITHIM(ITHIM.national, "Rwt", RwtNational)
