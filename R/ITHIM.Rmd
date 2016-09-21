@@ -25,6 +25,9 @@ install_github("smbache/magrittr", ref="master")
 library("magrittr")
 install("~/ITHIM/")
 library("ITHIM")
+
+fig.width <- 6 # inches
+phi <- (1+sqrt(5))/2 # the golden ratio ;)
 ```
 
 ## HHS Metro Region Parameter Sets
@@ -194,9 +197,6 @@ walkMatrix <- lapply(walkLength, reformatData)
 cycleMatrix <- lapply(cycleLength, reformatData)
 meanWalkList <- mapply(walkMatrix,   countMatrix, FUN = function(x,y) ifelse(y == 0, 0, x/y*7), SIMPLIFY = FALSE)
 meanCycleList <- mapply(cycleMatrix, countMatrix, FUN = function(x,y) ifelse(y == 0, 0, x/y*7), SIMPLIFY = FALSE)
-
-#RwtList <- lapply( , function(x) ifelse(x == 0, 0, x) )
-#RctList <- lapply( , function(x) ifelse(x == 0, 0, x) )
 
 zeroReferentCase <- function(x){
   if(x[3,2]==0){
@@ -420,13 +420,13 @@ METmatrix <- METmatrix/METmatrix[3,2]
 
 ```{r foobar, eval = TRUE, echo = FALSE}
 sumDALY <- function(ITHIM.baseline, ITHIM.scenario){
-    return(sum(unlist(compareModels(ITHIM.baseline, ITHIM.scenario)$daly.delta)))
+    return(sum(unlist(data.frame(compareModels(ITHIM.baseline,ITHIM.scenario)$daly.delta)[-1,]))) # AgeClass 1 is removed from totals
     }
 ```
 
-```{r ITHIMObjs, eval = TRUE, fig.width = 8, fig.height = 5, echo = FALSE, warning = FALSE}
+```{r ITHIMObjs, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, echo = FALSE, warning = FALSE}
 upper <- 20
-length <- 200
+length <- 100
 
 DALYsTotal <- data.frame()
 ITHIMList <- list()
@@ -461,13 +461,13 @@ for( muNonTravel in seq(0.01,upper,length.out = length) ){
   ITHIM.national <- updateITHIM(ITHIM.national, "muNonTravel", muNonTravel)
 
   DALYs <- lapply(ITHIMList, sumDALY, ITHIM.baseline = ITHIM.national)
-  DALYs <- data.frame(HHS = names(DALYs), muNonTravel = muNonTravel, DALY = unlist(DALYs))
+  DALYs <- data.frame(Region = names(DALYs), muNonTravel = muNonTravel, DALY = unlist(DALYs))
   DALYsTotal <- rbind(DALYsTotal, DALYs)
 }
 
-barplot(with(NHTS,table(HHS)))
+barplot(with(NHTS,table(Region)))
 
-p <- ggplot(DALYsTotal, aes(x = muNonTravel, y = DALY/1e3, colour = HHS))
+p <- ggplot(DALYsTotal, aes(x = muNonTravel, y = DALY/1e3, colour = Region))
 
 p + stat_smooth( method = loess) + theme_bw() + scale_x_continuous(name="Non-Travel METs mean (MET-hrs./week)") + scale_y_continuous(name="Change in National DALYs (Thousands)") + coord_cartesian(xlim = c(0, upper))
 
@@ -477,27 +477,35 @@ p + stat_smooth( method = loess) + theme_bw() + scale_x_continuous(name="Non-Tra
 
 ### Visualization of trip time matrices
 
-```{r meanMatrices, eval = TRUE, fig.width = 10, fig.height = 5, warning = FALSE, message = FALSE, echo = FALSE}
+```{r meanMatrices, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
 
 
-ITHIMList <- c(ITHIMList, list("Natl" = ITHIM.national))
+ITHIMList <- c(ITHIMList, list("National" = ITHIM.national))
 
-meanMatrix <- function(ITHIM, mode = "walk"){
-   if(mode == "walk"){
+meanMatrix <- function(ITHIM, mode = "Walking"){
+   if(mode == "Walking"){
       return(with(ITHIM$parameters, data.frame(ageClass = factor(1:8), mode = mode, Rwt*muwt)))
-}else{
+   }else if (mode == "Cycling"){
       return(with(ITHIM$parameters, data.frame(ageClass = factor(1:8), mode = mode, Rct*muct)))
-}
+   }else{
+      message("error in meanMatrix function")
+   }
 }
 
-meanMatrixListWalk <- lapply(ITHIMList, meanMatrix, mode = "walk")
-meanMatrixListCycle <- lapply(ITHIMList, meanMatrix, mode = "cycle")
+meanMatrixListWalk <- lapply(ITHIMList, meanMatrix, mode = "Walking")
+meanMatrixListCycle <- lapply(ITHIMList, meanMatrix, mode = "Cycling")
 
 D <- melt(c(meanMatrixListWalk,meanMatrixListCycle))
-names(D) <- c("ageClass", "mode", "sex", "time", "HHS")
+names(D) <- c("ageClass", "mode", "Sex", "time", "Region")
 
-p1 <- ggplot(D, aes(x = ageClass, y = time, fill = sex)) + geom_bar(stat= "identity", position = "dodge") 
-p1 + theme_bw() + scale_x_discrete(name="Age Class", breaks = c(2,4,6,8)) + scale_y_continuous(name="Travel Minutes per Week") + facet_grid( mode ~ HHS, scales = "free_y")
+D1 <- subset(D, Region %in% c("HHS01","HHS02","HHS09","HHS10","National") & ageClass != "1" )
+D2 <- subset(D, !(Region %in% c("HHS01","HHS02","HHS09","HHS10")) & ageClass != "1" )
+
+p1 <- ggplot(D1, aes(x = ageClass, y = time, fill = Sex)) + geom_bar(stat= "identity", position = "dodge") 
+p1 + theme_bw() + scale_x_discrete(name="Age Class", breaks = c(2,4,6,8)) + scale_y_continuous(name="Travel Time per Week (minutes)") + facet_grid( mode ~ Region, scales = "free_y")
+
+p2 <- ggplot(D2, aes(x = ageClass, y = time, fill = Sex)) + geom_bar(stat= "identity", position = "dodge") 
+p2 + theme_bw() + scale_x_discrete(name="Age Class", breaks = c(2,4,6,8)) + scale_y_continuous(name="Travel Time per Week (minutes)") + facet_grid( mode ~ Region, scales = "free_y")
 
 ```
 # Appendix
