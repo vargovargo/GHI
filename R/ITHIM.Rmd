@@ -469,9 +469,9 @@ barplot(with(NHTS,table(Region)))
 
 p <- ggplot(DALYsTotal, aes(x = muNonTravel, y = DALY/1e3, colour = Region))
 
-p + stat_smooth( method = loess) + theme_bw() + scale_x_continuous(name="Non-Travel METs mean (MET-hrs./week)") + scale_y_continuous(name="Change in National DALYs (Thousands)") + coord_cartesian(xlim = c(0, upper))
+p + stat_smooth( method = loess) + theme_bw() + scale_x_continuous(name="Mean Non-Travel METs (MET-hrs./week) (Referent Group)") + scale_y_continuous(name="Change in National DALYs (Thousands)") + coord_cartesian(xlim = c(0, upper))
 
-p + stat_smooth( method = loess) + theme_bw() + scale_x_continuous(name="Non-Travel METs mean (MET-hrs./week)") + scale_y_continuous(name="Change in National DALYs (Thousands)") + coord_cartesian(xlim = c(0, upper)) + geom_point()
+p + stat_smooth( method = loess) + theme_bw() + scale_x_continuous(name="Mean Non-Travel METs (MET-hrs./week) (Referent Group)") + scale_y_continuous(name="Change in National DALYs (Thousands)") + coord_cartesian(xlim = c(0, upper)) + geom_point()
 
 ```
 

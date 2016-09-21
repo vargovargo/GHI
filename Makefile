@@ -7,5 +7,5 @@ webpage : html/index.txt html/tableau/tableau.txt
 report : R/ITHIM.Rmd R/ITHIM.R
 	cd R; R --vanilla -e 'source("ITHIM.R")'
 
-manuscript.pdf : manuscript/manuscript.tex manuscript/ITHIM.bib manuscript/figures/fig1.pdf manuscript/figures/fig2.png manuscript/figures/fig3.png
+manuscript.pdf : manuscript/manuscript.tex manuscript/ITHIM.bib manuscript/figures/fig1.pdf manuscript/figures/fig2.pdf manuscript/figures/fig3.pdf
 	cd manuscript; make manuscript.pdf
