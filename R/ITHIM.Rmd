@@ -425,15 +425,16 @@ sumDALY <- function(ITHIM.baseline, ITHIM.scenario){
 ```
 
 ```{r ITHIMObjs, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, echo = FALSE, warning = FALSE}
-upper <- 20
-length <- 100
+upper <- 50
+length <- 500
 
 DALYsTotal <- data.frame()
 ITHIMList <- list()
 ITHIM.default <- createITHIM(vision = "baseline", region = "national")
-ITHIM.default <- updateITHIM(ITHIMList[[HHS]], "cvNonTravel", 3)
-ITHIM.default <- updateITHIM(ITHIMList[[HHS]], "cv", 3.0288)
-ITHIM.default <- updateITHIM(ITHIMList[[HHS]], "pWalk", 0.85)
+ITHIM.default <- updateITHIM(ITHIM.default, "cvNonTravel", 3)
+ITHIM.default <- updateITHIM(ITHIM.default, "cv", 3.0288)
+ITHIM.default <- updateITHIM(ITHIM.default, "pWalk", 0.85)
+ITHIM.default <- updateITHIM(ITHIM.default, "quantiles", (1:99)/100)
 
 for (HHS in c(paste0("HHS0",1:9),"HHS10")){
     ITHIMList[[HHS]] <- ITHIM.default
