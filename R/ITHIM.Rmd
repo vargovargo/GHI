@@ -79,7 +79,7 @@ NHTS.trips <- with(DAYV2PUB,{
                    TRVL_MIN = as.numeric(TRVL_MIN),
                    TRVLCMIN = ifelse(as.numeric(TRVLCMIN) != 0, as.numeric(TRVLCMIN), NA),
                    URBRUR  = as.factor(URBRUR),
-                   HHSTATE = as.factor(HHSTATE),
+                   #HHSTATE = as.factor(HHSTATE),
                    MSACAT = as.factor(MSACAT),
                    MSA = ifelse(MSASIZE %in% 1:5, TRUE, FALSE),
                    TRPTRANS = as.factor(TRPTRANS),
@@ -106,13 +106,6 @@ NHTS.person <- with(PERV2PUB,{
 #### Investigate Trip Data
 
 ```{r summary, fig.width = 20, fig.height = 10, eval = TRUE, echo = FALSE, message = FALSE, warning = FALSE}
-#summary(with(subset(NHTS.trips, AT == "walk"), TRPMILES))
-#summary(with(subset(NHTS.trips, AT == "cycle"), TRPMILES))
-#summary(with(subset(NHTS.trips, AT == "other"), TRPMILES))
-#summary(with(subset(NHTS.trips, AT == "walk"), TRVL_MIN))
-#summary(with(subset(NHTS.trips, AT == "cycle"), TRVL_MIN))
-#summary(with(subset(NHTS.trips, AT == "other"), TRVL_MIN))
-
 walkHours <- with(subset(NHTS.trips, {
     AT == "walk" & TRPMILES < 10 & TRPMILES/TRVL_MIN*60 < 8 & TRVL_MIN > 5 #& TRPMILES/TRVL_MIN*60 > 0.5
 }), TRVL_MIN/60)
@@ -155,7 +148,7 @@ travel time?  Couldnt have been very many.  But I think there are
 people in the PERSON table that were not interviewed.
 
 ```{r subset, eval = TRUE, fig.width = 10, echo = FALSE}
-NHTS.person <- subset( NHTS.person, MSA == TRUE )
+NHTS.person <- subset( NHTS.person, MSA == TRUE & HHSTATE %in% c("CA","TX","NY","FL","VA","NC","AZ"))
 NHTS <- merge(NHTS.person, NHTS.trips, by = c("HOUSEID","PERSONID"))
 ```
 
@@ -188,7 +181,7 @@ rm("listOfLists","counts","walkLength","cycleLength","countMatrix","walkMatrix",
 #### Compute Mean Trip Lengths
 
 ```{r count, eval = TRUE, echo = FALSE}
-listOfLists <- lapply(split(NHTS, NHTS$HHS),function(x) lapply(split(x, x$SEX), function(x) split(x, x$AGE)))
+listOfLists <- lapply(split(NHTS, NHTS$HHSTATE),function(x) lapply(split(x, x$SEX), function(x) split(x, x$AGE)))
 counts <- lapply(listOfLists, function(x) lapply(x, function(x) lapply(x, countPeople)))
 walkLength <- lapply(listOfLists, function(x) lapply(x, function(x) lapply( x, tripTime, mode = "walk")))
 cycleLength <- lapply(listOfLists, function(x) lapply(x, function(x) lapply( x, tripTime, mode = "cycle")))
@@ -220,7 +213,7 @@ The data files in ~/Box Sync/work/CoBenefits/MaggieShare/VitalStats/CDCwonder/.
 
 #### Query Results File (HHSmetro_Age_sex_2010-14.csv)
 
-```{r CDC, eval = TRUE, echo = FALSE}
+```{r CDC, eval = FALSE, echo = FALSE}
 wonder <- read.csv("./../data/CDCwonder/HHSmetro_Age_sex_2010-14.csv", header=T)
 names(wonder) <- c("HHSRegion", "HHSRegionCode", "gender", "genderCode","WONDERage","WONDERageCode","ICD10",  "ICD10Code", "deaths5yr", "population5yr", "crudeRate")
 
@@ -230,12 +223,12 @@ wonder <- subset(wonder, WONDERageCode != "NS") # remove 'Not stated' Age entrie
 The following two recoding chunks should probably be redone.  They
 depend on the ordering of the factors which seems dangerous.
 
-```{r ITHIMCause, eval = TRUE, echo = FALSE}
+```{r ITHIMCause, eval = FALSE, echo = FALSE}
 ITHIMcauseKey <- c("ColonCancer","LungCancer","BreastCancer","Diabetes","Dementia","IHD","InflammatoryHD","InflammatoryHD","HHD","Stroke","AcuteRespInfections","AcuteRespInfections","RespiratoryDisease","RespiratoryDisease","RTIs","RTIs")
 names(ITHIMcauseKey) <- unique(wonder$ICD10)
 wonder$ITHIMcause <- ITHIMcauseKey[as.character(wonder$ICD10)]
 ```
-```{r recodeAge, eval = TRUE, echo = FALSE}
+```{r recodeAge, eval = FALSE, echo = FALSE}
 ITHIMageKey <- c("ageClass1", "ageClass1", "ageClass2", "ageClass2", "ageClass3", "ageClass3", "ageClass3", "ageClass4", "ageClass4", "ageClass4", "ageClass5", "ageClass5", "ageClass5", "ageClass6", "ageClass6", "ageClass7", "ageClass7", "ageClass8", "ageClass8","ageClass8", "ageClass8", "ageClass8")
 names(ITHIMageKey) <- unique(wonder$WONDERage)
 wonder$ITHIMage <- ITHIMageKey[as.character(wonder$WONDERage)]
@@ -243,7 +236,7 @@ wonder$ITHIMage <- ITHIMageKey[as.character(wonder$WONDERage)]
 
 Depression was not in the WONDER data, since there are no deaths, have to add it manually.
 
-```{r wonder, eval = TRUE, echo = FALSE}
+```{r wonder, eval = FALSE, echo = FALSE}
 wonder <- wonder[, c("HHSRegionCode","gender","ITHIMage","ITHIMcause","deaths5yr","population5yr")]
 depress <- expand.grid(HHSRegionCode=unique(wonder$HHSRegionCode), gender=unique(wonder$gender),ITHIMage = unique(wonder$ITHIMage), ITHIMcause = "Depression", deaths5yr = "0", population5yr = "0", stringsAsFactors=T)
 wonder <- rbind(wonder, depress)
@@ -251,7 +244,7 @@ wonder <- rbind(wonder, depress)
 
 Replace suppressed values with random number 1-9
 
-```{r suppressed, eval = TRUE, echo = FALSE, warning = FALSE}
+```{r suppressed, eval = FALSE, echo = FALSE, warning = FALSE}
 wonder <- within( wonder, {
     newDeaths <- as.numeric(ifelse(deaths5yr == "Suppressed", sample(0:9), as.numeric(as.character(deaths5yr))))
     })
@@ -259,7 +252,7 @@ wonder <- within( wonder, {
 
 10 HHS x 2 sex x 8 age x 13 disease = 2,080 strata.
 
-```{r summary2, eval = TRUE, echo = FALSE}
+```{r summary2, eval = FALSE, echo = FALSE}
 wonderSummary <- ddply(wonder, .(HHSRegionCode, gender, ITHIMage, ITHIMcause), summarise,
                        numberOfDeaths5yr = sum(as.numeric(as.character(newDeaths)), na.rm=T)
 )
@@ -271,7 +264,7 @@ Read in data for single year population.  Processed in Excel, to
 combine two WONDER queries, need to go back and script the processing
 of the raw WONDER output
 
-```{r singleyear, eval = TRUE, echo = FALSE}
+```{r singleyear, eval = FALSE, echo = FALSE}
 pop14 <- read.csv("./../data/CDCwonder/HHSmetro_Age_sex_2014_AllCause.csv", header=T)
 
 
@@ -279,13 +272,13 @@ names(pop14) <- c("HHSRegion", "HHSRegionCode","gender", "genderCode","WONDERage
 ```
 This is delicate(read sloppy), really need to check the order of age groups returned by the 'unique(pop14$WONDERage)' command.
 
-```{r sloppy, eval = TRUE, echo = FALSE}
+```{r sloppy, eval = FALSE, echo = FALSE}
 ITHIMageKey2 <- c("ageClass8", "ageClass1", "ageClass7", "ageClass7", "ageClass6", "ageClass6", "ageClass1", "ageClass5", "ageClass5","ageClass5","ageClass4", "ageClass3", "ageClass4", "ageClass2", "ageClass2", "ageClass3", "ageClass4", "ageClass3","ageClass8")
 names(ITHIMageKey2) <- unique(pop14$WONDERage)
 pop14$ITHIMage <- ITHIMageKey2[as.character(pop14$WONDERage)]
 ```
 
-```{r foop, eval = TRUE, echo = FALSE}
+```{r foop, eval = FALSE, echo = FALSE}
 pop14 <-  pop14[, c("HHSRegionCode","gender","ITHIMage","deaths2014AllCause","population2014")]
 pop14$deaths2014 <- as.numeric(ifelse(pop14$deaths2014 == "Suppressed", sample(0:9), as.numeric(as.character(pop14$deaths2014))))
 
@@ -300,7 +293,7 @@ HHSmetroCauseSpecific <- merge(wonderSummary, popSummary)
 
 Presumably this comes from an EXCEL file.
 
-```{r USGBD, eval = TRUE, echo = FALSE}
+```{r USGBD, eval = FALSE, echo = FALSE}
 USGBD <- read.csv("./../data/CDCwonder/USGBD.csv", header=T)
 USGBD$ITHIMage <- as.character(USGBD$ITHIMage)
 USGBD$ITHIMcause <- as.character(USGBD$ITHIMcause)
@@ -325,7 +318,7 @@ burdenOut <- burdenOut[,c("HHS", "disease","sex","dproj","yll","yld","daly")]
 
 Now we create an R list of GBD objects named by HHS region.
 
-```{r burdenList, eval = TRUE, echo = FALSE}
+```{r burdenList, eval = FALSE, echo = FALSE}
 GBDList <- lapply(split(burdenOut, burdenOut$HHS),function(x) lapply(split(x, x$disease), function(x) split(x, x$sex)))
 #saveRDS(GBDList, file = "../data/GBD.rds")
 ```
@@ -436,27 +429,27 @@ ITHIM.default <- updateITHIM(ITHIM.default, "cv", 3.0288)
 ITHIM.default <- updateITHIM(ITHIM.default, "pWalk", 0.85)
 ITHIM.default <- updateITHIM(ITHIM.default, "quantiles", (1:99)/100)
 
-for (HHS in c(paste0("HHS0",1:9),"HHS10")){
-    ITHIMList[[HHS]] <- ITHIM.default
-    ITHIMList[[HHS]] <- updateITHIM(ITHIMList[[HHS]], "muwt", muwtList[[HHS]])
-    ITHIMList[[HHS]] <- updateITHIM(ITHIMList[[HHS]], "muct", muctList[[HHS]])
-    ITHIMList[[HHS]] <- updateITHIM(ITHIMList[[HHS]], "Rwt", RwtList[[HHS]])
-    ITHIMList[[HHS]] <- updateITHIM(ITHIMList[[HHS]], "Rct", RctList[[HHS]])
-    ITHIMList[[HHS]] <- updateITHIM(ITHIMList[[HHS]], "GBD", GBDList[[HHS]])
-  }
-
 ITHIM.national <- ITHIM.default
 ITHIM.national <- updateITHIM(ITHIM.national, "muwt", muwtNational)
 ITHIM.national <- updateITHIM(ITHIM.national, "muct", muctNational)
 ITHIM.national <- updateITHIM(ITHIM.national, "Rwt", RwtNational)
 ITHIM.national <- updateITHIM(ITHIM.national, "Rct", RctNational)
 
-for( muNonTravel in seq(0.01,upper,length.out = length) ){
+for (HHSTATE in c("CA","TX","NY","FL","VA","NC","AZ")){
+    ITHIMList[[HHSTATE]] <- ITHIM.default
+    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "muwt", muwtList[[HHSTATE]])
+    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "muct", muctList[[HHSTATE]])
+    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "Rwt", RwtList[[HHSTATE]])
+    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "Rct", RctList[[HHSTATE]])
+    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "GBD", ITHIM.national$parameters$GBD)
+  }
+
+for( muNonTravel in seq(0,upper,length.out = length) ){
 
   rm(DALYs)
 
-  for (HHS in c(paste0("HHS0",1:9),"HHS10")){
-    ITHIMList[[HHS]] <- updateITHIM(ITHIMList[[HHS]], "muNonTravel", muNonTravel)
+  for (HHSTATE in c("CA","TX","NY","FL","VA","NC","AZ")){
+    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "muNonTravel", muNonTravel)
   }
   
   ITHIM.national <- updateITHIM(ITHIM.national, "muNonTravel", muNonTravel)
@@ -479,7 +472,7 @@ p + stat_smooth( method = loess) + theme_bw() + scale_x_continuous(name="Mean No
 ```{r meanMatrices, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
 
 
-ITHIMList <- c(ITHIMList, list("National" = ITHIM.national))
+ITHIMList <- c(ITHIMList, list("Natl." = ITHIM.national))
 
 meanMatrix <- function(ITHIM, mode = "Walking"){
    if(mode == "Walking"){
@@ -495,16 +488,16 @@ meanMatrixListWalk <- lapply(ITHIMList, meanMatrix, mode = "Walking")
 meanMatrixListCycle <- lapply(ITHIMList, meanMatrix, mode = "Cycling")
 
 D <- melt(c(meanMatrixListWalk,meanMatrixListCycle))
-names(D) <- c("ageClass", "mode", "Sex", "time", "Region")
+names(D) <- c("ageClass", "mode", "Sex", "time", "State")
 
-D1 <- subset(D, Region %in% c("HHS01","HHS02","HHS09","HHS10","National") & ageClass != "1" )
-D2 <- subset(D, !(Region %in% c("HHS01","HHS02","HHS09","HHS10")) & ageClass != "1" )
+## D1 <- subset(D, Region %in% c("HHS01","HHS02","HHS09","HHS10","National") & ageClass != "1" )
+## D2 <- subset(D, !(Region %in% c("HHS01","HHS02","HHS09","HHS10")) & ageClass != "1" )
 
-p1 <- ggplot(D1, aes(x = ageClass, y = time, fill = Sex)) + geom_bar(stat= "identity", position = "dodge") 
-p1 + theme_bw() + scale_x_discrete(name="Age Class", breaks = c(2,4,6,8)) + scale_y_continuous(name="Travel Time per Week (minutes)") + facet_grid( mode ~ Region, scales = "free_y")
+p <- ggplot(D, aes(x = ageClass, y = time, fill = Sex)) + geom_bar(stat= "identity", position = "dodge") 
+p + theme_bw() + scale_x_discrete(name="Age Class", breaks = c(2,4,6,8)) + scale_y_continuous(name="Travel Time per Week (minutes)") + facet_grid( mode ~ State, scales = "free_y")
 
-p2 <- ggplot(D2, aes(x = ageClass, y = time, fill = Sex)) + geom_bar(stat= "identity", position = "dodge") 
-p2 + theme_bw() + scale_x_discrete(name="Age Class", breaks = c(2,4,6,8)) + scale_y_continuous(name="Travel Time per Week (minutes)") + facet_grid( mode ~ Region, scales = "free_y")
+## p2 <- ggplot(D2, aes(x = ageClass, y = time, fill = Sex)) + geom_bar(stat= "identity", position = "dodge") 
+## p2 + theme_bw() + scale_x_discrete(name="Age Class", breaks = c(2,4,6,8)) + scale_y_continuous(name="Travel Time per Week (minutes)") + facet_grid( mode ~ Region, scales = "free_y")
 
 ```
 # Appendix
