@@ -455,11 +455,15 @@ for( muNonTravel in seq(0,upper,length.out = length) ){
   ITHIM.national <- updateITHIM(ITHIM.national, "muNonTravel", muNonTravel)
 
   DALYs <- lapply(ITHIMList, sumDALY, ITHIM.baseline = ITHIM.national)
-  DALYs <- data.frame(Region = names(DALYs), muNonTravel = muNonTravel, DALY = unlist(DALYs))
+  DALYs <- data.frame(State = names(DALYs), muNonTravel = muNonTravel, DALY = unlist(DALYs))
   DALYsTotal <- rbind(DALYsTotal, DALYs)
 }
 
-p <- ggplot(DALYsTotal, aes(x = muNonTravel, y = DALY/1e3, colour = Region))
+DALYsTotal <- within(DALYsTotal, {
+  State <- factor(State, levels = c("NC","TX","VA","FL","AZ","NY","CA"))
+})
+
+p <- ggplot(DALYsTotal, aes(x = muNonTravel, y = DALY/1e3, colour = State))
 
 p + stat_smooth( method = loess) + theme_bw() + scale_x_continuous(name="Mean Non-Travel METs (MET-hrs./week) (Referent Group)") + scale_y_continuous(name="Change in National DALYs (Thousands)") + coord_cartesian(xlim = c(0, upper))
 
@@ -489,6 +493,10 @@ meanMatrixListCycle <- lapply(ITHIMList, meanMatrix, mode = "Cycling")
 
 D <- melt(c(meanMatrixListWalk,meanMatrixListCycle))
 names(D) <- c("ageClass", "mode", "Sex", "time", "State")
+
+D <- within(D,{
+  State <- factor(State, levels = c("NC","TX","VA","FL","AZ","NY","CA","Natl."))
+})
 
 ## D1 <- subset(D, Region %in% c("HHS01","HHS02","HHS09","HHS10","National") & ageClass != "1" )
 ## D2 <- subset(D, !(Region %in% c("HHS01","HHS02","HHS09","HHS10")) & ageClass != "1" )
