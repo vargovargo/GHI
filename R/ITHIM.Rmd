@@ -325,7 +325,7 @@ GBDList <- lapply(split(burdenOut, burdenOut$HHS),function(x) lapply(split(x, x$
 
 ## Non-Travel METs
 
-```{r newMETs, echo = TRUE, eval = TRUE, echo = FALSE}
+```{r newMETs, echo = TRUE, eval = FALSE, echo = FALSE}
 newMETsFile <- "~/GHI/data/ATUS/ATUS_to_METS_key.csv"
 newMETs <- read.csv(file = newMETsFile, stringsAsFactors = FALSE, colClasses = c("character","character","character","character","numeric","character","character","character"))
 dataColumns <- c(1,5)
@@ -347,7 +347,7 @@ names(metKey) <- activityCode
 
 ```
 
-```{r readnewMETs, echo = TRUE, eval = TRUE, echo = FALSE}
+```{r readnewMETs, echo = TRUE, eval = FALSE, echo = FALSE}
 cpsFile <- "~/GHI/data/ATUS/atuscps_0311.dat"
 cps <- read.table(cpsFile, header=T, skip=0, sep="," )
 cps <- within(cps, {
@@ -378,7 +378,7 @@ summaryList$metaData <- within(summaryList$metaData,{
 
 We shift the MET estimates by the minimum value so that the new minimum MET estimate is zero.
 
-```{r metKey, echo = TRUE, eval = TRUE, echo = FALSE}
+```{r metKey, echo = TRUE, eval = FALSE, echo = FALSE}
 allActivities <- colnames(summaryList$Data)
 nonTravelActivities <- rownames(newMETs$metaData)[which(newMETs$metaData$Travel.related..Y.N. == "N")]
 nonTravelActivities <- nonTravelActivities[which(nonTravelActivities %in% allActivities)]
@@ -398,7 +398,7 @@ ggplot(D, aes(x = METs, ..density.., colour = AGECAT)) + geom_freqpoly(binwidth 
 
 ```
 
-```{r parameters, eval = TRUE, echo = FALSE}
+```{r parameters, eval = FALSE, echo = FALSE}
 parameters <- ddply(D, .(SEX, AGECAT), summarise,
              mean = mean(METs, na.rm=T),
              sd = sd(METs, na.rm=T)
@@ -419,7 +419,7 @@ sumDALY <- function(ITHIM.baseline, ITHIM.scenario){
 
 ```{r ITHIMObjs, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, echo = FALSE, warning = FALSE}
 upper <- 100
-length <- 100
+length <- 10
 
 DALYsTotal <- data.frame()
 ITHIMList <- list()
@@ -496,6 +496,7 @@ names(D) <- c("ageClass", "mode", "Sex", "time", "State")
 
 D <- within(D,{
   State <- factor(State, levels = c("NC","TX","VA","FL","AZ","NY","CA","Natl."))
+  Sex <- factor(Sex, levels = c("F","M"))
 })
 
 ## D1 <- subset(D, Region %in% c("HHS01","HHS02","HHS09","HHS10","National") & ageClass != "1" )
@@ -508,6 +509,18 @@ p + theme_bw() + scale_x_discrete(name="Age Class", breaks = c(2,4,6,8)) + scale
 ## p2 + theme_bw() + scale_x_discrete(name="Age Class", breaks = c(2,4,6,8)) + scale_y_continuous(name="Travel Time per Week (minutes)") + facet_grid( mode ~ Region, scales = "free_y")
 
 ```
+
+```{r California, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
+ITHIM.CA <- ITHIMList[["CA"]]
+ITHIM.CA <- updateITHIM(ITHIM.CA, parName = "muNonTravel", 10)
+ITHIM.national <- updateITHIM(ITHIM.national, parName = "muNonTravel", 10)
+foo <- compareModels(ITHIM.national,ITHIM.CA)
+foobar <- data.frame(cbind(melt(foo$daly.delta),paste0("ageClass",1:8)))
+names(foobar) <- c("delta.DALY","Sex","Disease","ageClass")
+p <- ggplot( foobar, aes(ageClass,-delta.DALY/1e3, fill = Sex) )
+p + geom_bar(stat="identity", position = "dodge") + scale_x_discrete(name="Age Class", breaks = c(2,4,6,8)) + scale_y_continuous(name="DALYs Averted Nationwide (Thousands)") + facet_grid( . ~ Disease) + theme_bw() 
+```
+
 # Appendix
 
 ## Example (Bay Area)
