@@ -228,14 +228,13 @@ sumDALY <- function(ITHIM.baseline, ITHIM.scenario){
 ```
 
 ```{r ITHIMObjs, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, echo = TRUE, warning = FALSE}
-upper <- 25; wd <- 1; length <- upper/wd + 1;
+upper <- 25; wd <- 10; length <- upper/wd + 1;
 
 DALYsTotal <- data.frame()
 ITHIMList <- list()
 ITHIM.default <- createITHIM(vision = "baseline", region = "national")
 ITHIM.default <- updateITHIM(ITHIM.default, "cvNonTravel", 3)
 ITHIM.default <- updateITHIM(ITHIM.default, "cv", 3.0288)
-ITHIM.default <- updateITHIM(ITHIM.default, "pWalk", 0.85)
 ITHIM.default <- updateITHIM(ITHIM.default, "quantiles", (1:99)/100)
 
 ITHIM.national <- ITHIM.default
