@@ -207,7 +207,7 @@ zeroReferentCase <- function(x){
   if(x[3,2]==0){
     return(matrix(1e-3,nrow=nrow(x),ncol=ncol(x), dimnames = dimnames(x)))
   }else{
-    return(ifelse(x==0, 1e-3, x/x[3,2]))    
+    return(ifelse(x==0, 1e-3, x/x[3,2]))
   }
 }
 
@@ -259,7 +259,7 @@ for( muNonTravel in seq(0,upper,length.out = length) ){
   for (HHSTATE in c("CA","TX","NY","FL","VA","NC","AZ")){
     ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "muNonTravel", muNonTravel)
   }
-  
+
   ITHIM.national <- updateITHIM(ITHIM.national, "muNonTravel", muNonTravel)
 
   DALYs <- lapply(ITHIMList, sumDALY, ITHIM.baseline = ITHIM.national)
@@ -306,7 +306,7 @@ D <- within(D,{
   Sex <- factor(Sex, levels = c("F","M"))
 })
 
-p <- ggplot(subset(D,ageClass != 1), aes(x = ageClass, y = time, fill = Sex)) + geom_bar(stat= "identity", position = "dodge") 
+p <- ggplot(subset(D,ageClass != 1), aes(x = ageClass, y = time, fill = Sex)) + geom_bar(stat= "identity", position = "dodge")
 p + theme_bw() + scale_x_discrete(name="", labels = c("5-14","15-29","30-44","45-59","60-69","70-79","80+")) + scale_y_continuous(name="Travel Time per Week (minutes)") + facet_grid( mode ~ State, scales = "free_y") + theme(axis.text.x  = element_text(angle = 90, vjust = 0.5, size = 5))
 
 ```
@@ -329,13 +329,13 @@ foobar <- rbind(foobar1,foobar2)
 names(foobar) <- c("delta.DALY","Sex","Disease","ageClass","State")
 
 foobar <- within(foobar, {
-  Disease[Disease == "BreastCancer"] <- "Breast"
-  Disease[Disease == "ColonCancer"] <- "Colon"
-  Disease <- factor(Disease, levels = c("Breast", "Colon", "Dementia", "Depression", "Diabetes"))
+  Disease[Disease == "BreastCancer"] <- "Breast Cancer"
+  Disease[Disease == "ColonCancer"] <- "Colon Cancer"
+  Disease <- factor(Disease, levels = c("Breast Cancer", "Colon Cancer", "Dementia", "Depression", "Diabetes"))
 })
 
-p <- ggplot( subset(foobar,ageClass != "ageClass1"), aes(ageClass,-delta.DALY/1e3, fill = Sex) )
-p + geom_bar(stat="identity", position = "dodge") + scale_x_discrete(name="", labels = c("5-14","15-29","30-44","45-59","60-69","70-79","80+")) + scale_y_continuous(name="DALYs Averted Nationwide (Thousands)") + facet_grid( State ~ Disease) + theme_bw() + theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=8)) + coord_flip()
+p <- ggplot( subset(foobar,ageClass != "ageClass1"), aes(ageClass,-delta.DALY/1e3) )
+p + geom_bar(stat="identity", position = "dodge") + scale_x_discrete(name="", labels = c("5-14","15-29","30-44","45-59","60-69","70-79","80+")) + scale_y_continuous(name="DALYs Averted Nationwide (Thousands)") + facet_grid( Disease ~ State) + theme_bw() + coord_flip() # + theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=8))
 ```
 
 ```{r counts, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = phi, warning = FALSE, message = FALSE, echo = FALSE}
@@ -345,8 +345,8 @@ D <- within(D,{
   State <- factor(State, levels = c("NC","TX","VA","FL","AZ","NY","CA","Natl."))
   Sex <- factor(Sex, levels = c("F","M"))
 })
-p <- ggplot(subset(D,AgeClass != "00-04"), aes(AgeClass, count/1e3, fill = Sex))
-p + geom_bar(stat="identity", position = "dodge") + scale_x_discrete(name="", labels = c("5-14","15-29","30-44","45-59","60-69","70-79","80+")) + scale_y_continuous(name="Individuals Sampled (Thousands)") + facet_grid( . ~ State) + theme_bw() + theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=6)) + coord_flip()
+p <- ggplot(subset(D,AgeClass != "00-04"), aes(AgeClass, count/1e3))
+p + geom_bar(stat="identity", position = "dodge") + scale_x_discrete(name="", labels = c("5-14","15-29","30-44","45-59","60-69","70-79","80+")) + scale_y_continuous(name="Individuals Sampled (Thousands)") + facet_grid( State ~ .) + theme_bw() + coord_flip() # + theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=6))
 ```
 
 ```{r roadInjuries, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
