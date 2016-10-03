@@ -311,7 +311,7 @@ p + theme_bw() + scale_x_discrete(name="", labels = c("5-14","15-29","30-44","45
 
 ```
 
-```{r California, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
+```{r California, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = phi, warning = FALSE, message = FALSE, echo = FALSE}
 
 ITHIM.national <- updateITHIM(ITHIM.national, parName = "muNonTravel", 10)
 
@@ -335,10 +335,10 @@ foobar <- within(foobar, {
 })
 
 p <- ggplot( subset(foobar,ageClass != "ageClass1"), aes(ageClass,-delta.DALY/1e3, fill = Sex) )
-p + geom_bar(stat="identity", position = "dodge") + scale_x_discrete(name="", labels = c("5-14","15-29","30-44","45-59","60-69","70-79","80+")) + scale_y_continuous(name="DALYs Averted Nationwide (Thousands)") + facet_grid( State ~ Disease) + theme_bw() + theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=8))
+p + geom_bar(stat="identity", position = "dodge") + scale_x_discrete(name="", labels = c("5-14","15-29","30-44","45-59","60-69","70-79","80+")) + scale_y_continuous(name="DALYs Averted Nationwide (Thousands)") + facet_grid( State ~ Disease) + theme_bw() + theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=8)) + coord_flip()
 ```
 
-```{r counts, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
+```{r counts, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = phi, warning = FALSE, message = FALSE, echo = FALSE}
 D <- melt(counts)
 names(D) <- c("count","AgeClass","Sex", "State")
 D <- within(D,{
@@ -346,7 +346,7 @@ D <- within(D,{
   Sex <- factor(Sex, levels = c("F","M"))
 })
 p <- ggplot(subset(D,AgeClass != "00-04"), aes(AgeClass, count/1e3, fill = Sex))
-p + geom_bar(stat="identity", position = "dodge") + scale_x_discrete(name="", labels = c("5-14","15-29","30-44","45-59","60-69","70-79","80+")) + scale_y_continuous(name="Individuals Sampled (Thousands)") + facet_grid( . ~ State) + theme_bw() + theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=6))
+p + geom_bar(stat="identity", position = "dodge") + scale_x_discrete(name="", labels = c("5-14","15-29","30-44","45-59","60-69","70-79","80+")) + scale_y_continuous(name="Individuals Sampled (Thousands)") + facet_grid( . ~ State) + theme_bw() + theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=6)) + coord_flip()
 ```
 
 ```{r roadInjuries, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
@@ -361,6 +361,7 @@ roadFatalaties <- subset(roadFatalaties, !is.na(SEX))
 p <- ggplot(roadFatalaties, aes(ageClass, fill = SEX))
 p + geom_bar(position = "dodge") + theme_bw()+ theme(axis.text.x  = element_text(angle=90, vjust=0.5)) + scale_x_discrete(name="", labels = c("0-4","5-14","15-29","30-44","45-59","60-69","70-79","80+")) + facet_grid( death ~ ., scales = "free_y")
 ```
+
 # Appendix
 
 ### CDC Mortality
