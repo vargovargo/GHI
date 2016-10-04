@@ -38,7 +38,7 @@ First we use NHTS to estimate mean walking and cycling times.
 ### NHTS
 
 ```{r compute, echo = FALSE, eval = TRUE}
-compute <- FALSE
+compute <- TRUE
 ```
 
 #### Create a handful of functions to help parse data
@@ -156,7 +156,7 @@ in the house all day.  Please correct me if I am mistaken abiout the
 nature of the PERSON or TRIP tables.
 
 ```{r subset, eval = compute, fig.width = 10, echo = FALSE}
-NHTS.person <- subset( NHTS.person, MSA == TRUE & HHSTATE %in% c("CA","TX","NY","FL","VA","NC","AZ"))
+NHTS.person <- subset( NHTS.person, MSA == TRUE ) # & HHSTATE %in% c("CA","TX","NY","FL","VA","NC","AZ"))
 NHTS <- merge(NHTS.person, NHTS.trips, by = c("HOUSEID","PERSONID"))
 saveRDS(NHTS, file = "./data/NHTS.rds")
 ```
@@ -345,10 +345,10 @@ scale_y_continuous(breaks=seq(1, upper, 1), name="DALYs Averted Nationwide (Thou
 
 #geom_hline(yintercept=seq(1, upper, 1), col="white", lwd=1) +
 scale_x_discrete(name="", labels = c("5-14","15-29","30-44","45-59","60-69","70-79","80+")) +
-theme_tufte(base_size=12, ticks=T) 
+theme_tufte(base_size=12, ticks=T)
 #
 
-# + annotate("text", x = 3.5, y = 5, adj=1,  family="serif", label = c("Foo")) 
+# + annotate("text", x = 3.5, y = 5, adj=1,  family="serif", label = c("Foo"))
 # + scale_y_continuous(name="DALYs Averted Nationwide (Thousands)") + facet_grid( Disease ~ State) + coord_flip() # + theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=8))
 ```
 
@@ -364,16 +364,41 @@ p + geom_bar(stat="identity", position = "dodge") + scale_x_discrete(name="", la
 ```
 
 ```{r roadInjuries, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
-roadFatalaties <- read.csv(file = "./../data/BikePedDeaths_09-13.csv", na.strings = c("998","999"))
+convertState <- function( stateCode ){
+
+stateCode <- as.character(stateCode)
+
+stateCodeMatrix <- matrix(c("Alabama","1","Nebraska","31","Alaska","2","Nevada","32","Arizona","4","New Hampshire","33","Arkansas","5","New Jersey","34","California","6","New Mexico","35","Colorado","8","New York","36","Connecticut","9","North Carolina","37","Delaware","10","North Dakota","38","District of Columbia","11", "Ohio", "39","Florida","12","Oklahoma","40","Georgia","13","Oregon","41","Hawaii","15","Pennsylvania","42","Idaho","16","Puerto Rico","43","Illinois","17","Rhode Island","44","Indiana","18","South Carolina","45","Iowa","19","South Dakota","46","Kansas","20","Tennessee","47","Kentucky","21","Texas","48","Louisiana","22","Utah","49","Maine","23","Vermont","50","Maryland","24","Virgin Islands (since 2004)","52","Massachusetts","25","Virginia","51","Michigan","26","Washington","53","Minnesota","27","West Virginia","54","Mississippi","28","Wisconsin","55","Missouri","29","Wyoming","56","Montana","30"), byrow = TRUE, ncol = 2)
+
+stateAbbrevMatrix <- matrix(c("Alabama","AL","Alaska","AK","Arizona","AZ","Arkansas","AR","California","CA","Colorado","CO","Connecticut","CT","Delaware","DE","District of Columbia","DC","Florida","FL","Georgia","GA","Hawaii","HI","Idaho","ID","Illinois","IL","Indiana","IN","Iowa","IA","Kansas","KS","Kentucky","KY","Louisiana","LA","Maine","ME","Maryland","MD","Massachusetts","MA","Michigan","MI","Minnesota","MN","Mississippi","MS","Missouri","MO","Montana","MT","Nebraska","NE","Nevada","NV","New Hampshire","NH","New Jersey","NJ","New Mexico","NM","New York","NY","North Carolina","NC"," North Dakota","ND","Ohio","OH","Oklahoma","OK","Oregon","OR","Pennsylvania","PA","Rhode Island","RI","South Carolina","SC","South Dakota","SD","Tennessee","TN","Texas","TX","Utah","UT","Vermont","VT","Virginia","VA","Washington","WA","West Virginia","WV","Wisconsin","WI","Wyoming","WY"), byrow = TRUE, ncol = 2)
+
+stateNames <- stateCodeMatrix[,1]
+names(stateNames) <- stateCodeMatrix[,2]
+
+stateAbbrevs <- stateAbbrevMatrix[,2]
+names(stateAbbrevs) <- stateAbbrevMatrix[,1]
+
+return(stateAbbrevs[stateNames[stateCode]])
+
+}
+
+roadFatalaties <- read.csv(file = "./../data/FARS/BikePedDeaths99-13.csv", na.strings = c("998","999"))
 roadFatalaties <- within(roadFatalaties, {
   ageClass <- convertToAgeClass(AGE)
   SEX <- ifelse(SEX == 1, "M", ifelse(SEX == 2, "F", NA))
   SEX <- factor(SEX, levels = c("F","M"))
+  STATE <- as.factor(convertState(STATE))
 })
-roadFatalaties <- subset(roadFatalaties, !is.na(SEX))
+roadFatalaties <- subset(roadFatalaties, !is.na(SEX) ) #& STATE %in% c("California", "New York"))
 
-p <- ggplot(roadFatalaties, aes(ageClass, fill = SEX))
-p + geom_bar(position = "dodge") + theme_bw()+ theme(axis.text.x  = element_text(angle=90, vjust=0.5)) + scale_x_discrete(name="", labels = c("0-4","5-14","15-29","30-44","45-59","60-69","70-79","80+")) + facet_grid( death ~ ., scales = "free_y")
+p <- ggplot(roadFatalaties, aes(Type, fill = STATE))
+p + geom_bar(position = "dodge") + theme_bw()+ theme(axis.text.x  = element_text(angle=90, vjust=0.5))# + scale_x_discrete(name="", labels = c("0-4","5-14","15-29","30-44","45-59","60-69","70-79","80+")) #+ facet_grid( Type ~ ., scales = "free_y")
+
+walkTime <- unlist(lapply(meanWalkList, function(x) x[3,2]))
+
+foo <- data.frame(with(roadFatalaties, table(STATE,Type)))
+within(subset(foo, Type == "Ped"), Walk <- walkTime[as.character(STATE)])
+
 ```
 
 # Appendix
