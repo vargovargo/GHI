@@ -149,54 +149,41 @@ much physical activity is required for cycling and walking.
 \end{methods}
 
 \begin{figure}[t]
-  \centerline{\includegraphics[width=0.5\textwidth]{./figures/fig4.pdf}}
-    \caption{California \& New York Averted DALYs Nationwide}\label{California}
-\end{figure}
-
-\section{Results}
-
-We used the National Household Transportation Survey \cite{NHTS} to
-estimate the mean walk and cycle times for individuals that live in
-metropolitan areas for each of seven states (CA, TX, NY, FL, VA, NC
-and AZ) which had sufficient sample size for reasonable estimates of
-age-sex specific travel-related walking and cycling means, Figure
-\ref{meanMatrices}.  Of these seven states two were found to have
-active transport behavior that would avert thousands of DALYs if
-adopted nation-wide. Values for national disease-specific DALYs were
-found using the CDC Wonder database \cite{CDCWonder}.
-  
-%% \begin{itemize}
-%% \item We used the National Household Transportation Survey \cite{NHTS} to
-%%   estimate the mean walk and cycle times for individuals that live in
-%%   metropolitan areas ($\textrm{DAYV2PUB.MSA} \in (1,2,\ldots,5)$ which
-%%   corresponds to individuals whose homes are in an MSA or cMSA)
-%%   \bi\item Data quality issues along with assumptions about travel speed
-%% created mirky data.  The median values of trip time were used to avoid
-%% undue influence by outliers.\ei
-%% \item We then divided these into the 10 regions of the U.S. defined by
-%%   the Department of Health and Human Services (HH1-10)
-%% \item Using only the active transport component of the ITHIM model we
-%%   ran comparative analyses for each of the ten regions, using the
-%%   national averages as the baseline.
-%% \item We used data from the American Time Use Survey \cite{ATUS} to
-%%   estimate the relative means for each of the age-sex strata.  We then
-%%   treat the mean of the referent group as a variable and compute
-%%   results over a grid of values for this variable.  See Figure
-%%   \ref{dalyFigure}.
-%% \item 
-%% \end{itemize}
-
-\begin{figure}[t]
     \centerline{\includegraphics[width=0.5\textwidth]{./figures/fig2}}
-    \caption{Change in total national DALYs for each regional
-      transportation estimates.}\label{dalyFigure}
+    \caption{}\label{dalyFigure}
 \end{figure}
 
 \begin{figure}[t]
   \centerline{\includegraphics[width=0.5\textwidth]{./figures/fig3.pdf}}
     \caption{Mean travel time by mode (walking/cycling) for each of
-      seven states National means are displayed on the right.}\label{meanMatrices}
+      seven states.  National means are displayed on the
+      right.}\label{meanMatrices}
 \end{figure}
+
+\begin{figure}[t]
+  \centerline{\includegraphics[width=0.5\textwidth]{./figures/fig4.pdf}}
+    \caption{}\label{California}
+\end{figure}
+
+\section{Results}
+
+We used the National Household Transportation Survey to estimate the
+mean walk and cycle times for individuals that live in metropolitan
+areas for each of seven states (CA, TX, NY, FL, VA, NC and AZ)
+\cite{NHTS}.  These states were selected becaused they had sufficient
+sample size for reasonable estimates of age-sex specific
+travel-related walking and cycling means, Figure \ref{meanMatrices}.
+
+Of these seven states one was found to show active transport behavior
+that, if adopted nation-wide, would avert 75-100,000 DALYs overall.
+Values for national disease-specific DALYs were found using the CDC
+Wonder database \cite{CDCWonder}.  California stood out among the
+estimates for national DALYs averted.  Most of the decrease in DALYs
+is due to prevention of dementia in the oldest age group, $80+$ years
+old.  California exhibits much greater walking means in this age group
+than the national average.  We also see prevention of depression and
+diabetes in the middle age groups due to increased active transport
+time.
 
 \section*{Acknowledgment}
 \paragraph{Funding\textcolon} SGY is supported by \ldots,\ JV, JP by \ldots
@@ -208,7 +195,6 @@ found using the CDC Wonder database \cite{CDCWonder}.
 \end{document}
 
 %% \subsection{Road Injuries}
-
 %% \textit{ We chose to model road injuries in a more simplifed manner
 %%   than the authors of ITHIM.  The original ITHIM requires information
 %%   about the transportational infrastructure that cannot be accurately
@@ -234,3 +220,24 @@ found using the CDC Wonder database \cite{CDCWonder}.
 %%     \centerline{\includegraphics[width=0.5\textwidth]{./figures/fig5.pdf}}
 %%     \caption{Counts}\label{counts}
 %% \end{figure}
+  
+%% \begin{itemize}
+%% \item We used the National Household Transportation Survey \cite{NHTS} to
+%%   estimate the mean walk and cycle times for individuals that live in
+%%   metropolitan areas ($\textrm{DAYV2PUB.MSA} \in (1,2,\ldots,5)$ which
+%%   corresponds to individuals whose homes are in an MSA or cMSA)
+%%   \bi\item Data quality issues along with assumptions about travel speed
+%% created mirky data.  The median values of trip time were used to avoid
+%% undue influence by outliers.\ei
+%% \item We then divided these into the 10 regions of the U.S. defined by
+%%   the Department of Health and Human Services (HH1-10)
+%% \item Using only the active transport component of the ITHIM model we
+%%   ran comparative analyses for each of the ten regions, using the
+%%   national averages as the baseline.
+%% \item We used data from the American Time Use Survey \cite{ATUS} to
+%%   estimate the relative means for each of the age-sex strata.  We then
+%%   treat the mean of the referent group as a variable and compute
+%%   results over a grid of values for this variable.  See Figure
+%%   \ref{dalyFigure}.
+%% \item 
+%% \end{itemize}
