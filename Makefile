@@ -1,8 +1,4 @@
-all : report manuscript.pdf webpage
-
-webpage: html/index.txt html/tableau/tableau.txt
-	perl ~/lib/Markdown_1.0.1/Markdown.pl ./html/index.txt > ./html/index.html
-	perl ~/lib/Markdown_1.0.1/Markdown.pl ./html/tableau/tableau.txt > ./html/tableau/tableau.html
+all : clean data report manuscript.pdf
 
 report: R/ITHIM.Rmd R/ITHIM.R
 	cd R; R --vanilla -e 'source("ITHIM.R")'
@@ -24,3 +20,7 @@ clean:
 .PHONY: data
 
 .PHONY2: clean
+
+# webpage: html/index.txt html/tableau/tableau.txt
+# 	perl ~/lib/Markdown_1.0.1/Markdown.pl ./html/index.txt > ./html/index.html
+# 	perl ~/lib/Markdown_1.0.1/Markdown.pl ./html/tableau/tableau.txt > ./html/tableau/tableau.html

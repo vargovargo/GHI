@@ -12,7 +12,7 @@
 \newcommand{\sgy}[1]{{\itshape\col{#1}}}
 \newcommand{\XX}{\sgy{XX}}
 \newcommand{\webpage}{\url{http://www.ithim.ghi.wisc.edu}}
-\newcommand{\af}{\textrm{PAF}}
+\newcommand{\af}{\mathrm{PAF}}
 \newcommand{\mets}{MET-hrs./week}
 \newcommand{\pEm}[1]{$\mathrm{PM}_{#1}$}
 \newcommand{\vmt}{$\mathrm{VMT}$}
@@ -124,7 +124,7 @@ $\af$ represents the proportional change in national disease burden if
 age and sex-specific active transport time means were changed.
 
 \begin{equation}
-\af = \frac{\int R(x)P(x) dx  - \int R(x)Q(x) dx }{\int R(x)P(x) dx}
+\af = \frac{\int \! R(x)P(x) \, \mathrm{d}x  - \int \! R(x)Q(x) \, \mathrm{d}x}{\int \! R(x)P(x) \, \mathrm{d}x}
 \end{equation}
 
 Here $R(x)$ represents the risk when the individual has exposure $x$,
@@ -143,9 +143,9 @@ greatly affect the estimate for disease burden.  The distribution for
 travel-related exposure is estimated from the time spent walking or
 cycling, i.e., active transport time, which as in the original ITHIM
 model has a \logNormal{} distribution with constant coefficient of
-variation across age-sex strata \cite{}.  Travel-related exposure
-is estimated from active transport time using assumptions about how
-much physical activity is required for cycling and walking.
+variation across age-sex strata.  Travel-related exposure is estimated
+from active transport time using assumptions about how much physical
+activity is required for cycling and walking.
 
 \end{methods}
 
@@ -181,10 +181,10 @@ Values for national disease-specific DALYs were found using the CDC
 Wonder database \cite{CDCWonder}.  California stood out among the
 estimates for national DALYs averted.  Most of the decrease in DALYs
 is due to prevention of dementia in the oldest age group, $80+$ years
-old.  California exhibits much greater walking and cycling means in this age group
-than the national average. In particular we see the cycling mean We also see prevention of depression and
-diabetes in the middle age groups due to increased active transport
-time.
+old.  California exhibits much greater walking and cycling means in
+this age group than the national average. In particular we see the
+cycling mean We also see prevention of depression and diabetes in the
+middle age groups due to increased active transport time.
 
 \section*{Acknowledgment}
 \paragraph{Funding\textcolon} SGY is supported by \ldots,\ JV, JP by \ldots
