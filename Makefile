@@ -1,9 +1,9 @@
-all : clean data report manuscript.pdf
+all : clean data report ITHIM-manuscript ITHIM-discussion
 
-report: R/ITHIM.Rmd R/ITHIM.R
+report: R/ITHIM.Rmd R/ITHIM.R R/ITHIM.html
 	cd R; R --vanilla -e 'source("ITHIM.R")'
 
-manuscript.pdf: manuscript/manuscript.tex manuscript/ITHIM.bib manuscript/figures/fig2.pdf manuscript/figures/fig3.pdf
+ITHIM-manuscript: manuscript/manuscript.tex manuscript/manuscript.pdf manuscript/ITHIM.bib manuscript/figures/fig2.pdf manuscript/figures/fig3.pdf
 	cd manuscript; make manuscript.pdf
 
 data:
@@ -12,10 +12,16 @@ data:
 	unzip Ascii.zip -d ./data/NHTS/
 	mv -v Ascii.zip ./data/NHTS/
 
+ITHIM-discussion: ./slides/ITHIM-discussion/ITHIM-discussion.tex ./slides/ITHIM-discussion/ITHIM-discussion.pdf
+	cd ./slides/ITHIM-discussion; make ITHIM-discussion.pdf
+
 clean:
-	rm -rf ./data/*
-	rm -rf ./R/figure/*
-	rm -rf ./R/data/*
+	rm -rf ./data/
+	rm -rf ./R/figure/
+	rm -rf ./R/data/
+	mkdir ./data/
+	mkdir ./R/figure/
+	mkdir ./R/data/
 
 .PHONY: data
 
