@@ -16,6 +16,7 @@
 \newcommand{\mets}{MET-hrs./week}
 \newcommand{\pEm}[1]{$\mathrm{PM}_{#1}$}
 \newcommand{\vmt}{$\mathrm{VMT}$}
+\newcommand{\logNormal}{log-normal}
 
 \begin{document}
 \firstpage{1}
@@ -129,28 +130,82 @@ Here $R(x)$ represents the risk when the individual has exposure $x$,
 physical activity (\mets).  $P(x)$ and $Q(x)$ denote the population
 density of individuals with exposure $x$, in the baseline and
 alternate scenarios, respectively.  The exposure variable, $x$, is
-modeled as the sum of travel-related exposure and non-travel-related
-exposure, which are modeled as two independent random variables.  The
-age-sex specific mean ratios for non-travel-related exposure are
-estimated from the ATUS \cite{ATUS} and the referent group mean is
-treated as a variable.  We see in Figure \ref{dalyFigure} that varying
-it does not greatly affect the estimate for disease burden.
+modeled as the sum of two independent random variables, travel-related
+exposure and non-travel-related exposure.  Non-travel-related exposure
+is modeled with a \logNormal{} distribution with the age-sex specific
+mean ratios for non-travel-related exposure are estimated from the
+ATUS \cite{ATUS}.  The referent group mean is treated as a variable
+and the coefficient of variation is treated as constant across age-sex
+strata and estimated with ATUS.  We see in Figure \ref{dalyFigure}
+that varying the mean values for non-travel-related exposure does not
+greatly affect the estimate for disease burden.  The distribution for
+travel-related exposure is estimated from the time spent walking or
+cycling, i.e., active transport time, which as in the original ITHIM
+model has a \logNormal{} distribution with constant coefficient of
+variation across age-sex strata \cite{}.  Travel-related exposure
+is estimated from active transport time using assumptions about how
+much physical activity is required for cycling and walking.
 
-\subsection{Active Transport}
+\end{methods}
 
-\textit{The time spent walking or cycling, i.e., active transport
-  time, is modeled as a log-normal random variable with means defined
-  for each age-sex stratum.  The non-travel-related physical activity
-  is also modeled as log-normal with stratum-specific means.}
+\begin{figure}[t]
+  \centerline{\includegraphics[width=0.5\textwidth]{./figures/fig4.pdf}}
+    \caption{California \& New York Averted DALYs Nationwide}\label{California}
+\end{figure}
 
-\textit{ The travel-related exposure is estimated using active
-  transport time along with assumptions about how much physical
-  activity is required for cycling and walking.  Active transport time
-  and non-travel-related physical activity are modeled as independent
-  random variables.  A fixed value was used as the coefficient of
-  variation for the distributin of active transport time. A different,
-  but also fixed, value was used for the non-travel-related physical
-  activity distribution.}
+\section{Results}
+
+We used the National Household Transportation Survey \cite{NHTS} to
+estimate the mean walk and cycle times for individuals that live in
+metropolitan areas for each of seven states (CA, TX, NY, FL, VA, NC
+and AZ) which had sufficient sample size for reasonable estimates of
+age-sex specific travel-related walking and cycling means, Figure
+\ref{meanMatrices}.  Of these seven states two were found to have
+active transport behavior that would avert thousands of DALYs if
+adopted nation-wide. Values for national disease-specific DALYs were
+found using the CDC Wonder database \cite{CDCWonder}.
+  
+%% \begin{itemize}
+%% \item We used the National Household Transportation Survey \cite{NHTS} to
+%%   estimate the mean walk and cycle times for individuals that live in
+%%   metropolitan areas ($\textrm{DAYV2PUB.MSA} \in (1,2,\ldots,5)$ which
+%%   corresponds to individuals whose homes are in an MSA or cMSA)
+%%   \bi\item Data quality issues along with assumptions about travel speed
+%% created mirky data.  The median values of trip time were used to avoid
+%% undue influence by outliers.\ei
+%% \item We then divided these into the 10 regions of the U.S. defined by
+%%   the Department of Health and Human Services (HH1-10)
+%% \item Using only the active transport component of the ITHIM model we
+%%   ran comparative analyses for each of the ten regions, using the
+%%   national averages as the baseline.
+%% \item We used data from the American Time Use Survey \cite{ATUS} to
+%%   estimate the relative means for each of the age-sex strata.  We then
+%%   treat the mean of the referent group as a variable and compute
+%%   results over a grid of values for this variable.  See Figure
+%%   \ref{dalyFigure}.
+%% \item 
+%% \end{itemize}
+
+\begin{figure}[t]
+    \centerline{\includegraphics[width=0.5\textwidth]{./figures/fig2}}
+    \caption{Change in total national DALYs for each regional
+      transportation estimates.}\label{dalyFigure}
+\end{figure}
+
+\begin{figure}[t]
+  \centerline{\includegraphics[width=0.5\textwidth]{./figures/fig3.pdf}}
+    \caption{Mean travel time by mode (walking/cycling) for each of
+      seven states National means are displayed on the right.}\label{meanMatrices}
+\end{figure}
+
+\section*{Acknowledgment}
+\paragraph{Funding\textcolon} SGY is supported by \ldots,\ JV, JP by \ldots
+
+%\bibliographystyle{natbib}
+\bibliographystyle{bmc_article}
+%\bibliographystyle{mypapers}
+\bibliography{ITHIM}
+\end{document}
 
 %% \subsection{Road Injuries}
 
@@ -175,70 +230,7 @@ it does not greatly affect the estimate for disease burden.
 %%   function of decrease in driving time?  The original plan was to use
 %%   a baseline value for \pEm{2.5} and a linear relationship bewteen
 %%   change in \pEm{2.5} and change in \vmt{}.}
-
-\end{methods}
-
-\begin{figure}[t]
-  \centerline{\includegraphics[width=0.5\textwidth]{./figures/fig4.pdf}}
-    \caption{California \& New York Averted DALYs Nationwide}\label{California}
-\end{figure}
-
 %% \begin{figure}[t]
 %%     \centerline{\includegraphics[width=0.5\textwidth]{./figures/fig5.pdf}}
 %%     \caption{Counts}\label{counts}
 %% \end{figure}
-
-\section{New York and California}
-
-
-
-\begin{itemize}
-\item We used the National Household Transportation Survey \cite{NHTS} to
-  estimate the mean walk and cycle times for individuals that live in
-  metropolitan areas ($\textrm{DAYV2PUB.MSA} \in (1,2,\ldots,5)$ which
-  corresponds to individuals whose homes are in an MSA or cMSA)
-  \bi\item Data quality issues along with assumptions about travel speed
-created mirky data.  The median values of trip time were used to avoid
-undue influence by outliers.\ei
-\item We then divided these into the 10 regions of the U.S. defined by
-  the Department of Health and Human Services (HH1-10)
-\item Using only the active transport component of the ITHIM model we
-  ran comparative analyses for each of the ten regions, using the
-  national averages as the baseline.
-\item We used data from the American Time Use Survey \cite{ATUS} to
-  estimate the relative means for each of the age-sex strata.  We then
-  treat the mean of the referent group as a variable and compute
-  results over a grid of values for this variable.  See Figure
-  \ref{dalyFigure}.
-\item Values for DALYs were found using the CDC Wonder database \cite{CDCWonder}
-\end{itemize}
-
-\begin{figure}[t]
-    \centerline{\includegraphics[width=0.5\textwidth]{./figures/fig2}}
-    \caption{Change in total national DALYs for each regional
-      transportation estimates.}\label{dalyFigure}
-\end{figure}
-
-\begin{figure}[t]
-  \centerline{\includegraphics[width=0.5\textwidth]{./figures/fig3.pdf}}
-    \caption{Mean travel time by mode (walking/cycling) for each of
-      the four regions with a decrease in DALYs
-      $(\textrm{HHS01},\textrm{HHS02},\textrm{HHS09},\textrm{HHS10})$. The
-      national means are displayed on the far right.  These four
-      regions correspond to New England/NewYork and the West
-      Coast. The age classes are defined as in the original ITHIM
-      implementation using 8 eight age classes defined in terms of
-      years as follows: 1. 0--4, 2. 5--14, 3. 15--29, 4. 30--44,
-      5. 45--59, 6. 60--69, 7. 70--79, and 8. 80+. Age class 1 is
-      omitted from all calclulations in this paper due to lack of
-      data.}\label{meanMatrices}
-\end{figure}
-
-\section*{Acknowledgment}
-\paragraph{Funding\textcolon} SGY is supported by \ldots,\ JV, JP by \ldots
-
-%\bibliographystyle{natbib}
-%\bibliographystyle{bmc_article}
-\bibliographystyle{mypapers}
-\bibliography{ITHIM}
-\end{document}
