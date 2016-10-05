@@ -17,7 +17,6 @@ foo.R
 #*
 GitPrimer
 PipelinePresentation
-misc
 *-bkup
 *.aux
 *.log
@@ -37,3 +36,4 @@ lib/
 *.rds
 hhsmap.png
 archive
+data.bkup
