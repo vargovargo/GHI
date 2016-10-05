@@ -38,130 +38,157 @@ University of Wisconsin{\textendash}Madison, Madison, WI USA\\
 \begin{abstract}
 
 \section{Summary:}
-\col[blue]{While increased active transportation, primarily cycling
-  and walking, is often held up as a goal for improved public health —
-  via reduced chronic disease, improved air quality, and reductions in
-  greenhouse gas emissions — obtaining estimates for the quantiative impacts of such shifts remains infrequent, if not altogether absent from related policy action. Using U.S. metropolitan counties from seven states we perform a comparative risk analysis between each regions and national averages as the baseline.  We employ a portion of the Integrated Transport and Health Impacts Model (ITHIM) to investigate the reduced chronic disease burden of (x,y,z outcomes) from changing levels of physical activity with population shifts in the amount of biking and walking done for transport. The analysis is informed by regional travel parameters from the National Household Transportation Survey, non-travel activity metrics from the American Time Use Survey, and baseline disease burden from the Centers for Disease Control and Prevention's WONDER database and the Global Burden of Disease dataset.  Our findings show that the California and New York State have travel patterns that, if mirrored by the nation, would save the U.S. upwards of fifty thousand disability adjusted life years.}
+
+While increased active transportation, primarily cycling and walking,
+is often held up as a goal for improved public health --- via reduced
+chronic disease, improved air quality, and reductions in greenhouse
+gas emissions — obtaining estimates for the quantiative impacts of
+such shifts remains infrequent, if not altogether absent from related
+policy action. Using U.S. metropolitan counties from seven states we
+perform a comparative risk analysis between each regions and national
+averages as the baseline.  We employ a portion of the Integrated
+Transport and Health Impacts Model (ITHIM) to investigate the reduced
+chronic disease burden of ($x$, $y$, $z$ outcomes) from changing
+levels of physical activity with population shifts in the amount of
+biking and walking done for transport. The analysis is informed by
+regional travel parameters from the National Household Transportation
+Survey, non-travel activity metrics from the American Time Use Survey,
+and baseline disease burden from the Centers for Disease Control and
+Prevention's WONDER database and the Global Burden of Disease dataset.
+Our findings show that the California and New York State have travel
+patterns that, if mirrored by the nation, would save the U.S. upwards
+of fifty thousand disability adjusted life years.
 
 \section{Availability:}
-\col[blue]{\package{} may be explored using the user interface
-  avaiable at \webpage{}.  The source code and data files for
-  \package{} are publicly available on GitHub at \webpage{}.}
+
+\package{} may be explored using the user interface avaiable
+at \webpage{}.  The source code and data files for \package{} are
+publicly available on GitHub at \webpage{}.
 
 \section{Supplementary information:}
 
-\col[blue]{See \webpage{} for links to the source code, manual,
-  tutorial and links for more information about the ITHIM model.}
+See \webpage{} for links to the source code, manual, tutorial and
+links for more information about the ITHIM model.
 
 \section{Contact:}
-\col[blue]{\href{javargo@wisc.edu}{javargo@wisc.edu}}
-\end{abstract}
+\href{javargo@wisc.edu}{javargo@wisc.edu}
 
+\end{abstract}
 
 \section{Introduction}
 
-\col{Regular exercise has been shown to provide health benefits in terms of chronic disease prevention \cite{warburton2006}, cognitive function \cite{hillman2008}, and overall well being and satisfaction with life \cite{maher2013}. Still only half of Americans obtain the recommended levels of aerobic activity, which is 2.5 hours per week. There is considerable variability in the attainment of this goal by location within the country. Supportive local built and policy environments are important determinants of population-level activity patterns. Particularly, as they facilitate and foster routine moderate physical activity, such as walking, local decissions on design and policy can play a huge role in the Nation's health.}
+Regular exercise has been shown to provide health benefits in terms of
+chronic disease prevention \cite{warburton2006}, cognitive function
+\cite{hillman2008}, and overall well being and satisfaction with life
+\cite{maher2013}. Still only half of Americans obtain the recommended
+levels of aerobic activity, which is 2.5 hours per week. There is
+considerable variability in the attainment of this goal by location
+within the country. Supportive local built and policy environments are
+important determinants of population-level activity
+patterns. Particularly, as they facilitate and foster routine moderate
+physical activity, such as walking, local decissions on design and
+policy can play a huge role in the Nation's health.
 
-\col{To better understand the potential for attainable shifts in transportation behavior across the US, we employed a comparative risk assessment methodology to compare national averages for time spent walking and cycling for transport to those of specific states. Our estimates can provide an important evidence base to encourage new construction, retrofits, land use policy, and programatic funding to support active transportation. Particularly in places with poor attainmnet of the physical activity guidelines, such investments can be importnat pieces of lareger population health interventions that have effective and long-lasting impacts. }
+To better understand the potential for attainable shifts in
+transportation behavior across the US, we employed a comparative risk
+assessment methodology to compare national averages for time spent
+walking and cycling for transport to those of specific states. Our
+estimates can provide an important evidence base to encourage new
+construction, retrofits, land use policy, and programatic funding to
+support active transportation. Particularly in places with poor
+attainmnet of the physical activity guidelines, such investments can
+be importnat pieces of lareger population health interventions that
+have effective and long-lasting impacts.
 
-\col{ITHIM is a statistical model that integrates data on travel
-  patterns, physical activity, fine particulate matter, GHG emissions,
-  and disease and injuries. Based on population and travel
-  scenarios. The model has been used to calculate the health impacts
-  of walking and bicycling short distances usually traveled by car or
-  driving low-emission automobiles \cite{woodcock2013,maizlish2013}.}
+ITHIM is a statistical model that integrates data on travel patterns,
+physical activity, fine particulate matter, GHG emissions, and disease
+and injuries. Based on population and travel scenarios. The model has
+been used to calculate the health impacts of walking and bicycling
+short distances usually traveled by car or driving low-emission
+automobiles \cite{woodcock2013,maizlish2013}.
 
-\col{The ITHIM model uses comparative risk assessment through which it
-  formulates a change in the disease burden, resulting from the shift
-  in the exposure distribution from a baseline scenario to an
-  alternative scenario.}
-
-
-
+The ITHIM model uses comparative risk assessment through which it
+formulates a change in the disease burden, resulting from the shift in
+the exposure distribution from a baseline scenario to an alternative
+scenario.
 
 \begin{methods}
 
 \section{Methods}
 
-\col[blue]{\textit{
+\textit{
     The ITHIM model uses the comparative risk
     assesment framework to estimate the population attributable
     fraction, $\af$.  In our case $\af$ represents the proportional
     change in mortality and morbidity if the physical activity levels
     were adjusted to represent an alternate scenario.
-}}
+}
 
 \begin{equation}
 \af = \frac{\int R(x)P(x) dx  - \int R(x)Q(x) dx }{\int R(x)P(x) dx}
 \end{equation}
 
-\col[blue]{\textit{
-    Here $R(x)$ represents the risk when the individual has exposure $x$,
-in our case physical activity (\mets).  $P(x)$ and $Q(x)$ denote the
-population density of individuals with exposure $x$, in the baseline
-and alternate scenarios, respectively.  The exposure variable, $x$, is
-modeled as the sum of travel-related exposure and non-travel-related
-exposure.
-}}
+\textit{ Here $R(x)$ represents the risk when the individual has
+  exposure $x$, in our case physical activity (\mets).  $P(x)$ and
+  $Q(x)$ denote the population density of individuals with exposure
+  $x$, in the baseline and alternate scenarios, respectively.  The
+  exposure variable, $x$, is modeled as the sum of travel-related
+  exposure and non-travel-related exposure.}
 
 \subsection{Active Transport}
 
-\col[blue]{\textit{The time spent walking or cycling, i.e., active
-    transport time, is modeled as a log-normal random variable with
-    means defined for each age-sex stratum.  The non-travel-related
-    physical activity is also modeled as log-normal with
-    stratum-specific means.}}
+\textit{The time spent walking or cycling, i.e., active transport
+  time, is modeled as a log-normal random variable with means defined
+  for each age-sex stratum.  The non-travel-related physical activity
+  is also modeled as log-normal with stratum-specific means.}
 
-\col[blue]{\textit{
-The travel-related exposure is estimated using active transport time
-along with assumptions about how much physical activity is required
-for cycling and walking.  Active transport time and non-travel-related
-physical activity are modeled as independent random variables.  A
-fixed value was used as the coefficient of variation for the
-distributin of active transport time. A different, but also fixed,
-value was used for the non-travel-related physical activity
-distribution.
-}}
+\textit{ The travel-related exposure is estimated using active
+  transport time along with assumptions about how much physical
+  activity is required for cycling and walking.  Active transport time
+  and non-travel-related physical activity are modeled as independent
+  random variables.  A fixed value was used as the coefficient of
+  variation for the distributin of active transport time. A different,
+  but also fixed, value was used for the non-travel-related physical
+  activity distribution.}
 
-\subsection{Road Injuries}
+%% \subsection{Road Injuries}
 
-\col[red]{\textit{
-We chose to model road injuries in a more simplifed manner than the
-authors of ITHIM.  The original ITHIM requires information about the
-transportational infrastructure that cannot be accurately modeled on a
-regional level, and is more well-suited to say a collection of
-counties as a case study. \cite{maizlish2013}  We use the overall percent
-of travel by walking and road fatalities per U.S. metropolitan area to
-estimate road fatalaties in U.S. metropolitan areas given the percent
-of travel by walking. \cite{UWTechReport}
-}}
+%% \textit{ We chose to model road injuries in a more simplifed manner
+%%   than the authors of ITHIM.  The original ITHIM requires information
+%%   about the transportational infrastructure that cannot be accurately
+%%   modeled on a regional level, and is more well-suited to say a
+%%   collection of counties as a case study. \cite{maizlish2013} We use
+%%   the overall percent of travel by walking and road fatalities per
+%%   U.S. metropolitan area to estimate road fatalaties in
+%%   U.S. metropolitan areas given the percent of travel by
+%%   walking. \cite{UWTechReport}}
 
-\col[red]{\textit{
-We need to estimate the increase/decrease in road injuries/fatalaties
-nation-wide as walking/cycling time increases.  We need a relative
-risk of road fatalaty as a function of active transport time...
-}}
+%% \textit{ We need to estimate the increase/decrease in road
+%%   injuries/fatalaties nation-wide as walking/cycling time increases.
+%%   We need a relative risk of road fatalaty as a function of active
+%%   transport time\ldots}
 
-\subsection{Air Pollution}
+%% \subsection{Air Pollution}
 
-\col[red]{\textit{
-    Can we model the decrease in \pEm{2.5} nationally as a function of
-decrease in driving time?  The original plan was to use a baseline
-value for \pEm{2.5} and a linear relationship bewteen change in
-\pEm{2.5} and change in \vmt{}.
-}}
+%% \textit{ Can we model the decrease in \pEm{2.5} nationally as a
+%%   function of decrease in driving time?  The original plan was to use
+%%   a baseline value for \pEm{2.5} and a linear relationship bewteen
+%%   change in \pEm{2.5} and change in \vmt{}.}
 
 \end{methods}
 
-\section{Seven State Analysis}
-
 \begin{figure}[t]
-    \centerline{\includegraphics[width=0.5\textwidth]{./figures/fig2}}
-    \caption{Change in total national DALYs for each regional
-      transportation estimates.}\label{dalyFigure}
+  \centerline{\includegraphics[width=0.5\textwidth]{./figures/fig4.pdf}}
+    \caption{California \& New York Averted DALYs Nationwide}\label{California}
 \end{figure}
 
-\col[blue]{\begin{itemize}
+%% \begin{figure}[t]
+%%     \centerline{\includegraphics[width=0.5\textwidth]{./figures/fig5.pdf}}
+%%     \caption{Counts}\label{counts}
+%% \end{figure}
+
+\section{Seven State Analysis}
+\begin{itemize}
 \item We used the National Household Transportation Survey \cite{NHTS} to
   estimate the mean walk and cycle times for individuals that live in
   metropolitan areas ($\textrm{DAYV2PUB.MSA} \in (1,2,\ldots,5)$ which
@@ -180,7 +207,13 @@ undue influence by outliers.\ei
   results over a grid of values for this variable.  See Figure
   \ref{dalyFigure}.
 \item Values for DALYs were found using the CDC Wonder database \cite{CDCWonder}
-\end{itemize}}
+\end{itemize}
+
+%% \begin{figure}[t]
+%%     \centerline{\includegraphics[width=0.5\textwidth]{./figures/fig2}}
+%%     \caption{Change in total national DALYs for each regional
+%%       transportation estimates.}\label{dalyFigure}
+%% \end{figure}
 
 \begin{figure}[t]
   \centerline{\includegraphics[width=0.5\textwidth]{./figures/fig3.pdf}}
@@ -197,23 +230,11 @@ undue influence by outliers.\ei
       data.}\label{meanMatrices}
 \end{figure}
 
-\begin{figure}[t]
-  \centerline{\includegraphics[width=0.5\textwidth]{./figures/fig4.pdf}}
-    \caption{California \& New York Averted DALYs Nationwide}\label{California}
-\end{figure}
-
-\begin{figure}[t]
-    \centerline{\includegraphics[width=0.5\textwidth]{./figures/fig5.pdf}}
-    \caption{Counts}\label{counts}
-\end{figure}
-
-
 \section*{Acknowledgment}
-\paragraph{Funding\textcolon} \col[red]{SGY is supported by$\ldots$ , JV, JP, $\ldots$}
+\paragraph{Funding\textcolon} SGY is supported by \ldots,\ JV, JP by \ldots
 
 %\bibliographystyle{natbib}
-\bibliographystyle{bmc_article}
-%\bibliographystyle{mypapers}
+%\bibliographystyle{bmc_article}
+\bibliographystyle{mypapers}
 \bibliography{ITHIM}
 \end{document}
-
