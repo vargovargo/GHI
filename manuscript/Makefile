@@ -1,4 +1,4 @@
-manuscript.pdf: manuscript.tex ITHIM.bib ./figures/fig1.pdf ./figures/fig2.pdf ./figures/fig3.pdf
+manuscript.pdf: manuscript.tex ITHIM.bib ./figures/fig2.pdf ./figures/fig3.pdf
 	pdflatex manuscript.tex
 	bibtex manuscript.aux
 	pdflatex manuscript.tex

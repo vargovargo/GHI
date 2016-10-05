@@ -17,6 +17,7 @@ library("dplyr")
 library("cowplot")
 library("grid")
 library("scales")
+library("ggthemes")
 ```
 
 ```{r loadITHIM, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = FALSE}
@@ -35,6 +36,10 @@ phi <- (1+sqrt(5))/2 # the golden ratio ;)
 First we use NHTS to estimate mean walking and cycling times.
 
 ### NHTS
+
+```{r compute, echo = FALSE, eval = TRUE}
+compute <- TRUE
+```
 
 #### Create a handful of functions to help parse data
 
@@ -65,7 +70,7 @@ return(foo[,c("M","F")])
 
 #### Read Two of the Four NHTS Data Tables
 
-```{r NHTS, eval = TRUE, echo = FALSE}
+```{r NHTS, eval = compute, echo = FALSE}
 DAYV2PUB <- read.csv(file = "~/GHI/data/NHTS/Ascii/DAYV2PUB.CSV", na.strings = c("-9","-8", "-7", "-1"))
 names(DAYV2PUB) <- c("HOUSEID","PERSONID","FRSTHM","OUTOFTWN","ONTD_P1","ONTD_P2","ONTD_P3","ONTD_P4","ONTD_P5","ONTD_P6","ONTD_P7","ONTD_P8","ONTD_P9","ONTD_P10","ONTD_P11","ONTD_P12","ONTD_P13","ONTD_P14","ONTD_P15","TDCASEID","HH_HISP","HH_RACE","DRIVER","R_SEX","WORKER","DRVRCNT","HHFAMINC","HHSIZE","HHVEHCNT","NUMADLT","FLAG100","LIF_CYC","TRIPPURP","AWAYHOME","CDIVMSAR","CENSUS_D","CENSUS_R","DROP_PRK","DRVR_FLG","EDUC","ENDTIME","HH_ONTD","HHMEMDRV","HHRESP","HHSTATE","HHSTFIPS","INTSTATE","MSACAT","MSASIZE","NONHHCNT","NUMONTRP","PAYTOLL","PRMACT","PROXY","PSGR_FLG","R_AGE","RAIL","STRTTIME","TRACC1","TRACC2","TRACC3","TRACC4","TRACC5","TRACCTM","TRAVDAY","TREGR1","TREGR2","TREGR3","TREGR4","TREGR5","TREGRTM","TRPACCMP","TRPHHACC","TRPHHVEH","TRPTRANS","TRVL_MIN","TRVLCMIN","TRWAITTM","URBAN","URBANSIZE","URBRUR","USEINTST","USEPUBTR","VEHID","WHODROVE","WHYFROM","WHYTO","WHYTRP1S","WRKCOUNT","DWELTIME","WHYTRP90","TDTRPNUM","TDWKND","TDAYDATE","TRPMILES","WTTRDFIN","VMT_MILE","PUBTRANS","HOMEOWN","HOMETYPE","HBHUR","HTRESDN","HTHTNRNT","HTPPOPDN","HTEEMPDN","HBRESDN","HBHTNRNT","HBPPOPDN","GASPRICE","VEHTYPE","HH_CBSA","HHC_MSA")
 
@@ -79,7 +84,6 @@ NHTS.trips <- with(DAYV2PUB,{
                    TRVL_MIN = as.numeric(TRVL_MIN),
                    TRVLCMIN = ifelse(as.numeric(TRVLCMIN) != 0, as.numeric(TRVLCMIN), NA),
                    URBRUR  = as.factor(URBRUR),
-                   HHSTATE = as.factor(HHSTATE),
                    MSACAT = as.factor(MSACAT),
                    MSA = ifelse(MSASIZE %in% 1:5, TRUE, FALSE),
                    TRPTRANS = as.factor(TRPTRANS),
@@ -103,16 +107,7 @@ NHTS.person <- with(PERV2PUB,{
 
 ```
 
-#### Investigate Trip Data
-
-```{r summary, fig.width = 20, fig.height = 10, eval = TRUE, echo = FALSE, message = FALSE, warning = FALSE}
-#summary(with(subset(NHTS.trips, AT == "walk"), TRPMILES))
-#summary(with(subset(NHTS.trips, AT == "cycle"), TRPMILES))
-#summary(with(subset(NHTS.trips, AT == "other"), TRPMILES))
-#summary(with(subset(NHTS.trips, AT == "walk"), TRVL_MIN))
-#summary(with(subset(NHTS.trips, AT == "cycle"), TRVL_MIN))
-#summary(with(subset(NHTS.trips, AT == "other"), TRVL_MIN))
-
+```{r summary, fig.width = 20, fig.height = 10, eval = compute, echo = FALSE, message = FALSE, warning = FALSE}
 walkHours <- with(subset(NHTS.trips, {
     AT == "walk" & TRPMILES < 10 & TRPMILES/TRVL_MIN*60 < 8 & TRVL_MIN > 5 #& TRPMILES/TRVL_MIN*60 > 0.5
 }), TRVL_MIN/60)
@@ -150,13 +145,24 @@ g
 
 #### Subset and Merge
 
-How do we merge?  Are there people who were surveyed who had zero
-travel time?  Couldnt have been very many.  But I think there are
-people in the PERSON table that were not interviewed.
+The PERSON table contains the family members of the person surveyed,
+right?  We want only the peole who were surveyed for their travel
+times.  So, we can\'t use everyone in the PERSON table.  If someone
+had zero trip time they would not exist in the TRIP table.  So, if we
+use just the TRIP table we miss people with zero trip time. So how do
+we merge?  We use an inner join and assume that their is a negligible
+number of people with zero trip time.  Not very many people never stay
+in the house all day.  Please correct me if I am mistaken abiout the
+nature of the PERSON or TRIP tables.
 
-```{r subset, eval = TRUE, fig.width = 10, echo = FALSE}
-NHTS.person <- subset( NHTS.person, MSA == TRUE )
+```{r subset, eval = compute, fig.width = 10, echo = FALSE}
+NHTS.person <- subset( NHTS.person, MSA == TRUE ) # & HHSTATE %in% c("CA","TX","NY","FL","VA","NC","AZ"))
 NHTS <- merge(NHTS.person, NHTS.trips, by = c("HOUSEID","PERSONID"))
+saveRDS(NHTS, file = "./data/NHTS.rds")
+```
+
+```{r loadNHTS, eval = !compute}
+NHTS <- readRDS(file = "./data/NHTS.rds")
 ```
 
 #### Compute National Metro Average
@@ -188,7 +194,7 @@ rm("listOfLists","counts","walkLength","cycleLength","countMatrix","walkMatrix",
 #### Compute Mean Trip Lengths
 
 ```{r count, eval = TRUE, echo = FALSE}
-listOfLists <- lapply(split(NHTS, NHTS$HHS),function(x) lapply(split(x, x$SEX), function(x) split(x, x$AGE)))
+listOfLists <- lapply(split(NHTS, NHTS$HHSTATE),function(x) lapply(split(x, x$SEX), function(x) split(x, x$AGE)))
 counts <- lapply(listOfLists, function(x) lapply(x, function(x) lapply(x, countPeople)))
 walkLength <- lapply(listOfLists, function(x) lapply(x, function(x) lapply( x, tripTime, mode = "walk")))
 cycleLength <- lapply(listOfLists, function(x) lapply(x, function(x) lapply( x, tripTime, mode = "cycle")))
@@ -202,7 +208,7 @@ zeroReferentCase <- function(x){
   if(x[3,2]==0){
     return(matrix(1e-3,nrow=nrow(x),ncol=ncol(x), dimnames = dimnames(x)))
   }else{
-    return(ifelse(x==0, 1e-3, x/x[3,2]))    
+    return(ifelse(x==0, 1e-3, x/x[3,2]))
   }
 }
 
@@ -212,6 +218,191 @@ muwtList <- lapply( meanWalkList, function(x) ifelse(x[3,2]==0,1e-3, x[3,2]))
 muctList <- lapply( meanCycleList, function(x) ifelse(x[3,2]==0,1e-3, x[3,2]))
 ```
 
+
+## Create List of ITHIM Objects
+
+
+```{r foobar, eval = TRUE, echo = FALSE}
+sumDALY <- function(ITHIM.baseline, ITHIM.scenario){
+    return(sum(unlist(data.frame(compareModels(ITHIM.baseline,ITHIM.scenario)$daly.delta)[-1,]))) # AgeClass 1 is removed from totals
+    }
+```
+
+```{r ITHIMObjs, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, echo = TRUE, warning = FALSE}
+upper <- 25; wd <- 10; length <- upper/wd + 1;
+
+DALYsTotal <- data.frame()
+ITHIMList <- list()
+ITHIM.default <- createITHIM(vision = "baseline", region = "national")
+ITHIM.default <- updateITHIM(ITHIM.default, "cvNonTravel", 3)
+ITHIM.default <- updateITHIM(ITHIM.default, "cv", 3.0288)
+ITHIM.default <- updateITHIM(ITHIM.default, "quantiles", (1:99)/100)
+
+ITHIM.national <- ITHIM.default
+ITHIM.national <- updateITHIM(ITHIM.national, "muwt", muwtNational)
+ITHIM.national <- updateITHIM(ITHIM.national, "muct", muctNational)
+ITHIM.national <- updateITHIM(ITHIM.national, "Rwt", RwtNational)
+ITHIM.national <- updateITHIM(ITHIM.national, "Rct", RctNational)
+
+for (HHSTATE in c("CA","TX","NY","FL","VA","NC","AZ")){
+    ITHIMList[[HHSTATE]] <- ITHIM.default
+    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "muwt", muwtList[[HHSTATE]])
+    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "muct", muctList[[HHSTATE]])
+    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "Rwt", RwtList[[HHSTATE]])
+    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "Rct", RctList[[HHSTATE]])
+    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "GBD", ITHIM.national$parameters$GBD)
+  }
+
+for( muNonTravel in seq(0,upper,length.out = length) ){
+
+  rm(DALYs)
+
+  for (HHSTATE in c("CA","TX","NY","FL","VA","NC","AZ")){
+    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "muNonTravel", muNonTravel)
+  }
+
+  ITHIM.national <- updateITHIM(ITHIM.national, "muNonTravel", muNonTravel)
+
+  DALYs <- lapply(ITHIMList, sumDALY, ITHIM.baseline = ITHIM.national)
+  DALYs <- data.frame(State = names(DALYs), muNonTravel = muNonTravel, DALY = unlist(DALYs))
+  DALYsTotal <- rbind(DALYsTotal, DALYs)
+}
+
+DALYsTotal <- within(DALYsTotal, {
+  State <- factor(State, levels = c("NC","TX","VA","FL","AZ","NY","CA"))
+})
+
+p <- ggplot(DALYsTotal, aes(x = muNonTravel, y = DALY/1e3, colour = State))
+
+p + stat_smooth( method = loess) + theme_bw() + scale_x_continuous(name="Mean Non-Travel METs (MET-hrs./week) (Referent Group)") + scale_y_continuous(name="Change in National DALYs (Thousands)") + coord_cartesian(xlim = c(0, upper))
+
+p + stat_smooth( method = loess) + theme_bw() + scale_x_continuous(name="Mean Non-Travel METs (MET-hrs./week) (Referent Group)") + scale_y_continuous(name="Change in National DALYs (Thousands)") + coord_cartesian(xlim = c(0, upper)) + geom_point()
+
+```
+
+### Visualization of trip time matrices
+
+```{r meanMatrices, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
+
+ITHIMList <- c(ITHIMList, list("Natl." = ITHIM.national))
+
+meanMatrix <- function(ITHIM, mode = "Walking"){
+   if(mode == "Walking"){
+      return(with(ITHIM$parameters, data.frame(ageClass = factor(1:8), mode = mode, Rwt*muwt)))
+   }else if (mode == "Cycling"){
+      return(with(ITHIM$parameters, data.frame(ageClass = factor(1:8), mode = mode, Rct*muct)))
+   }else{
+      message("error in meanMatrix function")
+   }
+}
+
+meanMatrixListWalk <- lapply(ITHIMList, meanMatrix, mode = "Walking")
+meanMatrixListCycle <- lapply(ITHIMList, meanMatrix, mode = "Cycling")
+
+D <- melt(c(meanMatrixListWalk,meanMatrixListCycle))
+names(D) <- c("ageClass", "mode", "Sex", "time", "State")
+
+D <- within(D,{
+  State <- factor(State, levels = c("NC","TX","VA","FL","AZ","NY","CA","Natl."))
+  Sex <- factor(Sex, levels = c("F","M"))
+})
+
+p <- ggplot(subset(D,ageClass != 1), aes(x = ageClass, y = time, fill = Sex)) + geom_bar(stat= "identity", position = "dodge")
+p + theme_bw() + scale_x_discrete(name="", labels = c("5-14","15-29","30-44","45-59","60-69","70-79","80+")) + scale_y_continuous(name="Travel Time per Week (minutes)") + facet_grid( mode ~ State, scales = "free_y") + theme(axis.text.x  = element_text(angle = 90, vjust = 0.5, size = 5))
+
+```
+
+```{r California, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = phi, warning = FALSE, message = FALSE, echo = FALSE}
+ITHIM.national <- updateITHIM(ITHIM.national, parName = "muNonTravel", 10)
+
+ITHIM.CA <- ITHIMList[["CA"]]
+ITHIM.CA <- updateITHIM(ITHIM.CA, parName = "muNonTravel", 10)
+foo1 <- compareModels(ITHIM.national,ITHIM.CA)
+foobar1 <- data.frame(cbind(melt(foo1$daly.delta),paste0("ageClass",1:8)),State = "CA")
+
+ITHIM.NY <- ITHIMList[["NY"]]
+ITHIM.NY <- updateITHIM(ITHIM.NY, parName = "muNonTravel", 10)
+foo2 <- compareModels(ITHIM.national,ITHIM.NY)
+foobar2 <- data.frame(cbind(melt(foo2$daly.delta),paste0("ageClass",1:8)),State = "NY")
+
+foobar <- rbind(foobar1,foobar2)
+names(foobar) <- c("delta.DALY","Sex","Disease","ageClass","State")
+
+foobar <- within(foobar, {
+  Disease[Disease == "BreastCancer"] <- "Breast Cancer"
+  Disease[Disease == "ColonCancer"] <- "Colon Cancer"
+  Disease <- factor(Disease, levels = c("Breast Cancer", "Colon Cancer", "Dementia", "Depression", "Diabetes"))
+})
+
+p <- ggplot( subset(foobar,ageClass != "ageClass1"), aes(ageClass,-delta.DALY/1e3, fill = State) )
+
+upper <- 10
+
+p + geom_bar(stat="identity", position = "dodge") +
+theme(axis.title=element_blank()) +
+facet_grid( Disease ~ ., scales = "free") +
+scale_y_continuous(breaks=seq(1, upper, 1), name="DALYs Averted Nationwide (Thousands)") +
+
+#geom_hline(yintercept=seq(1, upper, 1), col="white", lwd=1) +
+scale_x_discrete(name="", labels = c("5-14","15-29","30-44","45-59","60-69","70-79","80+")) +
+theme_tufte(base_size=12, ticks=T)
+#
+
+# + annotate("text", x = 3.5, y = 5, adj=1,  family="serif", label = c("Foo"))
+# + scale_y_continuous(name="DALYs Averted Nationwide (Thousands)") + facet_grid( Disease ~ State) + coord_flip() # + theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=8))
+```
+
+```{r counts, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = phi, warning = FALSE, message = FALSE, echo = FALSE}
+D <- melt(counts)
+names(D) <- c("count","AgeClass","Sex", "State")
+D <- within(D,{
+  State <- factor(State, levels = c("NC","TX","VA","FL","AZ","NY","CA","Natl."))
+  Sex <- factor(Sex, levels = c("F","M"))
+})
+p <- ggplot(subset(D,AgeClass != "00-04"), aes(AgeClass, count/1e3))
+p + geom_bar(stat="identity", position = "dodge") + scale_x_discrete(name="", labels = c("5-14","15-29","30-44","45-59","60-69","70-79","80+")) + scale_y_continuous(name="Individuals Sampled (Thousands)") + facet_grid( State ~ .) + theme_bw() + coord_flip() # + theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=6))
+```
+
+```{r roadInjuries, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
+convertState <- function( stateCode ){
+
+stateCode <- as.character(stateCode)
+
+stateCodeMatrix <- matrix(c("Alabama","1","Nebraska","31","Alaska","2","Nevada","32","Arizona","4","New Hampshire","33","Arkansas","5","New Jersey","34","California","6","New Mexico","35","Colorado","8","New York","36","Connecticut","9","North Carolina","37","Delaware","10","North Dakota","38","District of Columbia","11", "Ohio", "39","Florida","12","Oklahoma","40","Georgia","13","Oregon","41","Hawaii","15","Pennsylvania","42","Idaho","16","Puerto Rico","43","Illinois","17","Rhode Island","44","Indiana","18","South Carolina","45","Iowa","19","South Dakota","46","Kansas","20","Tennessee","47","Kentucky","21","Texas","48","Louisiana","22","Utah","49","Maine","23","Vermont","50","Maryland","24","Virgin Islands (since 2004)","52","Massachusetts","25","Virginia","51","Michigan","26","Washington","53","Minnesota","27","West Virginia","54","Mississippi","28","Wisconsin","55","Missouri","29","Wyoming","56","Montana","30"), byrow = TRUE, ncol = 2)
+
+stateAbbrevMatrix <- matrix(c("Alabama","AL","Alaska","AK","Arizona","AZ","Arkansas","AR","California","CA","Colorado","CO","Connecticut","CT","Delaware","DE","District of Columbia","DC","Florida","FL","Georgia","GA","Hawaii","HI","Idaho","ID","Illinois","IL","Indiana","IN","Iowa","IA","Kansas","KS","Kentucky","KY","Louisiana","LA","Maine","ME","Maryland","MD","Massachusetts","MA","Michigan","MI","Minnesota","MN","Mississippi","MS","Missouri","MO","Montana","MT","Nebraska","NE","Nevada","NV","New Hampshire","NH","New Jersey","NJ","New Mexico","NM","New York","NY","North Carolina","NC"," North Dakota","ND","Ohio","OH","Oklahoma","OK","Oregon","OR","Pennsylvania","PA","Rhode Island","RI","South Carolina","SC","South Dakota","SD","Tennessee","TN","Texas","TX","Utah","UT","Vermont","VT","Virginia","VA","Washington","WA","West Virginia","WV","Wisconsin","WI","Wyoming","WY"), byrow = TRUE, ncol = 2)
+
+stateNames <- stateCodeMatrix[,1]
+names(stateNames) <- stateCodeMatrix[,2]
+
+stateAbbrevs <- stateAbbrevMatrix[,2]
+names(stateAbbrevs) <- stateAbbrevMatrix[,1]
+
+return(stateAbbrevs[stateNames[stateCode]])
+
+}
+
+roadFatalaties <- read.csv(file = "./../data/FARS/BikePedDeaths99-13.csv", na.strings = c("998","999"))
+roadFatalaties <- within(roadFatalaties, {
+  ageClass <- convertToAgeClass(AGE)
+  SEX <- ifelse(SEX == 1, "M", ifelse(SEX == 2, "F", NA))
+  SEX <- factor(SEX, levels = c("F","M"))
+  STATE <- as.factor(convertState(STATE))
+})
+roadFatalaties <- subset(roadFatalaties, !is.na(SEX) ) #& STATE %in% c("California", "New York"))
+
+p <- ggplot(roadFatalaties, aes(Type, fill = STATE))
+p + geom_bar(position = "dodge") + theme_bw()+ theme(axis.text.x  = element_text(angle=90, vjust=0.5))# + scale_x_discrete(name="", labels = c("0-4","5-14","15-29","30-44","45-59","60-69","70-79","80+")) #+ facet_grid( Type ~ ., scales = "free_y")
+
+walkTime <- unlist(lapply(meanWalkList, function(x) x[3,2]))
+
+foo <- data.frame(with(roadFatalaties, table(STATE,Type)))
+within(subset(foo, Type == "Ped"), Walk <- walkTime[as.character(STATE)])
+
+```
+
+# Appendix
+
 ### CDC Mortality
 
 Next we parse the output of a CDC Wonder query to estimate mortality rates.
@@ -220,7 +411,7 @@ The data files in ~/Box Sync/work/CoBenefits/MaggieShare/VitalStats/CDCwonder/.
 
 #### Query Results File (HHSmetro_Age_sex_2010-14.csv)
 
-```{r CDC, eval = TRUE, echo = FALSE}
+```{r CDC, eval = FALSE, echo = FALSE}
 wonder <- read.csv("./../data/CDCwonder/HHSmetro_Age_sex_2010-14.csv", header=T)
 names(wonder) <- c("HHSRegion", "HHSRegionCode", "gender", "genderCode","WONDERage","WONDERageCode","ICD10",  "ICD10Code", "deaths5yr", "population5yr", "crudeRate")
 
@@ -230,12 +421,12 @@ wonder <- subset(wonder, WONDERageCode != "NS") # remove 'Not stated' Age entrie
 The following two recoding chunks should probably be redone.  They
 depend on the ordering of the factors which seems dangerous.
 
-```{r ITHIMCause, eval = TRUE, echo = FALSE}
+```{r ITHIMCause, eval = FALSE, echo = FALSE}
 ITHIMcauseKey <- c("ColonCancer","LungCancer","BreastCancer","Diabetes","Dementia","IHD","InflammatoryHD","InflammatoryHD","HHD","Stroke","AcuteRespInfections","AcuteRespInfections","RespiratoryDisease","RespiratoryDisease","RTIs","RTIs")
 names(ITHIMcauseKey) <- unique(wonder$ICD10)
 wonder$ITHIMcause <- ITHIMcauseKey[as.character(wonder$ICD10)]
 ```
-```{r recodeAge, eval = TRUE, echo = FALSE}
+```{r recodeAge, eval = FALSE, echo = FALSE}
 ITHIMageKey <- c("ageClass1", "ageClass1", "ageClass2", "ageClass2", "ageClass3", "ageClass3", "ageClass3", "ageClass4", "ageClass4", "ageClass4", "ageClass5", "ageClass5", "ageClass5", "ageClass6", "ageClass6", "ageClass7", "ageClass7", "ageClass8", "ageClass8","ageClass8", "ageClass8", "ageClass8")
 names(ITHIMageKey) <- unique(wonder$WONDERage)
 wonder$ITHIMage <- ITHIMageKey[as.character(wonder$WONDERage)]
@@ -243,7 +434,7 @@ wonder$ITHIMage <- ITHIMageKey[as.character(wonder$WONDERage)]
 
 Depression was not in the WONDER data, since there are no deaths, have to add it manually.
 
-```{r wonder, eval = TRUE, echo = FALSE}
+```{r wonder, eval = FALSE, echo = FALSE}
 wonder <- wonder[, c("HHSRegionCode","gender","ITHIMage","ITHIMcause","deaths5yr","population5yr")]
 depress <- expand.grid(HHSRegionCode=unique(wonder$HHSRegionCode), gender=unique(wonder$gender),ITHIMage = unique(wonder$ITHIMage), ITHIMcause = "Depression", deaths5yr = "0", population5yr = "0", stringsAsFactors=T)
 wonder <- rbind(wonder, depress)
@@ -251,7 +442,7 @@ wonder <- rbind(wonder, depress)
 
 Replace suppressed values with random number 1-9
 
-```{r suppressed, eval = TRUE, echo = FALSE, warning = FALSE}
+```{r suppressed, eval = FALSE, echo = FALSE, warning = FALSE}
 wonder <- within( wonder, {
     newDeaths <- as.numeric(ifelse(deaths5yr == "Suppressed", sample(0:9), as.numeric(as.character(deaths5yr))))
     })
@@ -259,7 +450,7 @@ wonder <- within( wonder, {
 
 10 HHS x 2 sex x 8 age x 13 disease = 2,080 strata.
 
-```{r summary2, eval = TRUE, echo = FALSE}
+```{r summary2, eval = FALSE, echo = FALSE}
 wonderSummary <- ddply(wonder, .(HHSRegionCode, gender, ITHIMage, ITHIMcause), summarise,
                        numberOfDeaths5yr = sum(as.numeric(as.character(newDeaths)), na.rm=T)
 )
@@ -271,7 +462,7 @@ Read in data for single year population.  Processed in Excel, to
 combine two WONDER queries, need to go back and script the processing
 of the raw WONDER output
 
-```{r singleyear, eval = TRUE, echo = FALSE}
+```{r singleyear, eval = FALSE, echo = FALSE}
 pop14 <- read.csv("./../data/CDCwonder/HHSmetro_Age_sex_2014_AllCause.csv", header=T)
 
 
@@ -279,13 +470,13 @@ names(pop14) <- c("HHSRegion", "HHSRegionCode","gender", "genderCode","WONDERage
 ```
 This is delicate(read sloppy), really need to check the order of age groups returned by the 'unique(pop14$WONDERage)' command.
 
-```{r sloppy, eval = TRUE, echo = FALSE}
+```{r sloppy, eval = FALSE, echo = FALSE}
 ITHIMageKey2 <- c("ageClass8", "ageClass1", "ageClass7", "ageClass7", "ageClass6", "ageClass6", "ageClass1", "ageClass5", "ageClass5","ageClass5","ageClass4", "ageClass3", "ageClass4", "ageClass2", "ageClass2", "ageClass3", "ageClass4", "ageClass3","ageClass8")
 names(ITHIMageKey2) <- unique(pop14$WONDERage)
 pop14$ITHIMage <- ITHIMageKey2[as.character(pop14$WONDERage)]
 ```
 
-```{r foop, eval = TRUE, echo = FALSE}
+```{r foop, eval = FALSE, echo = FALSE}
 pop14 <-  pop14[, c("HHSRegionCode","gender","ITHIMage","deaths2014AllCause","population2014")]
 pop14$deaths2014 <- as.numeric(ifelse(pop14$deaths2014 == "Suppressed", sample(0:9), as.numeric(as.character(pop14$deaths2014))))
 
@@ -300,7 +491,7 @@ HHSmetroCauseSpecific <- merge(wonderSummary, popSummary)
 
 Presumably this comes from an EXCEL file.
 
-```{r USGBD, eval = TRUE, echo = FALSE}
+```{r USGBD, eval = FALSE, echo = FALSE}
 USGBD <- read.csv("./../data/CDCwonder/USGBD.csv", header=T)
 USGBD$ITHIMage <- as.character(USGBD$ITHIMage)
 USGBD$ITHIMcause <- as.character(USGBD$ITHIMcause)
@@ -325,14 +516,14 @@ burdenOut <- burdenOut[,c("HHS", "disease","sex","dproj","yll","yld","daly")]
 
 Now we create an R list of GBD objects named by HHS region.
 
-```{r burdenList, eval = TRUE, echo = FALSE}
+```{r burdenList, eval = FALSE, echo = FALSE}
 GBDList <- lapply(split(burdenOut, burdenOut$HHS),function(x) lapply(split(x, x$disease), function(x) split(x, x$sex)))
 #saveRDS(GBDList, file = "../data/GBD.rds")
 ```
 
 ## Non-Travel METs
 
-```{r newMETs, echo = TRUE, eval = TRUE, echo = FALSE}
+```{r newMETs, echo = TRUE, eval = FALSE, echo = FALSE}
 newMETsFile <- "~/GHI/data/ATUS/ATUS_to_METS_key.csv"
 newMETs <- read.csv(file = newMETsFile, stringsAsFactors = FALSE, colClasses = c("character","character","character","character","numeric","character","character","character"))
 dataColumns <- c(1,5)
@@ -354,7 +545,7 @@ names(metKey) <- activityCode
 
 ```
 
-```{r readnewMETs, echo = TRUE, eval = TRUE, echo = FALSE}
+```{r readnewMETs, echo = TRUE, eval = FALSE, echo = FALSE}
 cpsFile <- "~/GHI/data/ATUS/atuscps_0311.dat"
 cps <- read.table(cpsFile, header=T, skip=0, sep="," )
 cps <- within(cps, {
@@ -385,7 +576,7 @@ summaryList$metaData <- within(summaryList$metaData,{
 
 We shift the MET estimates by the minimum value so that the new minimum MET estimate is zero.
 
-```{r metKey, echo = TRUE, eval = TRUE, echo = FALSE}
+```{r metKey, echo = TRUE, eval = FALSE, echo = FALSE}
 allActivities <- colnames(summaryList$Data)
 nonTravelActivities <- rownames(newMETs$metaData)[which(newMETs$metaData$Travel.related..Y.N. == "N")]
 nonTravelActivities <- nonTravelActivities[which(nonTravelActivities %in% allActivities)]
@@ -405,7 +596,7 @@ ggplot(D, aes(x = METs, ..density.., colour = AGECAT)) + geom_freqpoly(binwidth 
 
 ```
 
-```{r parameters, eval = TRUE, echo = FALSE}
+```{r parameters, eval = FALSE, echo = FALSE}
 parameters <- ddply(D, .(SEX, AGECAT), summarise,
              mean = mean(METs, na.rm=T),
              sd = sd(METs, na.rm=T)
@@ -415,180 +606,86 @@ METmatrix <- rbind(matrix(0,nrow = 2, ncol = 2), matrix(parameters$mean, ncol = 
 METmatrix <- METmatrix/METmatrix[3,2]
 ```
 
-## Create List of ITHIM Objects
-
-
-```{r foobar, eval = TRUE, echo = FALSE}
-sumDALY <- function(ITHIM.baseline, ITHIM.scenario){
-    return(sum(unlist(data.frame(compareModels(ITHIM.baseline,ITHIM.scenario)$daly.delta)[-1,]))) # AgeClass 1 is removed from totals
-    }
-```
-
-```{r ITHIMObjs, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, echo = FALSE, warning = FALSE}
-upper <- 100
-length <- 100
-
-DALYsTotal <- data.frame()
-ITHIMList <- list()
-ITHIM.default <- createITHIM(vision = "baseline", region = "national")
-ITHIM.default <- updateITHIM(ITHIM.default, "cvNonTravel", 3)
-ITHIM.default <- updateITHIM(ITHIM.default, "cv", 3.0288)
-ITHIM.default <- updateITHIM(ITHIM.default, "pWalk", 0.85)
-ITHIM.default <- updateITHIM(ITHIM.default, "quantiles", (1:99)/100)
-
-for (HHS in c(paste0("HHS0",1:9),"HHS10")){
-    ITHIMList[[HHS]] <- ITHIM.default
-    ITHIMList[[HHS]] <- updateITHIM(ITHIMList[[HHS]], "muwt", muwtList[[HHS]])
-    ITHIMList[[HHS]] <- updateITHIM(ITHIMList[[HHS]], "muct", muctList[[HHS]])
-    ITHIMList[[HHS]] <- updateITHIM(ITHIMList[[HHS]], "Rwt", RwtList[[HHS]])
-    ITHIMList[[HHS]] <- updateITHIM(ITHIMList[[HHS]], "Rct", RctList[[HHS]])
-    ITHIMList[[HHS]] <- updateITHIM(ITHIMList[[HHS]], "GBD", GBDList[[HHS]])
-  }
-
-ITHIM.national <- ITHIM.default
-ITHIM.national <- updateITHIM(ITHIM.national, "muwt", muwtNational)
-ITHIM.national <- updateITHIM(ITHIM.national, "muct", muctNational)
-ITHIM.national <- updateITHIM(ITHIM.national, "Rwt", RwtNational)
-ITHIM.national <- updateITHIM(ITHIM.national, "Rct", RctNational)
-
-for( muNonTravel in seq(0.01,upper,length.out = length) ){
-
-  rm(DALYs)
-
-  for (HHS in c(paste0("HHS0",1:9),"HHS10")){
-    ITHIMList[[HHS]] <- updateITHIM(ITHIMList[[HHS]], "muNonTravel", muNonTravel)
-  }
-  
-  ITHIM.national <- updateITHIM(ITHIM.national, "muNonTravel", muNonTravel)
-
-  DALYs <- lapply(ITHIMList, sumDALY, ITHIM.baseline = ITHIM.national)
-  DALYs <- data.frame(Region = names(DALYs), muNonTravel = muNonTravel, DALY = unlist(DALYs))
-  DALYsTotal <- rbind(DALYsTotal, DALYs)
-}
-
-p <- ggplot(DALYsTotal, aes(x = muNonTravel, y = DALY/1e3, colour = Region))
-
-p + stat_smooth( method = loess) + theme_bw() + scale_x_continuous(name="Mean Non-Travel METs (MET-hrs./week) (Referent Group)") + scale_y_continuous(name="Change in National DALYs (Thousands)") + coord_cartesian(xlim = c(0, upper))
-
-p + stat_smooth( method = loess) + theme_bw() + scale_x_continuous(name="Mean Non-Travel METs (MET-hrs./week) (Referent Group)") + scale_y_continuous(name="Change in National DALYs (Thousands)") + coord_cartesian(xlim = c(0, upper)) + geom_point()
-
-```
-
-### Visualization of trip time matrices
-
-```{r meanMatrices, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
-
-
-ITHIMList <- c(ITHIMList, list("National" = ITHIM.national))
-
-meanMatrix <- function(ITHIM, mode = "Walking"){
-   if(mode == "Walking"){
-      return(with(ITHIM$parameters, data.frame(ageClass = factor(1:8), mode = mode, Rwt*muwt)))
-   }else if (mode == "Cycling"){
-      return(with(ITHIM$parameters, data.frame(ageClass = factor(1:8), mode = mode, Rct*muct)))
-   }else{
-      message("error in meanMatrix function")
-   }
-}
-
-meanMatrixListWalk <- lapply(ITHIMList, meanMatrix, mode = "Walking")
-meanMatrixListCycle <- lapply(ITHIMList, meanMatrix, mode = "Cycling")
-
-D <- melt(c(meanMatrixListWalk,meanMatrixListCycle))
-names(D) <- c("ageClass", "mode", "Sex", "time", "Region")
-
-D1 <- subset(D, Region %in% c("HHS01","HHS02","HHS09","HHS10","National") & ageClass != "1" )
-D2 <- subset(D, !(Region %in% c("HHS01","HHS02","HHS09","HHS10")) & ageClass != "1" )
-
-p1 <- ggplot(D1, aes(x = ageClass, y = time, fill = Sex)) + geom_bar(stat= "identity", position = "dodge") 
-p1 + theme_bw() + scale_x_discrete(name="Age Class", breaks = c(2,4,6,8)) + scale_y_continuous(name="Travel Time per Week (minutes)") + facet_grid( mode ~ Region, scales = "free_y")
-
-p2 <- ggplot(D2, aes(x = ageClass, y = time, fill = Sex)) + geom_bar(stat= "identity", position = "dodge") 
-p2 + theme_bw() + scale_x_discrete(name="Age Class", breaks = c(2,4,6,8)) + scale_y_continuous(name="Travel Time per Week (minutes)") + facet_grid( mode ~ Region, scales = "free_y")
-
-```
-# Appendix
-
 ## Example (Bay Area)
 
 First we define the baseline and scenario objects.
 
-```{r instantiate, eval = TRUE, echo = FALSE}
+```{r instantiate, eval = FALSE, echo = FALSE}
 ITHIM.baseline <- createITHIM(vision = "baseline", region = "SFBayArea")
 ITHIM.scenario <- createITHIM(vision = "scenario", region = "SFBayArea")
 ```
 
 Next we compare the scenario to the baseline using compareModels().
 
-```{r RRs, eval = TRUE, echo = FALSE}
+```{r RRs, eval = FALSE, echo = FALSE}
 comparativeRisk <- compareModels(ITHIM.baseline,ITHIM.scenario)
 ```
 
 ### Deaths
-```{r show, echo = FALSE, eval = TRUE, echo = FALSE}
+```{r show, echo = FALSE, eval = FALSE, echo = FALSE}
 matrix(unlist(lapply(comparativeRisk$dproj.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
 ```
 ### DALY
-```{r show2, echo = FALSE, eval = TRUE, echo = FALSE}
+```{r show2, echo = FALSE, eval = FALSE, echo = FALSE}
 matrix(unlist(lapply(comparativeRisk$daly.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
 ```
 ### YLD
-```{r show3, echo = FALSE, eval = TRUE, echo = FALSE}
+```{r show3, echo = FALSE, eval = FALSE, echo = FALSE}
 matrix(unlist(lapply(comparativeRisk$yld.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
 ```
 ### YLL
-```{r show4, echo = FALSE, eval = TRUE, echo = FALSE}
+```{r show4, echo = FALSE, eval = FALSE, echo = FALSE}
 matrix(unlist(lapply(comparativeRisk$yll.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
 ```
 
 ## Example (National)
 
-```{r instantiate2, eval = TRUE, echo = FALSE}
+```{r instantiate2, eval = FALSE, echo = FALSE}
 ITHIM.baseline <- createITHIM(vision = "baseline", region = "national")
 ITHIM.scenario <- createITHIM(vision = "scenario", region = "national")
 ```
 
-```{r RRs2, eval = TRUE, echo = FALSE}
+```{r RRs2, eval = FALSE, echo = FALSE}
 comparativeRisk <- compareModels(ITHIM.baseline,ITHIM.scenario)
 ```
 
 ### Deaths
-```{r show222, echo = FALSE, eval = TRUE}
+```{r show222, echo = FALSE, eval = FALSE}
 matrix(unlist(lapply(comparativeRisk$dproj.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
 ```
 ### DALY
-```{r show22, echo = FALSE, eval = TRUE}
+```{r show22, echo = FALSE, eval = FALSE}
 matrix(unlist(lapply(comparativeRisk$daly.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
 ```
 ### YLD
-```{r show23, echo = FALSE, eval = TRUE}
+```{r show23, echo = FALSE, eval = FALSE}
 matrix(unlist(lapply(comparativeRisk$yld.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
 ```
 #### YLL
-```{r show24, echo = FALSE, eval = TRUE}
+```{r show24, echo = FALSE, eval = FALSE}
 matrix(unlist(lapply(comparativeRisk$yll.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
 ```
 
 ## Example
 
-```{r example, eval = TRUE, echo = FALSE}
+```{r example, eval = FALSE, echo = FALSE}
 example("ITHIM-package")
 ```
 
 ### Creating Different Visions
 
-```{r vision, eval = TRUE, echo = FALSE}
+```{r vision, eval = FALSE, echo = FALSE}
 ITHIM.vision <- updateITHIM(ITHIM.scenario, "muwt", 2*ITHIM.scenario$parameters$muwt) # Double the mean walking time
 comparativeRisk <- compareModels(ITHIM.baseline,ITHIM.vision)
 ```
 #### YLL
-```{r show233, echo = FALSE, eval = TRUE}
+```{r show233, echo = FALSE, eval = FALSE}
 matrix(unlist(lapply(comparativeRisk$yll.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
 ```
 
 ## Interrogate Parameters
 
-```{r params, eval = TRUE, echo = FALSE}
+```{r params, eval = FALSE, echo = FALSE}
 names(ITHIM.baseline$parameters)
 ITHIM.baseline$parameters$NonTravelMETs
 ITHIM.baseline$parameters$Rwt
@@ -911,15 +1008,8 @@ foo <- group_by(NHTS.trips, HOUSEID,PERSONID)
 foobar <- dplyr::summarise(foo, n = n())
 nrow(foobar) # 262,934 number of people with trip data
 
-
-
 NHTS %>% group_by(HOUSEID, PERSONID) %>% dplyr::summarise( n = n()) # 260,576 people in merged data
-
-#NHTS <- subset(NHTS, !is.na(AGE) & !is.na(SEX))
-
 ggplot(NHTS, aes(x = TRVL_MIN, ..density.., colour = AGE)) + geom_freqpoly(binwidth = 15) + facet_grid( SEX ~ AT) + labs(x = "Foo", colour = "Age") + coord_cartesian(xlim = c(0, 75))
-
-
 NHTS %>% group_by(SEX, AGE) %>% dplyr::summarize(count = countPeople(data.frame(HOUSEID = HOUSEID, PERSONID = PERSONID)))
 ```
 
