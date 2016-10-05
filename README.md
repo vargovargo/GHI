@@ -3,8 +3,15 @@ May, 2016
 
 Welcome to the GHI repository! I hope you will be loving it!
 
-To reproduce the analyses run
+To reproduce the analyses run in the top-level directory:
 
 ```
 make all
 ```
+
+System Requirements
+- R
+- R packages
+ - ITHIM
+ - etc
+ 
