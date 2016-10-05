@@ -12,7 +12,7 @@
 \newcommand{\sgy}[1]{{\itshape\col{#1}}}
 \newcommand{\XX}{\sgy{XX}}
 \newcommand{\webpage}{\url{http://www.ithim.ghi.wisc.edu}}
-\newcommand{\af}{\rho}
+\newcommand{\af}{\textrm{PAF}}
 \newcommand{\mets}{MET-hrs./week}
 \newcommand{\pEm}[1]{$\mathrm{PM}_{#1}$}
 \newcommand{\vmt}{$\mathrm{VMT}$}
@@ -116,24 +116,25 @@ scenario.
 
 \section{Methods}
 
-\textit{
-    The ITHIM model uses the comparative risk
-    assesment framework to estimate the population attributable
-    fraction, $\af$.  In our case $\af$ represents the proportional
-    change in mortality and morbidity if the physical activity levels
-    were adjusted to represent an alternate scenario.
-}
+The ITHIM model uses the comparative risk assesment framework to
+estimate the population attributable fraction, $\af$.  In our case the
+$\af$ represents the proportional change in national disease burden if
+age and sex-specific active transport time means were changed.
 
 \begin{equation}
 \af = \frac{\int R(x)P(x) dx  - \int R(x)Q(x) dx }{\int R(x)P(x) dx}
 \end{equation}
 
-\textit{ Here $R(x)$ represents the risk when the individual has
-  exposure $x$, in our case physical activity (\mets).  $P(x)$ and
-  $Q(x)$ denote the population density of individuals with exposure
-  $x$, in the baseline and alternate scenarios, respectively.  The
-  exposure variable, $x$, is modeled as the sum of travel-related
-  exposure and non-travel-related exposure.}
+Here $R(x)$ represents the risk when the individual has exposure $x$,
+physical activity (\mets).  $P(x)$ and $Q(x)$ denote the population
+density of individuals with exposure $x$, in the baseline and
+alternate scenarios, respectively.  The exposure variable, $x$, is
+modeled as the sum of travel-related exposure and non-travel-related
+exposure, which are modeled as two independent random variables.  The
+age-sex specific mean ratios for non-travel-related exposure are
+estimated from the ATUS \cite{ATUS} and the referent group mean is
+treated as a variable.  We see in Figure \ref{dalyFigure} that varying
+it does not greatly affect the estimate for disease burden.
 
 \subsection{Active Transport}
 
@@ -187,7 +188,10 @@ scenario.
 %%     \caption{Counts}\label{counts}
 %% \end{figure}
 
-\section{Seven State Analysis}
+\section{New York and California}
+
+
+
 \begin{itemize}
 \item We used the National Household Transportation Survey \cite{NHTS} to
   estimate the mean walk and cycle times for individuals that live in
@@ -209,11 +213,11 @@ undue influence by outliers.\ei
 \item Values for DALYs were found using the CDC Wonder database \cite{CDCWonder}
 \end{itemize}
 
-%% \begin{figure}[t]
-%%     \centerline{\includegraphics[width=0.5\textwidth]{./figures/fig2}}
-%%     \caption{Change in total national DALYs for each regional
-%%       transportation estimates.}\label{dalyFigure}
-%% \end{figure}
+\begin{figure}[t]
+    \centerline{\includegraphics[width=0.5\textwidth]{./figures/fig2}}
+    \caption{Change in total national DALYs for each regional
+      transportation estimates.}\label{dalyFigure}
+\end{figure}
 
 \begin{figure}[t]
   \centerline{\includegraphics[width=0.5\textwidth]{./figures/fig3.pdf}}
