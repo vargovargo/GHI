@@ -229,7 +229,7 @@ sumDALY <- function(ITHIM.baseline, ITHIM.scenario){
 ```
 
 ```{r ITHIMObjs, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, echo = TRUE, warning = FALSE}
-upper <- 25; wd <- 10; length <- upper/wd + 1;
+upper <- 25; length <- 10; wd <- upper/length;
 
 DALYsTotal <- data.frame()
 ITHIMList <- list()
@@ -253,7 +253,7 @@ for (HHSTATE in c("CA","TX","NY","FL","VA","NC","AZ")){
     ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "GBD", ITHIM.national$parameters$GBD)
   }
 
-for( muNonTravel in seq(0,upper,length.out = length) ){
+for( muNonTravel in seq(0, upper, by = wd)){
 
   rm(DALYs)
 
@@ -320,13 +320,15 @@ ITHIM.CA <- updateITHIM(ITHIM.CA, parName = "muNonTravel", 10)
 foo1 <- compareModels(ITHIM.national,ITHIM.CA)
 foobar1 <- data.frame(cbind(melt(foo1$daly.delta),paste0("ageClass",1:8)),State = "CA")
 
-ITHIM.NY <- ITHIMList[["NY"]]
-ITHIM.NY <- updateITHIM(ITHIM.NY, parName = "muNonTravel", 10)
-foo2 <- compareModels(ITHIM.national,ITHIM.NY)
-foobar2 <- data.frame(cbind(melt(foo2$daly.delta),paste0("ageClass",1:8)),State = "NY")
-
-foobar <- rbind(foobar1,foobar2)
+foobar <- foobar1
 names(foobar) <- c("delta.DALY","Sex","Disease","ageClass","State")
+
+## ITHIM.NY <- ITHIMList[["NY"]]
+## ITHIM.NY <- updateITHIM(ITHIM.NY, parName = "muNonTravel", 10)
+## foo2 <- compareModels(ITHIM.national,ITHIM.NY)
+## foobar2 <- data.frame(cbind(melt(foo2$daly.delta),paste0("ageClass",1:8)),State = "NY")
+## foobar <- rbind(foobar1,foobar2)
+## names(foobar) <- c("delta.DALY","Sex","Disease","ageClass","State")
 
 foobar <- within(foobar, {
   Disease[Disease == "BreastCancer"] <- "Breast Cancer"
@@ -334,17 +336,17 @@ foobar <- within(foobar, {
   Disease <- factor(Disease, levels = c("Breast Cancer", "Colon Cancer", "Dementia", "Depression", "Diabetes"))
 })
 
-p <- ggplot( subset(foobar,ageClass != "ageClass1"), aes(ageClass,-delta.DALY/1e3, fill = State) )
+p <- ggplot( subset(foobar,ageClass != "ageClass1"), aes(ageClass,-delta.DALY/1e3, fill = Sex) )
 
-upper <- 10
+#upper <- 10
 
 p + geom_bar(stat="identity", position = "dodge") +
 theme(axis.title=element_blank()) +
 facet_grid( Disease ~ ., scales = "free") +
-scale_y_continuous(breaks=seq(1, upper, 1), name="DALYs Averted Nationwide (Thousands)") +
+scale_y_continuous(name="DALYs Averted Nationwide (Thousands)") +
+scale_x_discrete(name="", labels = c("5-14","15-29","30-44","45-59","60-69","70-79","80+"))
 
 #geom_hline(yintercept=seq(1, upper, 1), col="white", lwd=1) +
-scale_x_discrete(name="", labels = c("5-14","15-29","30-44","45-59","60-69","70-79","80+"))
 # + theme_tufte(base_size=12, ticks=T)
 #
 # + annotate("text", x = 3.5, y = 5, adj=1,  family="serif", label = c("Foo"))
