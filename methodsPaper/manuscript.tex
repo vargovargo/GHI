@@ -3,21 +3,7 @@
 \copyrightyear{2016}
 \pubyear{2016}
 
-\newcommand{\col}[2][red]{\textcolor{#1}{#2}}
-\newcommand{\bi}{\begin{itemize}}
-\newcommand{\ei}{\end{itemize}}
-\newcommand{\package}{\emph{ITHIM}}
-\newcommand{\ithim}{\emph{ITHIM}}
-\newcommand{\R}{\emph{R}}
-\newcommand{\sgy}[1]{{\itshape\col{#1}}}
-\newcommand{\XX}{\sgy{XX}}
-\newcommand{\webpage}{\url{http://www.ithim.ghi.wisc.edu}}
-\newcommand{\af}{\mathrm{PAF}}
-\newcommand{\mets}{MET-hrs./week}
-\newcommand{\pEm}[1]{$\mathrm{PM}_{#1}$}
-\newcommand{\vmt}{$\mathrm{VMT}$}
-\newcommand{\logNormal}{log-normal}
-
+\input{../tex/sgy.tex}
 \begin{document}
 \firstpage{1}
 
@@ -38,20 +24,15 @@ University of Wisconsin{\textendash}Madison, Madison, WI USA\\
 \maketitle
 
 \begin{abstract}
-
 \input{tex/abstract}
 \end{abstract}
 
 \section{Introduction}
-
 \input{tex/introduction}
 
 \begin{methods}
-
 \section{Methods}
-
 \input{tex/methods}
-
 \end{methods}
 
 % \begin{figure}[t]
@@ -72,13 +53,13 @@ University of Wisconsin{\textendash}Madison, Madison, WI USA\\
 % \end{figure}
 
 \section{Results}
-
 \input{tex/results}
+
 \section*{Acknowledgment}
 \paragraph{Funding\textcolon} SGY is supported by \ldots,\ JV, JP by \ldots
 
 %\bibliographystyle{natbib}
 \bibliographystyle{bmc_article}
 %\bibliographystyle{mypapers}
-\bibliography{ITHIM}
+\bibliography{../tex/ITHIM}
 \end{document}

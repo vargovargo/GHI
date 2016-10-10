@@ -4,10 +4,10 @@ tex : methods second ITHIM-discussion
 report: R/ITHIM.Rmd R/ITHIM.R
 	cd R; R --vanilla -e 'source("ITHIM.R")'
 
-methods: methodsPaper/manuscript.tex methodsPaper/ITHIM.bib
+methods: methodsPaper/manuscript.tex tex/ITHIM.bib
 	cd methodsPaper; make manuscript.pdf
 
-second: secondPaper/manuscript.tex secondPaper/ITHIM.bib
+second: secondPaper/manuscript.tex tex/ITHIM.bib
 	cd secondPaper; make manuscript.pdf
 
 data:
