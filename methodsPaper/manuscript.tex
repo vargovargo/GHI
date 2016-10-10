@@ -1,65 +1,357 @@
-\documentclass{bioinfo}
-\usepackage{url}
-\copyrightyear{2016}
-\pubyear{2016}
+% Template for PLoS
+% Version 3.3 June 2016
+%
+% % % % % % % % % % % % % % % % % % % % % %
+%
+% -- IMPORTANT NOTE
+%
+% This template contains comments intended 
+% to minimize problems and delays during our production 
+% process. Please follow the template instructions
+% whenever possible.
+%
+% % % % % % % % % % % % % % % % % % % % % % % 
+%
+% Once your paper is accepted for publication, 
+% PLEASE REMOVE ALL TRACKED CHANGES in this file 
+% and leave only the final text of your manuscript. 
+% PLOS recommends the use of latexdiff to track changes during review, as this will help to maintain a clean tex file.
+% Visit https://www.ctan.org/pkg/latexdiff?lang=en for info or contact us at latex@plos.org.
+%
+%
+% There are no restrictions on package use within the LaTeX files except that 
+% no packages listed in the template may be deleted.
+%
+% Please do not include colors or graphics in the text.
+%
+% The manuscript LaTeX source should be contained within a single file (do not use \input, \externaldocument, or similar commands).
+%
+% % % % % % % % % % % % % % % % % % % % % % %
+%
+% -- FIGURES AND TABLES
+%
+% Please include tables/figure captions directly after the paragraph where they are first cited in the text.
+%
+% DO NOT INCLUDE GRAPHICS IN YOUR MANUSCRIPT
+% - Figures should be uploaded separately from your manuscript file. 
+% - Figures generated using LaTeX should be extracted and removed from the PDF before submission. 
+% - Figures containing multiple panels/subfigures must be combined into one image file before submission.
+% For figure citations, please use "Fig" instead of "Figure".
+% See http://journals.plos.org/plosone/s/figures for PLOS figure guidelines.
+%
+% Tables should be cell-based and may not contain:
+% - spacing/line breaks within cells to alter layout or alignment
+% - do not nest tabular environments (no tabular environments within tabular environments)
+% - no graphics or colored text (cell background color/shading OK)
+% See http://journals.plos.org/plosone/s/tables for table guidelines.
+%
+% For tables that exceed the width of the text column, use the adjustwidth environment as illustrated in the example table in text below.
+%
+% % % % % % % % % % % % % % % % % % % % % % % %
+%
+% -- EQUATIONS, MATH SYMBOLS, SUBSCRIPTS, AND SUPERSCRIPTS
+%
+% IMPORTANT
+% Below are a few tips to help format your equations and other special characters according to our specifications. For more tips to help reduce the possibility of formatting errors during conversion, please see our LaTeX guidelines at http://journals.plos.org/plosone/s/latex
+%
+% For inline equations, please be sure to include all portions of an equation in the math environment.  For example, x$^2$ is incorrect; this should be formatted as $x^2$ (or $\mathrm{x}^2$ if the romanized font is desired).
+%
+% Do not include text that is not math in the math environment. For example, CO2 should be written as CO\textsubscript{2} instead of CO$_2$.
+%
+% Please add line breaks to long display equations when possible in order to fit size of the column. 
+%
+% For inline equations, please do not include punctuation (commas, etc) within the math environment unless this is part of the equation.
+%
+% When adding superscript or subscripts outside of brackets/braces, please group using {}.  For example, change "[U(D,E,\gamma)]^2" to "{[U(D,E,\gamma)]}^2". 
+%
+% Do not use \cal for caligraphic font.  Instead, use \mathcal{}
+%
+% % % % % % % % % % % % % % % % % % % % % % % % 
+%
+% Please contact latex@plos.org with any questions.
+%
+% % % % % % % % % % % % % % % % % % % % % % % %
 
-\input{../tex/sgy.tex}
-\begin{document}
-\firstpage{1}
+\documentclass[10pt,letterpaper]{article}
+\usepackage[top=0.85in,left=2.75in,footskip=0.75in]{geometry}
 
-\title[\package{}]{Improved implementation of comparative risk
-  assessment for health benefits of active transportation using
-  national datasets}
-\author[Younkin \textit{et~al}]{Samuel G. Younkin$^{1}$,
-  Jason Vargo$^{1}$\footnote{to whom correspondence should be addressed},
-  $\ldots$
-  \ and Jonathan Patz$^{1}$}
-\address{$^{1}$Global Health Institute\\
-University of Wisconsin{\textendash}Madison, Madison, WI USA\\
+% amsmath and amssymb packages, useful for mathematical formulas and symbols
+\usepackage{amsmath,amssymb}
+
+% Use adjustwidth environment to exceed column width (see example table in text)
+\usepackage{changepage}
+
+% Use Unicode characters when possible
+\usepackage[utf8x]{inputenc}
+
+% textcomp package and marvosym package for additional characters
+\usepackage{textcomp,marvosym}
+
+% cite package, to clean up citations in the main text. Do not remove.
+\usepackage{cite}
+
+% Use nameref to cite supporting information files (see Supporting Information section for more info)
+\usepackage{nameref,hyperref}
+
+% line numbers
+\usepackage[right]{lineno}
+
+% ligatures disabled
+\usepackage{microtype}
+\DisableLigatures[f]{encoding = *, family = * }
+
+% color can be used to apply background shading to table cells only
+\usepackage[table]{xcolor}
+
+% array package and thick rules for tables
+\usepackage{array}
+
+% create "+" rule type for thick vertical lines
+\newcolumntype{+}{!{\vrule width 2pt}}
+
+% create \thickcline for thick horizontal lines of variable length
+\newlength\savedwidth
+\newcommand\thickcline[1]{%
+  \noalign{\global\savedwidth\arrayrulewidth\global\arrayrulewidth 2pt}%
+  \cline{#1}%
+  \noalign{\vskip\arrayrulewidth}%
+  \noalign{\global\arrayrulewidth\savedwidth}%
 }
-\history{Received on XXXXX; revised on XXXXX; accepted on XXXXX}
 
-\editor{Associate Editor: XXXXXXX}
+% \thickhline command for thick horizontal lines that span the table
+\newcommand\thickhline{\noalign{\global\savedwidth\arrayrulewidth\global\arrayrulewidth 2pt}%
+\hline
+\noalign{\global\arrayrulewidth\savedwidth}}
 
-\maketitle
+% Remove comment for double spacing
+%\usepackage{setspace} 
+%\doublespacing
 
-\begin{abstract}
+% Text layout
+\raggedright
+\setlength{\parindent}{0.5cm}
+\textwidth 5.25in 
+\textheight 8.75in
+
+% Bold the 'Figure #' in the caption and separate it from the title/caption with a period
+% Captions will be left justified
+\usepackage[aboveskip=1pt,labelfont=bf,labelsep=period,justification=raggedright,singlelinecheck=off]{caption}
+\renewcommand{\figurename}{Fig}
+
+% Use the PLoS provided BiBTeX style
+\bibliographystyle{plos2015}
+
+% Remove brackets from numbering in List of References
+\makeatletter
+\renewcommand{\@biblabel}[1]{\quad#1.}
+\makeatother
+
+% Leave date blank
+\date{}
+
+% Header and Footer with logo
+\usepackage{lastpage,fancyhdr,graphicx}
+\usepackage{epstopdf}
+\pagestyle{myheadings}
+\pagestyle{fancy}
+\fancyhf{}
+\setlength{\headheight}{27.023pt}
+\lhead{\includegraphics[width=2.0in]{PLOS-submission.eps}}
+\rfoot{\thepage/\pageref{LastPage}}
+\renewcommand{\footrule}{\hrule height 2pt \vspace{2mm}}
+\fancyheadoffset[L]{2.25in}
+\fancyfootoffset[L]{2.25in}
+\lfoot{\sf PLOS}
+
+%% Include all macros below
+
+\newcommand{\lorem}{{\bf LOREM}}
+\newcommand{\ipsum}{{\bf IPSUM}}
+
+% added by sgy
+\usepackage{url}
+\input{../tex/sgy}
+
+%% END MACROS SECTION
+
+\begin{document}
+\vspace*{0.2in}
+
+% Title must be 250 characters or less.
+\begin{flushleft}
+{\Large
+\textbf\newline{Improved Implementation of Comparative Risk
+  Assessment for Health Benefits of Active Transportation Using
+  National Datasets} % Please use "title case" (capitalize all terms in the title except conjunctions, prepositions, and articles).
+}
+\newline
+% Insert author names, affiliations and corresponding author email (do not include titles, positions, or degrees).
+\\
+Samuel Younkin\textsuperscript{1},\ %,2\Yinyang},
+Jason Vargo\textsuperscript{1},\ %\Yinyang},
+Jonathan Patz\textsuperscript{1}%,3\textcurrency},
+%Name4 Surname\textsuperscript{2},
+%#Name5 Surname\textsuperscript{2\ddag},
+%Name6 Surname\textsuperscript{2\ddag},
+%Name7 Surname\textsuperscript{1,2,3*},
+%with the Global Health Institute\textsuperscript{\textpilcrow}
+\\
+\bigskip
+\textbf{1} Global Health Institute, University of Wisconsin{\textendash}Madison, Madison, WI, USA
+\\
+%\textbf{2} Affiliation Dept/Program/Center, Institution Name, City, State, Country
+%\\
+%\textbf{3} Affiliation Dept/Program/Center, Institution Name, City, State, Country
+%\\
+\bigskip
+
+% Insert additional author notes using the symbols described below. Insert symbol callouts after author names as necessary.
+% 
+% Remove or comment out the author notes below if they aren't used.
+%
+% Primary Equal Contribution Note
+%\Yinyang These authors contributed equally to this work.
+
+% Additional Equal Contribution Note
+% Also use this double-dagger symbol for special authorship notes, such as senior authorship.
+% \ddag These authors also contributed equally to this work.
+
+% Current address notes
+% \textcurrency Current Address: GHI UW{\textendash}Madison, 1300
+% University Ave., Madison, WI, 53706, USA
+% WI, USA % change symbol to "\textcurrency a" if more than one current address note
+% \textcurrency b Insert second current address 
+% \textcurrency c Insert third current address
+
+% Deceased author note
+%\dag Deceased
+
+% Group/Consortium Author Note
+%\textpilcrow Membership list can be found in the Acknowledgments section.
+
+% Use the asterisk to denote corresponding authorship and provide email address in note below.
+%* correspondingauthor@institute.edu
+
+\end{flushleft}
+% Please keep the abstract below 300 words
+\section*{Abstract}
 \input{tex/abstract}
-\end{abstract}
 
-\section{Introduction}
-\input{tex/introduction}
+% Please keep the Author Summary between 150 and 200 words
+% Use first person. PLOS ONE authors please skip this step. 
+% Author Summary not valid for PLOS ONE submissions.   
+\section*{Author Summary}
+\input{tex/authorSummary}
 
-\begin{methods}
-\section{Methods}
-\input{tex/methods}
-\end{methods}
+\linenumbers
 
-% \begin{figure}[t]
-%     \centerline{\includegraphics[width=0.5\textwidth]{./figures/fig2}}
-%     \caption{}\label{dalyFigure}
+% Use "Eq" instead of "Equation" for equation citations.
+\section*{Introduction}
+\input{tex/introduction.tex}
+
+%Lorem ipsum dolor sit~\cite{bib1} amet, consectetur adipiscing elit. Curabitur eget porta erat. Morbi consectetur est vel gravida pretium. Suspendisse ut dui eu ante cursus gravida non sed sem. Nullam Eq~(\ref{eq:schemeP}) sapien tellus, commodo id velit id, eleifend volutpat quam. Phasellus mauris velit, dapibus finibus elementum vel, pulvinar non tellus. Nunc pellentesque pretium diam, quis maximus dolor faucibus id.~\cite{bib2} Nunc convallis sodales ante, ut ullamcorper est egestas vitae. Nam sit amet enim ultrices, ultrices elit pulvinar, volutpat risus.
+
+% \begin{eqnarray}
+% \label{eq:schemeP}
+% 	\mathrm{P_Y} = \underbrace{H(Y_n) - H(Y_n|\mathbf{V}^{Y}_{n})}_{S_Y} + \underbrace{H(Y_n|\mathbf{V}^{Y}_{n})- H(Y_n|\mathbf{V}^{X,Y}_{n})}_{T_{X\rightarrow Y}},
+% \end{eqnarray}
+
+\section*{Materials and Methods}
+\input{tex/materialsAndMethods}
+
+% \subsection*{Etiam eget sapien nibh.}
+
+% % For figure citations, please use "Fig" instead of "Figure".
+% Nulla mi mi, Fig~\ref{fig1} venenatis sed ipsum varius, volutpat euismod diam. Proin rutrum vel massa non gravida. Quisque tempor sem et dignissim rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi at justo vitae nulla elementum commodo eu id massa. In vitae diam ac augue semper tincidunt eu ut eros. Fusce fringilla erat porttitor lectus cursus, \nameref{S1_Video} vel sagittis arcu lobortis. Aliquam in enim semper, aliquam massa id, cursus neque. Praesent faucibus semper libero.
+
+% % Place figure captions after the first paragraph in which they are cited.
+% \begin{figure}[!h]
+% \caption{{\bf Bold the figure title.}
+% Figure caption text here, please use this space for the figure panel descriptions instead of using subfigure commands. A: Lorem ipsum dolor sit amet. B: Consectetur adipiscing elit.}
+% \label{fig1}
 % \end{figure}
 
-% \begin{figure}[t]
-%   \centerline{\includegraphics[width=0.5\textwidth]{./figures/fig3.pdf}}
-%     \caption{Mean travel time by mode (walking/cycling) for each of
-%       seven states.  National means are displayed on the
-%       right.}\label{meanMatrices}
-% \end{figure}
-
-% \begin{figure}[t]
-%   \centerline{\includegraphics[width=0.5\textwidth]{./figures/fig4.pdf}}
-%     \caption{}\label{California}
-% \end{figure}
-
-\section{Results}
+% Results and Discussion can be combined.
+\section*{Results}
 \input{tex/results}
 
-\section*{Acknowledgment}
-\paragraph{Funding\textcolon} SGY is supported by \ldots,\ JV, JP by \ldots
 
-%\bibliographystyle{natbib}
-\bibliographystyle{bmc_article}
-%\bibliographystyle{mypapers}
+%PLOS does not support heading levels beyond the 3rd (no 4th level headings).
+% \subsection*{\lorem\ and \ipsum\ Nunc blandit a tortor.}
+% \subsubsection*{3rd Level Heading.} 
+% Maecenas convallis mauris sit amet sem ultrices gravida. Etiam eget sapien nibh. Sed ac ipsum eget enim egestas ullamcorper nec euismod ligula. Curabitur fringilla pulvinar lectus consectetur pellentesque. Quisque augue sem, tincidunt sit amet feugiat eget, ullamcorper sed velit. Sed non aliquet felis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris commodo justo ac dui pretium imperdiet. Sed suscipit iaculis mi at feugiat. 
+
+% \begin{enumerate}
+% 	\item{react}
+% 	\item{diffuse free particles}
+% 	\item{increment time by dt and go to 1}
+% \end{enumerate}
+
+
+% \subsection*{Sed ac quam id nisi malesuada congue.}
+
+% Nulla mi mi, venenatis sed ipsum varius, volutpat euismod diam. Proin rutrum vel massa non gravida. Quisque tempor sem et dignissim rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi at justo vitae nulla elementum commodo eu id massa. In vitae diam ac augue semper tincidunt eu ut eros. Fusce fringilla erat porttitor lectus cursus, vel sagittis arcu lobortis. Aliquam in enim semper, aliquam massa id, cursus neque. Praesent faucibus semper libero.
+
+% \begin{itemize}
+% 	\item First bulleted item.
+% 	\item Second bulleted item.
+% 	\item Third bulleted item.
+% \end{itemize}
+
+\section*{Discussion}
+\input{tex/discussion}
+
+
+\section*{Conclusion}
+\input{tex/conclusion}
+
+
+\section*{Supporting Information}
+
+\include{supportingInformation}
+
+
+\section*{Acknowledgments}
+%Cras egestas velit mauris, eu mollis turpis pellentesque sit amet. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nam id pretium nisi. Sed ac quam id nisi malesuada congue. Sed interdum aliquet augue, at pellentesque quam rhoncus vitae.
+
+\nolinenumbers
+
+% Either type in your references using
+% \begin{thebibliography}{}
+% \bibitem{}
+% Text
+% \end{thebibliography}
+%
+% or
+%
+% Compile your BiBTeX database using our plos2015.bst
+% style file and paste the contents of your .bbl file
+% here.
+% 
+
 \bibliography{../tex/ITHIM}
+
+% \begin{thebibliography}{10}
+
+% % \bibitem{bib1}
+% % Conant GC, Wolfe KH.
+% % \newblock {{T}urning a hobby into a job: how duplicated genes find new
+% %   functions}.
+% % \newblock Nat Rev Genet. 2008 Dec;9(12):938--950.
+
+% % \bibitem{bib2}
+% % Ohno S.
+% % \newblock Evolution by gene duplication.
+% % \newblock London: George Alien \& Unwin Ltd. Berlin, Heidelberg and New York:
+% %   Springer-Verlag.; 1970.
+
+% % \bibitem{bib3}
+% % Magwire MM, Bayer F, Webster CL, Cao C, Jiggins FM.
+% % \newblock {{S}uccessive increases in the resistance of {D}rosophila to viral
+% %   infection through a transposon insertion followed by a {D}uplication}.
+% % \newblock PLoS Genet. 2011 Oct;7(10):e1002337.
+% \input{../tex/ITHIM}
+% \end{thebibliography}
+
 \end{document}
+
