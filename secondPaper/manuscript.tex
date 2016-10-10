@@ -45,9 +45,9 @@ University of Wisconsin{\textendash}Madison, Madison, WI USA\\
 
 \end{abstract}
 
-\section{Introduction}
+\textit{The Americal Journal of Public Health} (AJPH) states the following:
 
-\subsection{AJPH}
+\begin{quote}
 There are 12 submission categories: Research Articles, Brief
 Articles, Systematic Reviews, Letters and Responses, The Editors
 Choice, Opinion Editorials, Commentaries, Analytic Essays, History
@@ -59,88 +59,99 @@ research in up to 3500 words in the text, a structured abstract, up to
 have an introduction and separate sections for Methods, Results,
 Discussion, and, Public Health Implications. This format is the
 highest priority for AJPH and represents the majority of papers
-published.  Brief Articles present preliminary findings or novel
-findings in up to 1200 words in the main text, a structured (except if
-justified otherwise in the cover letter) abstract, up to 1 table or
-figure, and no more than 12 references.
+published.
 
-Research Brief Articles must have an introduction and separate
-sections for the Methods, Results, Discussion, and Public Health
-Implications. Some policy -focused Brief Articles which are shor t
-essays and do not report study results do not require the “method,
-results, discussion, public health implications” format subheadings.
+Brief Articles present preliminary findings or novel findings in up to
+1200 words in the main text, a structured (except if justified
+otherwise in the cover letter) abstract, up to 1 table or figure, and
+no more than 12 references.  Research Brief Articles must have an
+introduction and separate sections for the Methods, Results,
+Discussion, and Public Health Implications. Some policy -focused Brief
+Articles which are shor t essays and do not report study results do
+not require the “method, results, discussion, public health
+implications” format subheadings.
+\end{quote}
 
-\subsection{Active Transport}
-Regular exercise has been shown to provide health benefits in terms of
-chronic disease prevention \cite{warburton2006}, cognitive function
-\cite{hillman2008}, and overall well being and satisfaction with life
-\cite{maher2013}. Still only half of Americans obtain the recommended
-levels of aerobic activity, which is 2.5 hours per week. There is
-considerable variability in the attainment of this goal by location
-within the country. Supportive local built and policy environments are
-important determinants of population-level activity
-patterns. Particularly, as they facilitate and foster routine moderate
-physical activity, such as walking, local decissions on design and
-policy can play a huge role in the Nation's health.
-
-To better understand the potential for attainable shifts in
-transportation behavior across the US, we employed a comparative risk
-assessment methodology to compare national averages for time spent
-walking and cycling for transport to those of specific states. Our
-estimates can provide an important evidence base to encourage new
-construction, retrofits, land use policy, and programatic funding to
-support active transportation. Particularly in places with poor
-attainmnet of the physical activity guidelines, such investments can
-be importnat pieces of lareger population health interventions that
-have effective and long-lasting impacts.
-
-ITHIM is a statistical model that integrates data on travel patterns,
-physical activity, fine particulate matter, GHG emissions, and disease
-and injuries. Based on population and travel scenarios. The model has
-been used to calculate the health impacts of walking and bicycling
-short distances usually traveled by car or driving low-emission
-automobiles \cite{woodcock2013,maizlish2013}.
-
-The ITHIM model uses comparative risk assessment through which it
-formulates a change in the disease burden, resulting from the shift in
-the exposure distribution from a baseline scenario to an alternative
-scenario.
-
-\begin{methods}
-
+\section{Introduction}
 \section{Methods}
-
-The ITHIM model uses the comparative risk assesment framework to
-estimate the population attributable fraction, $\af$.  In our case the
-$\af$ represents the proportional change in national disease burden if
-age and sex-specific active transport time means were changed.
-
-\begin{equation}
-\af = \frac{\int \! R(x)P(x) \, \mathrm{d}x  - \int \! R(x)Q(x) \, \mathrm{d}x}{\int \! R(x)P(x) \, \mathrm{d}x}
-\end{equation}
-
-Here $R(x)$ represents the risk when the individual has exposure $x$,
-physical activity (\mets).  $P(x)$ and $Q(x)$ denote the population
-density of individuals with exposure $x$, in the baseline and
-alternate scenarios, respectively.  The exposure variable, $x$, is
-modeled as the sum of two independent random variables, travel-related
-exposure and non-travel-related exposure.  Non-travel-related exposure
-is modeled with a \logNormal{} distribution with the age-sex specific
-mean ratios for non-travel-related exposure are estimated from the
-ATUS \cite{ATUS}.  The referent group mean is treated as a variable
-and the coefficient of variation is treated as constant across age-sex
-strata and estimated with ATUS.  We see in Figure \ref{dalyFigure}
-that varying the mean values for non-travel-related exposure does not
-greatly affect the estimate for disease burden.  The distribution for
-travel-related exposure is estimated from the time spent walking or
-cycling, i.e., active transport time, which as in the original ITHIM
-model has a \logNormal{} distribution with constant coefficient of
-variation across age-sex strata.  Travel-related exposure is estimated
-from active transport time using assumptions about how much physical
-activity is required for cycling and walking.
-
+\begin{methods}
 \end{methods}
+\section{Results}
+\section{Discussion}
+\section{Public Health Implications}
 
+\section*{Acknowledgment}
+\paragraph{Funding\textcolon} SGY is supported by \ldots,\ JV, JP by \ldots
+
+%\bibliographystyle{natbib}
+\bibliographystyle{bmc_article}
+%\bibliographystyle{mypapers}
+\bibliography{ITHIM}
+\end{document}
+
+% \subsection{Active Transport}
+% Regular exercise has been shown to provide health benefits in terms of
+% chronic disease prevention \cite{warburton2006}, cognitive function
+% \cite{hillman2008}, and overall well being and satisfaction with life
+% \cite{maher2013}. Still only half of Americans obtain the recommended
+% levels of aerobic activity, which is 2.5 hours per week. There is
+% considerable variability in the attainment of this goal by location
+% within the country. Supportive local built and policy environments are
+% important determinants of population-level activity
+% patterns. Particularly, as they facilitate and foster routine moderate
+% physical activity, such as walking, local decissions on design and
+% policy can play a huge role in the Nation's health.
+
+% To better understand the potential for attainable shifts in
+% transportation behavior across the US, we employed a comparative risk
+% assessment methodology to compare national averages for time spent
+% walking and cycling for transport to those of specific states. Our
+% estimates can provide an important evidence base to encourage new
+% construction, retrofits, land use policy, and programatic funding to
+% support active transportation. Particularly in places with poor
+% attainmnet of the physical activity guidelines, such investments can
+% be importnat pieces of lareger population health interventions that
+% have effective and long-lasting impacts.
+
+% ITHIM is a statistical model that integrates data on travel patterns,
+% physical activity, fine particulate matter, GHG emissions, and disease
+% and injuries. Based on population and travel scenarios. The model has
+% been used to calculate the health impacts of walking and bicycling
+% short distances usually traveled by car or driving low-emission
+% automobiles \cite{woodcock2013,maizlish2013}.
+
+% The ITHIM model uses comparative risk assessment through which it
+% formulates a change in the disease burden, resulting from the shift in
+% the exposure distribution from a baseline scenario to an alternative
+% scenario.
+% The ITHIM model uses the comparative risk assesment framework to
+% estimate the population attributable fraction, $\af$.  In our case the
+% $\af$ represents the proportional change in national disease burden if
+% age and sex-specific active transport time means were changed.
+
+% \begin{equation}
+% \af = \frac{\int \! R(x)P(x) \, \mathrm{d}x  - \int \! R(x)Q(x) \, \mathrm{d}x}{\int \! R(x)P(x) \, \mathrm{d}x}
+% \end{equation}
+
+% Here $R(x)$ represents the risk when the individual has exposure $x$,
+% physical activity (\mets).  $P(x)$ and $Q(x)$ denote the population
+% density of individuals with exposure $x$, in the baseline and
+% alternate scenarios, respectively.  The exposure variable, $x$, is
+% modeled as the sum of two independent random variables, travel-related
+% exposure and non-travel-related exposure.  Non-travel-related exposure
+% is modeled with a \logNormal{} distribution with the age-sex specific
+% mean ratios for non-travel-related exposure are estimated from the
+% ATUS \cite{ATUS}.  The referent group mean is treated as a variable
+% and the coefficient of variation is treated as constant across age-sex
+% strata and estimated with ATUS.  We see in Figure \ref{dalyFigure}
+% that varying the mean values for non-travel-related exposure does not
+% greatly affect the estimate for disease burden.  The distribution for
+% travel-related exposure is estimated from the time spent walking or
+% cycling, i.e., active transport time, which as in the original ITHIM
+% model has a \logNormal{} distribution with constant coefficient of
+% variation across age-sex strata.  Travel-related exposure is estimated
+% from active transport time using assumptions about how much physical
+% activity is required for cycling and walking.
 % \begin{figure}[t]
 %     \centerline{\includegraphics[width=0.5\textwidth]{./figures/fig2}}
 %     \caption{}\label{dalyFigure}
@@ -158,31 +169,20 @@ activity is required for cycling and walking.
 %     \caption{}\label{California}
 % \end{figure}
 
-\section{Results}
+% We used the National Household Transportation Survey to estimate the
+% mean walk and cycle times for individuals that live in metropolitan
+% areas for each of seven states (CA, TX, NY, FL, VA, NC and AZ)
+% \cite{NHTS}.  These states were selected becaused they had sufficient
+% sample size for reasonable estimates of age-sex specific
+% travel-related walking and cycling means, Figure \ref{meanMatrices}.
 
-We used the National Household Transportation Survey to estimate the
-mean walk and cycle times for individuals that live in metropolitan
-areas for each of seven states (CA, TX, NY, FL, VA, NC and AZ)
-\cite{NHTS}.  These states were selected becaused they had sufficient
-sample size for reasonable estimates of age-sex specific
-travel-related walking and cycling means, Figure \ref{meanMatrices}.
-
-Of these seven states one was found to show active transport behavior
-that, if adopted nation-wide, would avert 75-100,000 DALYs overall.
-Values for national disease-specific DALYs were found using the CDC
-Wonder database \cite{CDCWonder}.  California stood out among the
-estimates for national DALYs averted.  Most of the decrease in DALYs
-is due to prevention of dementia in the oldest age group, $80+$ years
-old.  California exhibits much greater walking and cycling means in
-this age group than the national average. In particular we see the
-cycling mean We also see prevention of depression and diabetes in the
-middle age groups due to increased active transport time.
-
-\section*{Acknowledgment}
-\paragraph{Funding\textcolon} SGY is supported by \ldots,\ JV, JP by \ldots
-
-%\bibliographystyle{natbib}
-\bibliographystyle{bmc_article}
-%\bibliographystyle{mypapers}
-\bibliography{ITHIM}
-\end{document}
+% Of these seven states one was found to show active transport behavior
+% that, if adopted nation-wide, would avert 75-100,000 DALYs overall.
+% Values for national disease-specific DALYs were found using the CDC
+% Wonder database \cite{CDCWonder}.  California stood out among the
+% estimates for national DALYs averted.  Most of the decrease in DALYs
+% is due to prevention of dementia in the oldest age group, $80+$ years
+% old.  California exhibits much greater walking and cycling means in
+% this age group than the national average. In particular we see the
+% cycling mean We also see prevention of depression and diabetes in the
+% middle age groups due to increased active transport time.
