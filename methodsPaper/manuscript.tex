@@ -232,32 +232,51 @@ Jonathan Patz\textsuperscript{1}%,3\textcurrency},
 % Use the asterisk to denote corresponding authorship and provide email address in note below.
 %* correspondingauthor@institute.edu
 
-\end{flushleft}
 % Please keep the abstract below 300 words
+% Use "Eq" instead of "Equation" for equation citations.
+
+% Results and Discussion can be combined.
+
+\end{flushleft}
+
 \section*{Abstract}
 \input{tex/abstract}
 
 % Please keep the Author Summary between 150 and 200 words
 % Use first person. PLOS ONE authors please skip this step. 
 % Author Summary not valid for PLOS ONE submissions.   
-\section*{Author Summary}
-\input{tex/authorSummary}
+% \section*{Author Summary}
+% \input{tex/authorSummary}
 
 \linenumbers
 
-% Use "Eq" instead of "Equation" for equation citations.
 \section*{Introduction}
 \input{tex/introduction.tex}
 
-%Lorem ipsum dolor sit~\cite{bib1} amet, consectetur adipiscing elit. Curabitur eget porta erat. Morbi consectetur est vel gravida pretium. Suspendisse ut dui eu ante cursus gravida non sed sem. Nullam Eq~(\ref{eq:schemeP}) sapien tellus, commodo id velit id, eleifend volutpat quam. Phasellus mauris velit, dapibus finibus elementum vel, pulvinar non tellus. Nunc pellentesque pretium diam, quis maximus dolor faucibus id.~\cite{bib2} Nunc convallis sodales ante, ut ullamcorper est egestas vitae. Nam sit amet enim ultrices, ultrices elit pulvinar, volutpat risus.
-
-% \begin{eqnarray}
-% \label{eq:schemeP}
-% 	\mathrm{P_Y} = \underbrace{H(Y_n) - H(Y_n|\mathbf{V}^{Y}_{n})}_{S_Y} + \underbrace{H(Y_n|\mathbf{V}^{Y}_{n})- H(Y_n|\mathbf{V}^{X,Y}_{n})}_{T_{X\rightarrow Y}},
-% \end{eqnarray}
-
 \section*{Materials and Methods}
 \input{tex/materialsAndMethods}
+
+\section*{Results}
+\input{tex/results}
+
+\section*{Discussion}
+\input{tex/discussion}
+
+\section*{Conclusion}
+\input{tex/conclusion}
+
+\section*{Supporting Information}
+
+\input{tex/supportingInformation}
+
+\section*{Acknowledgments}
+
+\nolinenumbers
+
+\bibliography{../tex/ITHIM}
+
+\end{document}
+
 
 % \subsection*{Etiam eget sapien nibh.}
 
@@ -271,51 +290,6 @@ Jonathan Patz\textsuperscript{1}%,3\textcurrency},
 % \label{fig1}
 % \end{figure}
 
-% Results and Discussion can be combined.
-\section*{Results}
-\input{tex/results}
-
-
-%PLOS does not support heading levels beyond the 3rd (no 4th level headings).
-% \subsection*{\lorem\ and \ipsum\ Nunc blandit a tortor.}
-% \subsubsection*{3rd Level Heading.} 
-% Maecenas convallis mauris sit amet sem ultrices gravida. Etiam eget sapien nibh. Sed ac ipsum eget enim egestas ullamcorper nec euismod ligula. Curabitur fringilla pulvinar lectus consectetur pellentesque. Quisque augue sem, tincidunt sit amet feugiat eget, ullamcorper sed velit. Sed non aliquet felis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris commodo justo ac dui pretium imperdiet. Sed suscipit iaculis mi at feugiat. 
-
-% \begin{enumerate}
-% 	\item{react}
-% 	\item{diffuse free particles}
-% 	\item{increment time by dt and go to 1}
-% \end{enumerate}
-
-
-% \subsection*{Sed ac quam id nisi malesuada congue.}
-
-% Nulla mi mi, venenatis sed ipsum varius, volutpat euismod diam. Proin rutrum vel massa non gravida. Quisque tempor sem et dignissim rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi at justo vitae nulla elementum commodo eu id massa. In vitae diam ac augue semper tincidunt eu ut eros. Fusce fringilla erat porttitor lectus cursus, vel sagittis arcu lobortis. Aliquam in enim semper, aliquam massa id, cursus neque. Praesent faucibus semper libero.
-
-% \begin{itemize}
-% 	\item First bulleted item.
-% 	\item Second bulleted item.
-% 	\item Third bulleted item.
-% \end{itemize}
-
-\section*{Discussion}
-\input{tex/discussion}
-
-
-\section*{Conclusion}
-\input{tex/conclusion}
-
-
-\section*{Supporting Information}
-
-\include{supportingInformation}
-
-
-\section*{Acknowledgments}
-%Cras egestas velit mauris, eu mollis turpis pellentesque sit amet. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nam id pretium nisi. Sed ac quam id nisi malesuada congue. Sed interdum aliquet augue, at pellentesque quam rhoncus vitae.
-
-\nolinenumbers
-
 % Either type in your references using
 % \begin{thebibliography}{}
 % \bibitem{}
@@ -328,9 +302,6 @@ Jonathan Patz\textsuperscript{1}%,3\textcurrency},
 % style file and paste the contents of your .bbl file
 % here.
 % 
-
-\bibliography{../tex/ITHIM}
-
 % \begin{thebibliography}{10}
 
 % % \bibitem{bib1}
@@ -352,6 +323,3 @@ Jonathan Patz\textsuperscript{1}%,3\textcurrency},
 % % \newblock PLoS Genet. 2011 Oct;7(10):e1002337.
 % \input{../tex/ITHIM}
 % \end{thebibliography}
-
-\end{document}
-

@@ -1,1 +1,28 @@
-foo
+The ITHIM model uses the comparative risk assesment framework to
+estimate the population attributable fraction, $\af$.  In our case the
+$\af$ represents the proportional change in national disease burden if
+age and sex-specific active transport time means were changed.
+
+\begin{equation}
+\af = \frac{\int \! R(x)P(x) \, \mathrm{d}x  - \int \! R(x)Q(x) \, \mathrm{d}x}{\int \! R(x)P(x) \, \mathrm{d}x}
+\end{equation}
+
+Here $R(x)$ represents the risk when the individual has exposure $x$,
+physical activity (\mets).  $P(x)$ and $Q(x)$ denote the population
+density of individuals with exposure $x$, in the baseline and
+alternate scenarios, respectively.  The exposure variable, $x$, is
+modeled as the sum of two independent random variables, travel-related
+exposure and non-travel-related exposure.  Non-travel-related exposure
+is modeled with a \logNormal{} distribution with the age-sex specific
+mean ratios for non-travel-related exposure are estimated from the
+ATUS \cite{ATUS}.  The referent group mean is treated as a variable
+and the coefficient of variation is treated as constant across age-sex
+strata and estimated with ATUS.  We see in Figure \ref{dalyFigure}
+that varying the mean values for non-travel-related exposure does not
+greatly affect the estimate for disease burden.  The distribution for
+travel-related exposure is estimated from the time spent walking or
+cycling, i.e., active transport time, which as in the original ITHIM
+model has a \logNormal{} distribution with constant coefficient of
+variation across age-sex strata.  Travel-related exposure is estimated
+from active transport time using assumptions about how much physical
+activity is required for cycling and walking.
