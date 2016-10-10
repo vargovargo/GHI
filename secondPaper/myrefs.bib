@@ -1,0 +1,141 @@
+@Article{li2011,
+AUTHOR = {Li, Bo and Dewey, Colin},
+TITLE = {{RSEM}: accurate transcript quantification from {RNA}-Seq data with or without a reference genome},
+JOURNAL = {BMC Bioinformatics},
+VOLUME = {12},
+YEAR = {2011},
+NUMBER = {1},
+PAGES = {323},
+URL = {http://www.biomedcentral.com/1471-2105/12/323},
+DOI = {10.1186/1471-2105-12-323},
+PubMedID = {21816040},
+ISSN = {1471-2105},
+ABSTRACT = {BACKGROUND:RNA-Seq is revolutionizing the way transcript abundances are measured. A key challenge in transcript quantification from RNA-Seq data is the handling of reads that map to multiple genes or isoforms. This issue is particularly important for quantification with de novo transcriptome assemblies in the absence of sequenced genomes, as it is difficult to determine which transcripts are isoforms of the same gene. A second significant issue is the design of RNA-Seq experiments, in terms of the number of reads, read length, and whether reads come from one or both ends of cDNA fragments.RESULTS:We present RSEM, an user-friendly software package for quantifying gene and isoform abundances from single-end or paired-end RNA-Seq data. RSEM outputs abundance estimates, 95\% credibility intervals, and visualization files and can also simulate RNA-Seq data. In contrast to other existing tools, the software does not require a reference genome. Thus, in combination with a de novo transcriptome assembler, RSEM enables accurate transcript quantification for species without sequenced genomes. On simulated and real data sets, RSEM has superior or comparable performance to quantification methods that rely on a reference genome. Taking advantage of RSEM's ability to effectively use ambiguously-mapping reads, we show that accurate gene-level abundance estimates are best obtained with large numbers of short single-end reads. On the other hand, estimates of the relative frequencies of isoforms within single genes may be improved through the use of paired-end reads, depending on the number of possible splice forms for each gene.CONCLUSIONS:RSEM is an accurate and user-friendly software tool for quantifying transcript abundances from RNA-Seq data. As it does not rely on the existence of a reference genome, it is particularly useful for quantification with de novo transcriptome assemblies. In addition, RSEM has enabled valuable guidance for cost-efficient design of quantification experiments with RNA-Seq, which is currently relatively expensive.},
+}
+
+@article{leng2013,
+author = {Leng, Ning and Dawson, John A. and Thomson, James A. and Ruotti, Victor and Rissman, Anna I. and Smits, Bart M. G. and Haag, Jill D. and Gould, Michael N. and Stewart, Ron M. and Kendziorski, Christina}, 
+title = {{EBS}eq: an empirical Bayes hierarchical model for inference in {RNA}-seq experiments},
+volume = {29}, 
+number = {8}, 
+pages = {1035-1043}, 
+year = {2013}, 
+doi = {10.1093/bioinformatics/btt087}, 
+abstract ={Motivation: Messenger RNA expression is important in normal development and differentiation, as well as in manifestation of disease. RNA-seq experiments allow for the identification of differentially expressed (DE) genes and their corresponding isoforms on a genome-wide scale. However, statistical methods are required to ensure that accurate identifications are made. A number of methods exist for identifying DE genes, but far fewer are available for identifying DE isoforms. When isoform DE is of interest, investigators often apply gene-level (count-based) methods directly to estimates of isoform counts. Doing so is not recommended. In short, estimating isoform expression is relatively straightforward for some groups of isoforms, but more challenging for others. This results in estimation uncertainty that varies across isoform groups. Count-based methods were not designed to accommodate this varying uncertainty, and consequently, application of them for isoform inference results in reduced power for some classes of isoforms and increased false discoveries for others.Results: Taking advantage of the merits of empirical Bayesian methods, we have developed EBSeq for identifying DE isoforms in an RNA-seq experiment comparing two or more biological conditions. Results demonstrate substantially improved power and performance of EBSeq for identifying DE isoforms. EBSeq also proves to be a robust approach for identifying DE genes.Availability and implementation: An R package containing examples and sample datasets is available at http://www.biostat.wisc.edu/∼kendzior/EBSEQ/.Contact: kendzior@biostat.wisc.eduSupplementary information: Supplementary data are available at Bioinformatics online.}, 
+URL = {http://bioinformatics.oxfordjournals.org/content/29/8/1035.abstract}, 
+eprint = {http://bioinformatics.oxfordjournals.org/content/29/8/1035.full.pdf+html}, 
+journal = {Bioinformatics} 
+}
+
+@article{leek2014,
+author = {Jeff Leek},
+title = {Polyester},
+volume = {?}, 
+number = {?}, 
+pages = {?}, 
+year = {2014}, 
+doi = {?}, 
+URL = {?}, 
+eprint = {?},
+journal = {Personal Communication} 
+}
+
+@article{Griebel2012,
+author = {Griebel, Thasso and Zacher, Benedikt and Ribeca, Paolo and Raineri, Emanuele and Lacroix, Vincent and Guigó, Roderic and Sammeth, Michael}, 
+title = {Modelling and simulating generic RNA-Seq experiments with the flux simulator},
+volume = {40}, 
+number = {20}, 
+pages = {10073-10083}, 
+year = {2012}, 
+doi = {10.1093/nar/gks666}, 
+abstract ={High-throughput sequencing of cDNA libraries constructed from cellular RNA complements (RNA-Seq) naturally provides a digital quantitative measurement for every expressed RNA molecule. Nature, impact and mutual interference of biases in different experimental setups are, however, still poorly understood—mostly due to the lack of data from intermediate protocol steps. We analysed multiple RNA-Seq experiments, involving different sample preparation protocols and sequencing platforms: we broke them down into their common—and currently indispensable—technical components (reverse transcription, fragmentation, adapter ligation, PCR amplification, gel segregation and sequencing), investigating how such different steps influence abundance and distribution of the sequenced reads. For each of those steps, we developed universally applicable models, which can be parameterised by empirical attributes of any experimental protocol. Our models are implemented in a computer simulation pipeline called the Flux Simulator, and we show that read distributions generated by different combinations of these models reproduce well corresponding evidence obtained from the corresponding experimental setups. We further demonstrate that our in silico RNA-Seq provides insights about hidden precursors that determine the final configuration of reads along gene bodies; enhancing or compensatory effects that explain apparently controversial observations can be observed. Moreover, our simulations identify hitherto unreported sources of systematic bias from RNA hydrolysis, a fragmentation technique currently employed by most RNA-Seq protocols.}, 
+URL = {http://nar.oxfordjournals.org/content/40/20/10073.abstract}, 
+eprint = {http://nar.oxfordjournals.org/content/40/20/10073.full.pdf+html}, 
+journal = {Nucleic Acids Research} 
+}
+
+@article{Grant2011,
+author = {Grant, Gregory R. and Farkas, Michael H. and Pizarro, Angel D. and Lahens, Nicholas F. and Schug, Jonathan and Brunk, Brian P. and Stoeckert, Christian J. and Hogenesch, John B. and Pierce, Eric A.}, 
+title = {Comparative analysis of RNA-Seq alignment algorithms and the RNA-Seq unified mapper (RUM)},
+volume = {27}, 
+number = {18}, 
+pages = {2518-2528}, 
+year = {2011}, 
+doi = {10.1093/bioinformatics/btr427}, 
+abstract ={Motivation: A critical task in high-throughput sequencing is aligning millions of short reads to a reference genome. Alignment is especially complicated for RNA sequencing (RNA-Seq) because of RNA splicing. A number of RNA-Seq algorithms are available, and claim to align reads with high accuracy and efficiency while detecting splice junctions. RNA-Seq data are discrete in nature; therefore, with reasonable gene models and comparative metrics RNA-Seq data can be simulated to sufficient accuracy to enable meaningful benchmarking of alignment algorithms. The exercise to rigorously compare all viable published RNA-Seq algorithms has not been performed previously.Results: We developed an RNA-Seq simulator that models the main impediments to RNA alignment, including alternative splicing, insertions, deletions, substitutions, sequencing errors and intron signal. We used this simulator to measure the accuracy and robustness of available algorithms at the base and junction levels. Additionally, we used reverse transcription–polymerase chain reaction (RT–PCR) and Sanger sequencing to validate the ability of the algorithms to detect novel transcript features such as novel exons and alternative splicing in RNA-Seq data from mouse retina. A pipeline based on BLAT was developed to explore the performance of established tools for this problem, and to compare it to the recently developed methods. This pipeline, the RNA-Seq Unified Mapper (RUM), performs comparably to the best current aligners and provides an advantageous combination of accuracy, speed and usability.Availability: The RUM pipeline is distributed via the Amazon Cloud and for computing clusters using the Sun Grid Engine (http://cbil.upenn.edu/RUM).Contact: ggrant@pcbi.upenn.edu; epierce@mail.med.upenn.eduSupplementary Information:The RNA-Seq sequence reads described in the article are deposited at GEO, accession GSE26248.}, 
+URL = {http://bioinformatics.oxfordjournals.org/content/27/18/2518.abstract}, 
+eprint = {http://bioinformatics.oxfordjournals.org/content/27/18/2518.full.pdf+html}, 
+journal = {Bioinformatics} 
+}
+
+@Article{Oshlack2010,
+AUTHOR = "Oshlack, Alicia and Robinson, Mark and Young, Matthew",
+TITLE = {From RNA-seq reads to differential expression results},
+JOURNAL = {Genome Biology},
+VOLUME = {11},
+YEAR = {2010},
+NUMBER = {12},
+PAGES = {220},
+URL = {http://genomebiology.com/2010/11/12/220},
+DOI = {10.1186/gb-2010-11-12-220},
+PubMedID = {21176179},
+ISSN = {1465-6906},
+ABSTRACT = {Many methods and tools are available for preprocessing high-throughput RNA sequencing data and detecting differential expression.},
+}
+
+
+@article{shi2006,
+AUTHOR = {{The MAQC Consortium}},
+TITLE = {The MicroArray Quality Control (MAQC) project shows inter- and intraplatform reproducibility of gene expression measurements},
+JOURNAL = {Nature Biotechnology},
+VOLUME = {24},
+YEAR = {2006},
+NUMBER = {9},
+PAGES = {1151–1161},
+DOI = {10.1038/nbt1239}
+}
+
+@article{love2014,
+	author = {Michael I Love and Wolfgang Huber and Simon Anders},
+	title = {Moderated estimation of fold change and dispersion for RNA-Seq data with DESeq2},
+	year = {2014},
+	doi = {10.1101/002832},
+	abstract = {Michael I Love1 (michaelisaiahlove{at}gmail.com), Wolfgang Huber2 (whuber{at}embl.de) (http://www.embl.de/research/units/genome_biology/huber/) and Simon Anders2,3 (anders{at}embl.de)
+				1 Harvard School of Public Health;
+			
+				2 European Molecular Biology Laboratory
+					 Corresponding author; email: anders{at}embl.de
+				AbstractIn comparative high-throughput sequencing assays, a fundamental task is the analysis of count data, such as read counts per gene in RNA-Seq data, for evidence of systematic changes across experimental conditions. Small replicate numbers, discreteness, large dynamic range and the presence of outliers require a suitable statistical approach. We present DESeq2, a method for differential analysis of count data. DESeq2 uses shrinkage estimation for dispersions and fold changes to improve stability and interpretability of the estimates. This enables a more quantitative analysis focused on the strength rather than the mere presence of differential expression and facilitates downstream tasks such as gene ranking and visualization. DESeq2 is available as an R/Bioconductor package.Received February 19, 2014.Accepted February 19, 2014.{\textcopyright} 2014, Published by Cold Spring Harbor Laboratory PressThis pre-print is available under a Creative Commons License (Attribution 4.0 International), CC BY 4.0, as described at http://creativecommons.org/licenses/by/4.0/},
+	URL = {http://biorxiv.org/content/early/2014/02/19/002832},
+	eprint = {http://biorxiv.org/content/early/2014/02/19/002832.full.pdf},
+	journal = {bioRxiv}
+}
+
+@article{Robinson2010,
+author = {Robinson, Mark D. and McCarthy, Davis J. and Smyth, Gordon K.}, 
+title = {edgeR: a Bioconductor package for differential expression analysis of digital gene expression data},
+volume = {26}, 
+number = {1}, 
+pages = {139-140}, 
+year = {2010}, 
+doi = {10.1093/bioinformatics/btp616}, 
+abstract ={Summary: It is expected that emerging digital gene expression (DGE) technologies will overtake microarray technologies in the near future for many functional genomics applications. One of the fundamental data analysis tasks, especially for gene expression studies, involves determining whether there is evidence that counts for a transcript or exon are significantly different across experimental conditions. edgeR is a Bioconductor software package for examining differential expression of replicated count data. An overdispersed Poisson model is used to account for both biological and technical variability. Empirical Bayes methods are used to moderate the degree of overdispersion across transcripts, improving the reliability of inference. The methodology can be used even with the most minimal levels of replication, provided at least one phenotype or experimental condition is replicated. The software may have other applications beyond sequencing data, such as proteome peptide count data.Availability: The package is freely available under the LGPL licence from the Bioconductor web site (http://bioconductor.org).Contact: mrobinson@wehi.edu.au}, 
+URL = {http://bioinformatics.oxfordjournals.org/content/26/1/139.abstract}, 
+eprint = {http://bioinformatics.oxfordjournals.org/content/26/1/139.full.pdf+html}, 
+journal = {Bioinformatics} 
+}
+
+@Article{langmead2009,
+AUTHOR = {Langmead, Ben and Trapnell, Cole and Pop, Mihai and Salzberg, Steven},
+TITLE = {Ultrafast and memory-efficient alignment of short DNA sequences to the human genome},
+JOURNAL = {Genome Biology},
+VOLUME = {10},
+YEAR = {2009},
+NUMBER = {3},
+PAGES = {R25},
+URL = {http://genomebiology.com/2009/10/3/R25},
+DOI = {10.1186/gb-2009-10-3-r25},
+PubMedID = {19261174},
+ISSN = {1465-6906},
+ABSTRACT = {Bowtie is an ultrafast, memory-efficient alignment program for aligning short DNA sequence reads to large genomes. For the human genome, Burrows-Wheeler indexing allows Bowtie to align more than 25 million reads per CPU hour with a memory footprint of approximately 1.3 gigabytes. Bowtie extends previous Burrows-Wheeler techniques with a novel quality-aware backtracking algorithm that permits mismatches. Multiple processor cores can be used simultaneously to achieve even greater alignment speeds. Bowtie is open source http://bowtie.cbcb.umd.edu webcite.},
+}

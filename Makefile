@@ -1,10 +1,14 @@
-all : clean data report ITHIM-manuscript ITHIM-discussion
+all : clean data report methods second ITHIM-discussion
+tex : methods second ITHIM-discussion
 
 report: R/ITHIM.Rmd R/ITHIM.R
 	cd R; R --vanilla -e 'source("ITHIM.R")'
 
-ITHIM-manuscript: manuscript/manuscript.tex manuscript/ITHIM.bib manuscript/figures/fig2.pdf manuscript/figures/fig3.pdf
-	cd manuscript; make manuscript.pdf
+methods: methodsPaper/manuscript.tex methodsPaper/ITHIM.bib
+	cd methodsPaper; make manuscript.pdf
+
+second: secondPaper/manuscript.tex secondPaper/ITHIM.bib
+	cd secondPaper; make manuscript.pdf
 
 data:
 	wget http://nhts.ornl.gov/2009/download/Ascii.zip
