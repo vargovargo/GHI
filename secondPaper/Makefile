@@ -1,4 +1,4 @@
-manuscript.pdf: manuscript.tex ../tex/ITHIM.bib
+manuscript.pdf: manuscript.tex ../tex/ITHIM.bib ./tex/abstract.tex ./tex/discussion.tex ./tex/introduction.tex ./tex/methods.tex ./tex/publicHealthImplications.tex ./tex/results.tex
 	pdflatex manuscript.tex
 	bibtex manuscript.aux
 	pdflatex manuscript.tex
