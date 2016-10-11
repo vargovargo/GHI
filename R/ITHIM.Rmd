@@ -24,7 +24,8 @@ library("ggthemes")
 library("devtools")
 install_github("smbache/magrittr", ref="master")
 library("magrittr")
-install("~/ITHIM/")
+#install("~/ITHIM/")
+install_github("syounkin/ITHIM", ref="devel")
 library("ITHIM")
 
 fig.width <- 6 # inches
@@ -38,7 +39,7 @@ First we use NHTS to estimate mean walking and cycling times.
 ### NHTS
 
 ```{r compute, echo = FALSE, eval = TRUE}
-compute <- TRUE
+compute <- FALSE
 ```
 
 #### Create a handful of functions to help parse data
@@ -229,7 +230,7 @@ sumDALY <- function(ITHIM.baseline, ITHIM.scenario){
 ```
 
 ```{r ITHIMObjs, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, echo = TRUE, warning = FALSE}
-upper <- 25; length <- 10; wd <- upper/length;
+upper <- 10; length <- 5; wd <- upper/length;
 
 DALYsTotal <- data.frame()
 ITHIMList <- list()
@@ -279,6 +280,61 @@ p + stat_smooth( method = loess) + theme_bw() + scale_x_continuous(name="Mean No
 p + stat_smooth( method = loess) + theme_bw() + scale_x_continuous(name="Mean Non-Travel METs (MET-hrs./week) (Referent Group)") + scale_y_continuous(name="Change in National DALYs (Thousands)") + coord_cartesian(xlim = c(0, upper)) + geom_point()
 
 ```
+
+Do it again, but with quintiles
+
+```{r ITHIMObjsQuintiles, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, echo = TRUE, warning = FALSE}
+DALYsTotal2 <- data.frame()
+ITHIMList <- list()
+ITHIM.default <- createITHIM(vision = "baseline", region = "national")
+ITHIM.default <- updateITHIM(ITHIM.default, "cvNonTravel", 3)
+ITHIM.default <- updateITHIM(ITHIM.default, "cv", 3.0288)
+ITHIM.default <- updateITHIM(ITHIM.default, "quantiles", seq(1, 9, by = 2)/10 )
+
+ITHIM.national <- ITHIM.default
+ITHIM.national <- updateITHIM(ITHIM.national, "muwt", muwtNational)
+ITHIM.national <- updateITHIM(ITHIM.national, "muct", muctNational)
+ITHIM.national <- updateITHIM(ITHIM.national, "Rwt", RwtNational)
+ITHIM.national <- updateITHIM(ITHIM.national, "Rct", RctNational)
+
+for (HHSTATE in c("CA","TX","NY","FL","VA","NC","AZ")){
+    ITHIMList[[HHSTATE]] <- ITHIM.default
+    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "muwt", muwtList[[HHSTATE]])
+    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "muct", muctList[[HHSTATE]])
+    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "Rwt", RwtList[[HHSTATE]])
+    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "Rct", RctList[[HHSTATE]])
+    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "GBD", ITHIM.national$parameters$GBD)
+  }
+
+for( muNonTravel in seq(0, upper, by = wd)){
+
+  rm(DALYs)
+
+  for (HHSTATE in c("CA","TX","NY","FL","VA","NC","AZ")){
+    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "muNonTravel", muNonTravel)
+  }
+
+  ITHIM.national <- updateITHIM(ITHIM.national, "muNonTravel", muNonTravel)
+
+  DALYs <- lapply(ITHIMList, sumDALY, ITHIM.baseline = ITHIM.national)
+  DALYs <- data.frame(State = names(DALYs), muNonTravel = muNonTravel, DALY = unlist(DALYs))
+  DALYsTotal2 <- rbind(DALYsTotal2, DALYs)
+}
+
+DALYsTotal2 <- within(DALYsTotal2, {
+  State <- factor(State, levels = c("NC","TX","VA","FL","AZ","NY","CA"))
+})
+
+DALYsTotal <- rbind(data.frame(DALYsTotal,quints="Percentiles"), data.frame(DALYsTotal2,quints="Quintiles"))
+
+p <- ggplot(DALYsTotal, aes(x = muNonTravel, y = DALY/1e3, colour = State))
+
+p + stat_smooth( method = loess) + theme_bw() + scale_x_continuous(name="Mean Non-Travel METs (MET-hrs./week) (Referent Group)") + scale_y_continuous(name="Change in National DALYs (Thousands)") + coord_cartesian(xlim = c(0, upper)) + facet_grid( . ~ quints)
+
+p + stat_smooth( method = loess) + theme_bw() + scale_x_continuous(name="Mean Non-Travel METs (MET-hrs./week) (Referent Group)") + scale_y_continuous(name="Change in National DALYs (Thousands)") + coord_cartesian(xlim = c(0, upper)) + geom_point() + facet_grid( . ~ quints)
+
+```
+
 
 ### Visualization of trip time matrices
 
@@ -364,7 +420,7 @@ p <- ggplot(subset(D,AgeClass != "00-04"), aes(AgeClass, count/1e3))
 p + geom_bar(stat="identity", position = "dodge") + scale_x_discrete(name="", labels = c("5-14","15-29","30-44","45-59","60-69","70-79","80+")) + scale_y_continuous(name="Individuals Sampled (Thousands)") + facet_grid( State ~ .) + theme_bw() + coord_flip() # + theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=6))
 ```
 
-```{r roadInjuries, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
+```{r roadInjuries, eval = FALSE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
 convertState <- function( stateCode ){
 
 stateCode <- as.character(stateCode)

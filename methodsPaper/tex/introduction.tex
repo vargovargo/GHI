@@ -10,25 +10,29 @@ patterns. Particularly, as they facilitate and foster routine moderate
 physical activity, such as walking, local decissions on design and
 policy can play a huge role in the Nation's health.
 
-To better understand the potential for attainable shifts in
-transportation behavior across the US, we employed a comparative risk
-assessment methodology to compare national averages for time spent
-walking and cycling for transport to those of specific states. Our
-estimates can provide an important evidence base to encourage new
-construction, retrofits, land use policy, and programatic funding to
-support active transportation. Particularly in places with poor
-attainmnet of the physical activity guidelines, such investments can
-be importnat pieces of lareger population health interventions that
-have effective and long-lasting impacts.
+%% To better understand the potential for attainable shifts in
+%% transportation behavior across the US, we employed a comparative risk
+%% assessment methodology to compare national averages for time spent
+%% walking and cycling for transport to those of specific states. Our
+%% estimates can provide an important evidence base to encourage new
+%% construction, retrofits, land use policy, and programatic funding to
+%% support active transportation. Particularly in places with poor
+%% attainmnet of the physical activity guidelines, such investments can
+%% be importnat pieces of lareger population health interventions that
+%% have effective and long-lasting impacts.
 
-ITHIM is a statistical model that integrates data on travel patterns,
-physical activity, fine particulate matter, GHG emissions, and disease
-and injuries. Based on population and travel scenarios. The model has
-been used to calculate the health impacts of walking and bicycling
-short distances usually traveled by car or driving low-emission
-automobiles \cite{woodcock2013,maizlish2013}.
+ITHIM is a statistical model that integrates data on active transport,
+physical activity, fine particulate matter and greenhouse gas
+emissions to provide estimates for the proportional change in
+mortality and morbidity for given baseline and alternate travel
+scenarios. The model has been used to calculate the health impacts of
+walking and bicycling short distances usually traveled by car or
+driving low-emission automobiles \cite{woodcock2013,maizlish2013}.
 
-The ITHIM model uses comparative risk assessment through which it
-formulates a change in the disease burden, resulting from the shift in
-the exposure distribution from a baseline scenario to an alternative
-scenario.
+ITHIM uses a comparative risk assessment framework for the active
+transport component of the model.  We improve on the existing
+implementation of the active transport component by including the
+distribution of non-travel-related activity, improving numerical
+precision when computing the population attributable fraction and
+creating a simple user-interface for the custom-built \R{}
+package \package{}.
