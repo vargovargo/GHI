@@ -39,7 +39,7 @@ First we use NHTS to estimate mean walking and cycling times.
 ### NHTS
 
 ```{r compute, echo = FALSE, eval = TRUE}
-compute <- FALSE
+compute <- TRUE
 ```
 
 #### Create a handful of functions to help parse data
