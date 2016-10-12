@@ -442,8 +442,8 @@ ITHIM.scenario.quints <- updateITHIM(ITHIM.scenario, "quantiles", seq(1,9,by=2)/
 pWalk <- ITHIM.national$means$pWalk[3,2]
 
 DALYs <- c(); DALYs.quints <- c();
-atVec <- seq(45, 120, length.out = 5)
-muNonTravelVec <- c(1,10,25)
+atVec <- seq(45, 120, length.out = 10)
+muNonTravelVec <- c(1,5,10,25)
 DTotal <- data.frame()
 
 for(at in atVec ){  # minutes active transport/week
