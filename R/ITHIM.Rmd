@@ -240,6 +240,7 @@ ITHIMList <- list()
 ITHIM.default <- createITHIM(vision = "baseline", region = "national")
 ITHIM.default <- updateITHIM(ITHIM.default, "cvNonTravel", 3)
 ITHIM.default <- updateITHIM(ITHIM.default, "cv", 1.65)
+ITHIM.default <- updateITHIM(ITHIM.default, "muNonTravel", 4)
 ITHIM.default <- updateITHIM(ITHIM.default, "quantiles", (1:99)/100)
 
 ITHIM.national <- ITHIM.default
@@ -421,8 +422,10 @@ p <- ggplot(subset(D,AgeClass != "00-04"), aes(AgeClass, count/1e3))
 p + geom_bar(stat="identity", position = "dodge") + scale_x_discrete(name="", labels = c("5-14","15-29","30-44","45-59","60-69","70-79","80+")) + scale_y_continuous(name="Individuals Sampled (Thousands)") + facet_grid( State ~ .) + theme_bw() + coord_flip() # + theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=6))
 ```
 
-```{r methodsPaper, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = phi, warning = FALSE, message = FALSE, echo = FALSE}
 
+## New Analysis
+
+```{r methodsPaper, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
 ITHIM.default <- updateITHIM(ITHIM.default, "quantiles", (1:99)/100)
 
 ITHIM.national <- ITHIM.default
@@ -432,9 +435,136 @@ ITHIM.national <- updateITHIM(ITHIM.national, "Rwt", RwtNational)
 ITHIM.national <- updateITHIM(ITHIM.national, "Rct", RctNational)
 
 
+ITHIM.scenario <- ITHIM.national
+ITHIM.national.quints <- updateITHIM(ITHIM.national, "quantiles", seq(1,9,by=2)/10)
+ITHIM.scenario.quints <- updateITHIM(ITHIM.scenario, "quantiles", seq(1,9,by=2)/10)
+
+pWalk <- ITHIM.national$means$pWalk[3,2]
+
+DALYs <- c(); DALYs.quints <- c();
+atVec <- seq(45, 120, length.out = 5)
+muNonTravelVec <- c(1,10,25)
+DTotal <- data.frame()
+
+for(at in atVec ){  # minutes active transport/week
+  for( muNonTravel in muNonTravelVec ){
+
+    ITHIM.scenario <- updateITHIM(ITHIM.scenario, "muwt", at*pWalk)
+    ITHIM.scenario <- updateITHIM(ITHIM.scenario, "muct", at*(1-pWalk))
+    ITHIM.scenario <- updateITHIM(ITHIM.scenario, "muNonTravel", muNonTravel)
+
+    ITHIM.scenario.quints <- updateITHIM(ITHIM.scenario.quints, "muwt", at*pWalk)
+    ITHIM.scenario.quints <- updateITHIM(ITHIM.scenario.quints, "muct", at*(1-pWalk))
+    ITHIM.scenario.quints <- updateITHIM(ITHIM.scenario.quints, "muNonTravel", muNonTravel)
+
+    ITHIM.national <- updateITHIM(ITHIM.national, "muNonTravel", muNonTravel)
+
+    DALYs <- sumDALY(ITHIM.national, ITHIM.scenario)
+    DALYs.quints <- sumDALY(ITHIM.national.quints, ITHIM.scenario.quints)
+
+    D <- data.frame(quants = c("percentiles","quintiles"), DALYs = c(DALYs,DALYs.quints),at = at, muNonTravel = muNonTravel)
+
+    DTotal <- rbind(D,DTotal)
+
+  }
+}
+
+p <- ggplot(DTotal, aes(x = at,y = -DALYs/1e3, colour = quants))
+p + stat_smooth( method = loess) + geom_point() + theme_bw() + scale_y_continuous(name="DALYs Averted Nationwide (Thousands)") + scale_x_continuous(name="Active Transport (minutes/week) (Referent Group)") + facet_grid( . ~ muNonTravel) + theme(axis.text.x  = element_text(angle = 90, vjust = 0.5, size = 8))
+
+#D <- rbind(data.frame(AT = atVec, DALYs = DALYs, quants = "percentiles"),data.frame(AT = atVec, DALYs = DALYs.quints, quants = "quintiles"))
+#+ scale_x_continuous(name="Mean Non-Travel METs (MET-hrs./week) (Referent Group)") + scale_y_continuous(name="Change in National DALYs (Thousands)") + coord_cartesian(xlim = c(0, upper)) + facet_grid( . ~ quints)
+#p + stat_smooth( method = loess) + theme_bw() + scale_x_continuous(name="Mean Non-Travel METs (MET-hrs./week) (Referent Group)") + scale_y_continuous(name="Change in National DALYs (Thousands)") + coord_cartesian(xlim = c(0, upper)) + geom_point() + facet_grid( . ~ quints)
+```
+
+# Appendix
+
+## Non-Travel METs
+
+```{r newMETs, echo = TRUE, eval = FALSE, echo = FALSE}
+newMETsFile <- "~/GHI/data/ATUS/ATUS_to_METS_key.csv"
+newMETs <- read.csv(file = newMETsFile, stringsAsFactors = FALSE, colClasses = c("character","character","character","character","numeric","character","character","character"))
+dataColumns <- c(1,5)
+D <- newMETs[,dataColumns]
+metaData <- newMETs[,-dataColumns]
+newMETs <- list(Data = D, metaData = metaData)
+activityCode <- ifelse(nchar(newMETs$Data$X6.digit.activity.code)==5,paste0("t0",newMETs$Data$X6.digit.activity.code),paste0("t",newMETs$Data$X6.digit.activity.code))
+
+rownames(newMETs$Data) <- activityCode
+rownames(newMETs$metaData) <- activityCode
+
+newMETs$metaData <- within(newMETs$metaData, {
+  Travel.related..Y.N. <- as.factor(Travel.related..Y.N.)
+})
+
+metKey <- newMETs$Data$AinsworthMETS
+names(metKey) <- activityCode
+
 
 ```
-# Appendix
+
+```{r readnewMETs, echo = TRUE, eval = FALSE, echo = FALSE}
+cpsFile <- "~/GHI/data/ATUS/atuscps_0311.dat"
+cps <- read.table(cpsFile, header=T, skip=0, sep="," )
+cps <- within(cps, {
+    TUCASEID <- as.character(TUCASEID)
+    TULINENO <- as.character(TULINENO)
+    GEREG <- as.factor(GEREG)
+    })
+cps <- subset(cps, TULINENO == "1")
+
+summaryFile <- "~/GHI/data/ATUS/atussum_0311.dat"
+summary <- read.table(summaryFile, header=T, skip=0, sep=",")
+metaDataColumns <- 1:24
+summaryList <- list(Data = summary[,-metaDataColumns], metaData = summary[,metaDataColumns])
+
+summaryList$metaData <- within(summaryList$metaData,{
+    TESEX <- as.factor(ifelse(TESEX == 1, "male", ifelse(TESEX == 2, "female",NA)))
+    AGECAT <- ifelse(TEAGE <5, "00-04",
+                     ifelse(TEAGE > 4 & TEAGE < 15, "05-14",
+                     ifelse(TEAGE > 14 & TEAGE < 30, "15-29",
+                     ifelse(TEAGE > 29 & TEAGE < 45, "30-44",
+                     ifelse(TEAGE > 44 & TEAGE < 60, "45-59",
+                     ifelse(TEAGE > 59 & TEAGE < 70, "60-69",
+                     ifelse(TEAGE > 69 & TEAGE < 80, "70-79", "80+"
+                            )))))))})
+
+
+```
+
+We shift the MET estimates by the minimum value so that the new minimum MET estimate is zero.
+
+```{r metKey, echo = TRUE, eval = FALSE, echo = FALSE}
+allActivities <- colnames(summaryList$Data)
+nonTravelActivities <- rownames(newMETs$metaData)[which(newMETs$metaData$Travel.related..Y.N. == "N")]
+nonTravelActivities <- nonTravelActivities[which(nonTravelActivities %in% allActivities)]
+
+activities <- nonTravelActivities
+
+metKeyVector <- (metKey[activities] - min(metKey, na.rm = TRUE))/60*7
+names(metKeyVector) <- activities
+metKeyMatrix <- matrix(metKeyVector, nrow = nrow(summaryList$Data), ncol = length(metKeyVector), byrow = TRUE)
+dimnames(metKeyMatrix) <- list( NULL, activities)
+
+
+METs <- data.frame(METs = rowSums(summaryList$Data[,activities] * metKeyMatrix[,activities], na.rm = TRUE), AGE = summaryList$metaData$TEAGE, SEX = summaryList$metaData$TESEX, AGECAT = summaryList$metaData$AGECAT, row.names = summaryList$metaData$TUCASEID )
+
+D <- merge(cps, METs, by.y = "row.names", by.x = "TUCASEID")
+ggplot(D, aes(x = METs, ..density.., colour = AGECAT)) + geom_freqpoly(binwidth = 10) + facet_grid( SEX ~ .) + labs(x = "Non-Travel Marginal MET-hrs./week", colour = "Age") + coord_cartesian(xlim = c(0, 400))
+
+```
+
+```{r parameters, eval = FALSE, echo = FALSE}
+parameters <- ddply(D, .(SEX, AGECAT), summarise,
+             mean = mean(METs, na.rm=T),
+             sd = sd(METs, na.rm=T)
+             )
+
+METmatrix <- rbind(matrix(0,nrow = 2, ncol = 2), matrix(parameters$mean, ncol = 2))
+METmatrix <- METmatrix/METmatrix[3,2]
+```
+
+
 
 ```{r roadInjuries, eval = FALSE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
 convertState <- function( stateCode ){
@@ -592,90 +722,6 @@ GBDList <- lapply(split(burdenOut, burdenOut$HHS),function(x) lapply(split(x, x$
 #saveRDS(GBDList, file = "../data/GBD.rds")
 ```
 
-## Non-Travel METs
-
-```{r newMETs, echo = TRUE, eval = FALSE, echo = FALSE}
-newMETsFile <- "~/GHI/data/ATUS/ATUS_to_METS_key.csv"
-newMETs <- read.csv(file = newMETsFile, stringsAsFactors = FALSE, colClasses = c("character","character","character","character","numeric","character","character","character"))
-dataColumns <- c(1,5)
-D <- newMETs[,dataColumns]
-metaData <- newMETs[,-dataColumns]
-newMETs <- list(Data = D, metaData = metaData)
-activityCode <- ifelse(nchar(newMETs$Data$X6.digit.activity.code)==5,paste0("t0",newMETs$Data$X6.digit.activity.code),paste0("t",newMETs$Data$X6.digit.activity.code))
-
-rownames(newMETs$Data) <- activityCode
-rownames(newMETs$metaData) <- activityCode
-
-newMETs$metaData <- within(newMETs$metaData, {
-  Travel.related..Y.N. <- as.factor(Travel.related..Y.N.)
-})
-
-metKey <- newMETs$Data$AinsworthMETS
-names(metKey) <- activityCode
-
-
-```
-
-```{r readnewMETs, echo = TRUE, eval = FALSE, echo = FALSE}
-cpsFile <- "~/GHI/data/ATUS/atuscps_0311.dat"
-cps <- read.table(cpsFile, header=T, skip=0, sep="," )
-cps <- within(cps, {
-    TUCASEID <- as.character(TUCASEID)
-    TULINENO <- as.character(TULINENO)
-    GEREG <- as.factor(GEREG)
-    })
-cps <- subset(cps, TULINENO == "1")
-
-summaryFile <- "~/GHI/data/ATUS/atussum_0311.dat"
-summary <- read.table(summaryFile, header=T, skip=0, sep=",")
-metaDataColumns <- 1:24
-summaryList <- list(Data = summary[,-metaDataColumns], metaData = summary[,metaDataColumns])
-
-summaryList$metaData <- within(summaryList$metaData,{
-    TESEX <- as.factor(ifelse(TESEX == 1, "male", ifelse(TESEX == 2, "female",NA)))
-    AGECAT <- ifelse(TEAGE <5, "00-04",
-                     ifelse(TEAGE > 4 & TEAGE < 15, "05-14",
-                     ifelse(TEAGE > 14 & TEAGE < 30, "15-29",
-                     ifelse(TEAGE > 29 & TEAGE < 45, "30-44",
-                     ifelse(TEAGE > 44 & TEAGE < 60, "45-59",
-                     ifelse(TEAGE > 59 & TEAGE < 70, "60-69",
-                     ifelse(TEAGE > 69 & TEAGE < 80, "70-79", "80+"
-                            )))))))})
-
-
-```
-
-We shift the MET estimates by the minimum value so that the new minimum MET estimate is zero.
-
-```{r metKey, echo = TRUE, eval = FALSE, echo = FALSE}
-allActivities <- colnames(summaryList$Data)
-nonTravelActivities <- rownames(newMETs$metaData)[which(newMETs$metaData$Travel.related..Y.N. == "N")]
-nonTravelActivities <- nonTravelActivities[which(nonTravelActivities %in% allActivities)]
-
-activities <- nonTravelActivities
-
-metKeyVector <- (metKey[activities] - min(metKey, na.rm = TRUE))/60*7
-names(metKeyVector) <- activities
-metKeyMatrix <- matrix(metKeyVector, nrow = nrow(summaryList$Data), ncol = length(metKeyVector), byrow = TRUE)
-dimnames(metKeyMatrix) <- list( NULL, activities)
-
-
-METs <- data.frame(METs = rowSums(summaryList$Data[,activities] * metKeyMatrix[,activities], na.rm = TRUE), AGE = summaryList$metaData$TEAGE, SEX = summaryList$metaData$TESEX, AGECAT = summaryList$metaData$AGECAT, row.names = summaryList$metaData$TUCASEID )
-
-D <- merge(cps, METs, by.y = "row.names", by.x = "TUCASEID")
-ggplot(D, aes(x = METs, ..density.., colour = AGECAT)) + geom_freqpoly(binwidth = 10) + facet_grid( SEX ~ .) + labs(x = "Non-Travel Marginal MET-hrs./week", colour = "Age") + coord_cartesian(xlim = c(0, 400))
-
-```
-
-```{r parameters, eval = FALSE, echo = FALSE}
-parameters <- ddply(D, .(SEX, AGECAT), summarise,
-             mean = mean(METs, na.rm=T),
-             sd = sd(METs, na.rm=T)
-             )
-
-METmatrix <- rbind(matrix(0,nrow = 2, ncol = 2), matrix(parameters$mean, ncol = 2))
-METmatrix <- METmatrix/METmatrix[3,2]
-```
 
 ## Example (Bay Area)
 
