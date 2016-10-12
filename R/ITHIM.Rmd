@@ -39,7 +39,7 @@ First we use NHTS to estimate mean walking and cycling times.
 ### NHTS
 
 ```{r compute, echo = FALSE, eval = TRUE}
-compute <- TRUE
+compute <- FALSE
 ```
 
 #### Create a handful of functions to help parse data
@@ -157,7 +157,7 @@ in the house all day.  Please correct me if I am mistaken abiout the
 nature of the PERSON or TRIP tables.
 
 ```{r subset, eval = compute, fig.width = 10, echo = FALSE}
-NHTS.person <- subset( NHTS.person, MSA == TRUE ) # & HHSTATE %in% c("CA","TX","NY","FL","VA","NC","AZ"))
+NHTS.person <- subset( NHTS.person, MSA == TRUE )
 NHTS <- merge(NHTS.person, NHTS.trips, by = c("HOUSEID","PERSONID"))
 saveRDS(NHTS, file = "./data/NHTS.rds")
 ```
@@ -230,13 +230,16 @@ sumDALY <- function(ITHIM.baseline, ITHIM.scenario){
 ```
 
 ```{r ITHIMObjs, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, echo = TRUE, warning = FALSE}
+stateVec <- c("CA","TX","NY","FL") #c("CA","TX","NY","FL","VA","NC","AZ")
+stateVecOrdered <- c("TX","FL","NY","CA") #c("NC","TX","VA","FL","AZ","NY","CA")
+
 upper <- 10; length <- 5; wd <- upper/length;
 
 DALYsTotal <- data.frame()
 ITHIMList <- list()
 ITHIM.default <- createITHIM(vision = "baseline", region = "national")
 ITHIM.default <- updateITHIM(ITHIM.default, "cvNonTravel", 3)
-ITHIM.default <- updateITHIM(ITHIM.default, "cv", 3.0288)
+ITHIM.default <- updateITHIM(ITHIM.default, "cv", 1.65)
 ITHIM.default <- updateITHIM(ITHIM.default, "quantiles", (1:99)/100)
 
 ITHIM.national <- ITHIM.default
@@ -245,7 +248,7 @@ ITHIM.national <- updateITHIM(ITHIM.national, "muct", muctNational)
 ITHIM.national <- updateITHIM(ITHIM.national, "Rwt", RwtNational)
 ITHIM.national <- updateITHIM(ITHIM.national, "Rct", RctNational)
 
-for (HHSTATE in c("CA","TX","NY","FL","VA","NC","AZ")){
+for (HHSTATE in stateVec){
     ITHIMList[[HHSTATE]] <- ITHIM.default
     ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "muwt", muwtList[[HHSTATE]])
     ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "muct", muctList[[HHSTATE]])
@@ -258,7 +261,7 @@ for( muNonTravel in seq(0, upper, by = wd)){
 
   rm(DALYs)
 
-  for (HHSTATE in c("CA","TX","NY","FL","VA","NC","AZ")){
+  for (HHSTATE in stateVec){
     ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "muNonTravel", muNonTravel)
   }
 
@@ -270,7 +273,7 @@ for( muNonTravel in seq(0, upper, by = wd)){
 }
 
 DALYsTotal <- within(DALYsTotal, {
-  State <- factor(State, levels = c("NC","TX","VA","FL","AZ","NY","CA"))
+  State <- factor(State, levels = stateVecOrdered)
 })
 
 p <- ggplot(DALYsTotal, aes(x = muNonTravel, y = DALY/1e3, colour = State))
@@ -286,9 +289,11 @@ Do it again, but with quintiles
 ```{r ITHIMObjsQuintiles, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, echo = TRUE, warning = FALSE}
 DALYsTotal2 <- data.frame()
 ITHIMList <- list()
-ITHIM.default <- createITHIM(vision = "baseline", region = "national")
-ITHIM.default <- updateITHIM(ITHIM.default, "cvNonTravel", 3)
-ITHIM.default <- updateITHIM(ITHIM.default, "cv", 3.0288)
+
+#ITHIM.default <- createITHIM(vision = "baseline", region = "national")
+#ITHIM.default <- updateITHIM(ITHIM.default, "cvNonTravel", 3)
+#ITHIM.default <- updateITHIM(ITHIM.default, "cv", 1.65)
+
 ITHIM.default <- updateITHIM(ITHIM.default, "quantiles", seq(1, 9, by = 2)/10 )
 
 ITHIM.national <- ITHIM.default
@@ -297,7 +302,7 @@ ITHIM.national <- updateITHIM(ITHIM.national, "muct", muctNational)
 ITHIM.national <- updateITHIM(ITHIM.national, "Rwt", RwtNational)
 ITHIM.national <- updateITHIM(ITHIM.national, "Rct", RctNational)
 
-for (HHSTATE in c("CA","TX","NY","FL","VA","NC","AZ")){
+for (HHSTATE in stateVec){
     ITHIMList[[HHSTATE]] <- ITHIM.default
     ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "muwt", muwtList[[HHSTATE]])
     ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "muct", muctList[[HHSTATE]])
@@ -310,7 +315,7 @@ for( muNonTravel in seq(0, upper, by = wd)){
 
   rm(DALYs)
 
-  for (HHSTATE in c("CA","TX","NY","FL","VA","NC","AZ")){
+  for (HHSTATE in stateVec){
     ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "muNonTravel", muNonTravel)
   }
 
@@ -322,7 +327,7 @@ for( muNonTravel in seq(0, upper, by = wd)){
 }
 
 DALYsTotal2 <- within(DALYsTotal2, {
-  State <- factor(State, levels = c("NC","TX","VA","FL","AZ","NY","CA"))
+  State <- factor(State, levels = stateVecOrdered)
 })
 
 DALYsTotal <- rbind(data.frame(DALYsTotal,quints="Percentiles"), data.frame(DALYsTotal2,quints="Quintiles"))
@@ -420,6 +425,20 @@ p <- ggplot(subset(D,AgeClass != "00-04"), aes(AgeClass, count/1e3))
 p + geom_bar(stat="identity", position = "dodge") + scale_x_discrete(name="", labels = c("5-14","15-29","30-44","45-59","60-69","70-79","80+")) + scale_y_continuous(name="Individuals Sampled (Thousands)") + facet_grid( State ~ .) + theme_bw() + coord_flip() # + theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=6))
 ```
 
+```{r methodsPaper, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = phi, warning = FALSE, message = FALSE, echo = FALSE}
+
+ITHIM.default <- updateITHIM(ITHIM.default, "quantiles", (1:99)/100)
+
+ITHIM.national <- ITHIM.default
+ITHIM.national <- updateITHIM(ITHIM.national, "muwt", muwtNational)
+ITHIM.national <- updateITHIM(ITHIM.national, "muct", muctNational)
+ITHIM.national <- updateITHIM(ITHIM.national, "Rwt", RwtNational)
+ITHIM.national <- updateITHIM(ITHIM.national, "Rct", RctNational)
+
+
+```
+# Appendix
+
 ```{r roadInjuries, eval = FALSE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
 convertState <- function( stateCode ){
 
@@ -457,8 +476,6 @@ foo <- data.frame(with(roadFatalaties, table(STATE,Type)))
 within(subset(foo, Type == "Ped"), Walk <- walkTime[as.character(STATE)])
 
 ```
-
-# Appendix
 
 ### CDC Mortality
 
