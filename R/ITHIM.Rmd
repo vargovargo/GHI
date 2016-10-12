@@ -290,10 +290,6 @@ Do it again, but with quintiles
 DALYsTotal2 <- data.frame()
 ITHIMList <- list()
 
-#ITHIM.default <- createITHIM(vision = "baseline", region = "national")
-#ITHIM.default <- updateITHIM(ITHIM.default, "cvNonTravel", 3)
-#ITHIM.default <- updateITHIM(ITHIM.default, "cv", 1.65)
-
 ITHIM.default <- updateITHIM(ITHIM.default, "quantiles", seq(1, 9, by = 2)/10 )
 
 ITHIM.national <- ITHIM.default
@@ -434,6 +430,7 @@ ITHIM.national <- updateITHIM(ITHIM.national, "muwt", muwtNational)
 ITHIM.national <- updateITHIM(ITHIM.national, "muct", muctNational)
 ITHIM.national <- updateITHIM(ITHIM.national, "Rwt", RwtNational)
 ITHIM.national <- updateITHIM(ITHIM.national, "Rct", RctNational)
+
 
 
 ```
