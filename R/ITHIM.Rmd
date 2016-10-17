@@ -10,22 +10,24 @@ results, questions, interpreations, notes, etc.-->
 
 ```{r libs, eval = TRUE, echo = FALSE, results = "hide", warning = FALSE, error = FALSE, message = FALSE}
 options(repos='http://cran.rstudio.com/')
+# install.packages(c("knitr","ggplot2","dplyr","openssl","httr", "git2r","devtools"))
 library("ggplot2")
+library("devtools")
 library("reshape2")
 library("plyr")
 library("dplyr")
-library("cowplot")
-library("grid")
-library("scales")
-library("ggthemes")
+#library("cowplot")
+#library("grid")
+#library("scales")
+#library("ggthemes")
 ```
 
 ```{r loadITHIM, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = FALSE}
-library("devtools")
-install_github("smbache/magrittr", ref="master")
-library("magrittr")
 #install("~/ITHIM/")
 install_github("syounkin/ITHIM", ref="devel")
+install_github("smbache/magrittr", ref="master")
+
+library("magrittr")
 library("ITHIM")
 
 fig.width <- 6 # inches
@@ -442,7 +444,7 @@ ITHIM.scenario.quints <- updateITHIM(ITHIM.scenario, "quantiles", seq(1,9,by=2)/
 pWalk <- ITHIM.national$means$pWalk[3,2]
 
 DALYs <- c(); DALYs.quints <- c();
-atVec <- seq(45, 120, length.out = 10)
+atVec <- seq(45, 120, length.out = 5)
 muNonTravelVec <- c(1,5,10,25)
 DTotal <- data.frame()
 
