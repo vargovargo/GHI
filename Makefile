@@ -28,12 +28,14 @@ ITHIM-discussion: ./slides/ITHIM-discussion/ITHIM-discussion.tex
 	cd ./slides/ITHIM-discussion; make ITHIM-discussion.pdf
 
 clean:
-	rm -rf ./data/
+	rm -rf ./data/ATUS/
+	rm -rf ./data/NHTS/
 	rm -rf ./R/figure/
-	rm -rf ./R/data/
-	mkdir ./data/
-	mkdir ./R/figure/
-	mkdir ./R/data/
+	rm -rf ./R/data/*
+	mkdir -p ./data/ATUS/
+	mkdir -p ./data/NHTS/
+	mkdir -p ./R/figure/
+	mkdir -p ./R/data/
 
 .PHONY: data
 
