@@ -15,6 +15,14 @@ data:
 	mkdir -p ./data/NHTS
 	unzip Ascii.zip -d ./data/NHTS/
 	mv -v Ascii.zip ./data/NHTS/
+	wget http://www.bls.gov/tus/special.requests/atuscps_2003.zip
+	mkdir -p ./data/ATUS/
+	unzip  atuscps_2003.zip -d ./data/ATUS/
+	mv -v atuscps_2003.zip ./data/ATUS
+	wget http://www.bls.gov/tus/special.requests/atussum_2003.zip
+	mkdir -p ./data/ATUS/
+	unzip  atussum_2003.zip -d ./data/ATUS/
+	mv -v atussum_2003.zip ./data/ATUS
 
 ITHIM-discussion: ./slides/ITHIM-discussion/ITHIM-discussion.tex
 	cd ./slides/ITHIM-discussion; make ITHIM-discussion.pdf
@@ -34,3 +42,4 @@ clean:
 # webpage: html/index.txt html/tableau/tableau.txt
 # 	perl ~/lib/Markdown_1.0.1/Markdown.pl ./html/index.txt > ./html/index.html
 # 	perl ~/lib/Markdown_1.0.1/Markdown.pl ./html/tableau/tableau.txt > ./html/tableau/tableau.html
+
