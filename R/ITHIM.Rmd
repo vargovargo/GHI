@@ -23,8 +23,8 @@ library("dplyr")
 ```
 
 ```{r loadITHIM, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = FALSE}
-#install("~/ITHIM/")
-install_github("syounkin/ITHIM", ref="devel")
+install("~/ITHIM/")
+#install_github("syounkin/ITHIM", ref="devel")
 install_github("smbache/magrittr", ref="master")
 
 library("magrittr")
@@ -41,7 +41,7 @@ First we use NHTS to estimate mean walking and cycling times.
 ### NHTS
 
 ```{r compute, echo = FALSE, eval = TRUE}
-compute <- FALSE
+compute <- TRUE
 ```
 
 #### Create a handful of functions to help parse data
@@ -239,7 +239,7 @@ upper <- 10; length <- 5; wd <- upper/length;
 
 DALYsTotal <- data.frame()
 ITHIMList <- list()
-ITHIM.default <- createITHIM(vision = "baseline", region = "national")
+ITHIM.default <- createITHIM()
 ITHIM.default <- updateITHIM(ITHIM.default, "cvNonTravel", 3)
 ITHIM.default <- updateITHIM(ITHIM.default, "cv", 1.65)
 ITHIM.default <- updateITHIM(ITHIM.default, "muNonTravel", 4)
@@ -506,7 +506,7 @@ names(metKey) <- activityCode
 ```
 
 ```{r readnewMETs, echo = TRUE, eval = FALSE, echo = FALSE}
-cpsFile <- "~/GHI/data/ATUS/atuscps_0311.dat"
+cpsFile <- "~/GHI/data/ATUS/atuscps_2003.dat"
 cps <- read.table(cpsFile, header=T, skip=0, sep="," )
 cps <- within(cps, {
     TUCASEID <- as.character(TUCASEID)
@@ -515,7 +515,7 @@ cps <- within(cps, {
     })
 cps <- subset(cps, TULINENO == "1")
 
-summaryFile <- "~/GHI/data/ATUS/atussum_0311.dat"
+summaryFile <- "~/GHI/data/ATUS/atussum_2003.dat"
 summary <- read.table(summaryFile, header=T, skip=0, sep=",")
 metaDataColumns <- 1:24
 summaryList <- list(Data = summary[,-metaDataColumns], metaData = summary[,metaDataColumns])
@@ -724,44 +724,11 @@ GBDList <- lapply(split(burdenOut, burdenOut$HHS),function(x) lapply(split(x, x$
 #saveRDS(GBDList, file = "../data/GBD.rds")
 ```
 
-
-## Example (Bay Area)
-
-First we define the baseline and scenario objects.
-
-```{r instantiate, eval = FALSE, echo = FALSE}
-ITHIM.baseline <- createITHIM(vision = "baseline", region = "SFBayArea")
-ITHIM.scenario <- createITHIM(vision = "scenario", region = "SFBayArea")
-```
-
-Next we compare the scenario to the baseline using compareModels().
-
-```{r RRs, eval = FALSE, echo = FALSE}
-comparativeRisk <- compareModels(ITHIM.baseline,ITHIM.scenario)
-```
-
-### Deaths
-```{r show, echo = FALSE, eval = FALSE, echo = FALSE}
-matrix(unlist(lapply(comparativeRisk$dproj.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
-```
-### DALY
-```{r show2, echo = FALSE, eval = FALSE, echo = FALSE}
-matrix(unlist(lapply(comparativeRisk$daly.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
-```
-### YLD
-```{r show3, echo = FALSE, eval = FALSE, echo = FALSE}
-matrix(unlist(lapply(comparativeRisk$yld.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
-```
-### YLL
-```{r show4, echo = FALSE, eval = FALSE, echo = FALSE}
-matrix(unlist(lapply(comparativeRisk$yll.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
-```
-
 ## Example (National)
 
 ```{r instantiate2, eval = FALSE, echo = FALSE}
-ITHIM.baseline <- createITHIM(vision = "baseline", region = "national")
-ITHIM.scenario <- createITHIM(vision = "scenario", region = "national")
+ITHIM.baseline <- createITHIM()
+ITHIM.scenario <- createITHIM()
 ```
 
 ```{r RRs2, eval = FALSE, echo = FALSE}
@@ -933,9 +900,9 @@ library(ggplot2)
 library(reshape2)
 library(plyr)
 
-summaryFile <- "~/GHI/data/ATUS/atussum_0311.dat" # ~/Box Documents/work/CoBenefits/MaggieShare/MET Analysis/AmerTimeUse/atussum_0311.dat
+summaryFile <- "~/GHI/data/ATUS/atussum_2003.dat" # ~/Box Documents/work/CoBenefits/MaggieShare/MET Analysis/AmerTimeUse/atussum_2003.dat
 
-cpsFile <- "~/GHI/data/ATUS/atuscps_0311.dat" #~/Box Documents/work/CoBenefits/MaggieShare/MET Analysis/AmerTimeUse/atuscps_0311.dat
+cpsFile <- "~/GHI/data/ATUS/atuscps_2003.dat" #~/Box Documents/work/CoBenefits/MaggieShare/MET Analysis/AmerTimeUse/atuscps_2003.dat
 
 stateResultFile <- "~/GHI/data/stateresults.csv" # ~/Box Documents/work/CoBenefits/MaggieShare/MET Analysis/AmerTimeUse/stateresults.csv
 
