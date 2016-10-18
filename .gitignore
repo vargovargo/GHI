@@ -28,7 +28,6 @@ PipelinePresentation
 *.bbl
 *.blg
 analytica
-data
 credentials
 R.css
 lib/
