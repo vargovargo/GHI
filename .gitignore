@@ -1,7 +1,6 @@
 docs
 *~
 .DS_Store
-data
 .Rhistory
 *.html
 R/figure/
