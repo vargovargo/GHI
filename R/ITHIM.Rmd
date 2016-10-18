@@ -23,6 +23,7 @@ library("dplyr")
 ```
 
 ```{r loadITHIM, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = FALSE}
+document("~/ITHIM/")
 install("~/ITHIM/")
 #install_github("syounkin/ITHIM", ref="devel")
 install_github("smbache/magrittr", ref="master")
