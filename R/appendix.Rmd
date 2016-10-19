@@ -1,0 +1,942 @@
+# Appendix
+
+## Non-Travel METs
+
+```{r newMETs, echo = TRUE, eval = FALSE, echo = FALSE}
+newMETsFile <- "~/GHI/data/ATUS/ATUS_to_METS_key.csv"
+newMETs <- read.csv(file = newMETsFile, stringsAsFactors = FALSE, colClasses = c("character","character","character","character","numeric","character","character","character"))
+dataColumns <- c(1,5)
+D <- newMETs[,dataColumns]
+metaData <- newMETs[,-dataColumns]
+newMETs <- list(Data = D, metaData = metaData)
+activityCode <- ifelse(nchar(newMETs$Data$X6.digit.activity.code)==5,paste0("t0",newMETs$Data$X6.digit.activity.code),paste0("t",newMETs$Data$X6.digit.activity.code))
+
+rownames(newMETs$Data) <- activityCode
+rownames(newMETs$metaData) <- activityCode
+
+newMETs$metaData <- within(newMETs$metaData, {
+  Travel.related..Y.N. <- as.factor(Travel.related..Y.N.)
+})
+
+metKey <- newMETs$Data$AinsworthMETS
+names(metKey) <- activityCode
+
+
+```
+
+```{r readnewMETs, echo = TRUE, eval = FALSE, echo = FALSE}
+cpsFile <- "~/GHI/data/ATUS/atuscps_2003.dat"
+cps <- read.table(cpsFile, header=T, skip=0, sep="," )
+cps <- within(cps, {
+    TUCASEID <- as.character(TUCASEID)
+    TULINENO <- as.character(TULINENO)
+    GEREG <- as.factor(GEREG)
+    })
+cps <- subset(cps, TULINENO == "1")
+
+summaryFile <- "~/GHI/data/ATUS/atussum_2003.dat"
+summary <- read.table(summaryFile, header=T, skip=0, sep=",")
+metaDataColumns <- 1:24
+summaryList <- list(Data = summary[,-metaDataColumns], metaData = summary[,metaDataColumns])
+
+summaryList$metaData <- within(summaryList$metaData,{
+    TESEX <- as.factor(ifelse(TESEX == 1, "male", ifelse(TESEX == 2, "female",NA)))
+    AGECAT <- ifelse(TEAGE <5, "00-04",
+                     ifelse(TEAGE > 4 & TEAGE < 15, "05-14",
+                     ifelse(TEAGE > 14 & TEAGE < 30, "15-29",
+                     ifelse(TEAGE > 29 & TEAGE < 45, "30-44",
+                     ifelse(TEAGE > 44 & TEAGE < 60, "45-59",
+                     ifelse(TEAGE > 59 & TEAGE < 70, "60-69",
+                     ifelse(TEAGE > 69 & TEAGE < 80, "70-79", "80+"
+                            )))))))})
+
+
+```
+
+We shift the MET estimates by the minimum value so that the new minimum MET estimate is zero.
+
+```{r metKey, echo = TRUE, eval = FALSE, echo = FALSE}
+allActivities <- colnames(summaryList$Data)
+nonTravelActivities <- rownames(newMETs$metaData)[which(newMETs$metaData$Travel.related..Y.N. == "N")]
+nonTravelActivities <- nonTravelActivities[which(nonTravelActivities %in% allActivities)]
+
+activities <- nonTravelActivities
+
+metKeyVector <- (metKey[activities] - min(metKey, na.rm = TRUE))/60*7
+names(metKeyVector) <- activities
+metKeyMatrix <- matrix(metKeyVector, nrow = nrow(summaryList$Data), ncol = length(metKeyVector), byrow = TRUE)
+dimnames(metKeyMatrix) <- list( NULL, activities)
+
+
+METs <- data.frame(METs = rowSums(summaryList$Data[,activities] * metKeyMatrix[,activities], na.rm = TRUE), AGE = summaryList$metaData$TEAGE, SEX = summaryList$metaData$TESEX, AGECAT = summaryList$metaData$AGECAT, row.names = summaryList$metaData$TUCASEID )
+
+D <- merge(cps, METs, by.y = "row.names", by.x = "TUCASEID")
+ggplot(D, aes(x = METs, ..density.., colour = AGECAT)) + geom_freqpoly(binwidth = 10) + facet_grid( SEX ~ .) + labs(x = "Non-Travel Marginal MET-hrs./week", colour = "Age") + coord_cartesian(xlim = c(0, 400))
+
+```
+
+```{r parameters, eval = FALSE, echo = FALSE}
+parameters <- ddply(D, .(SEX, AGECAT), summarise,
+             mean = mean(METs, na.rm=T),
+             sd = sd(METs, na.rm=T)
+             )
+
+METmatrix <- rbind(matrix(0,nrow = 2, ncol = 2), matrix(parameters$mean, ncol = 2))
+METmatrix <- METmatrix/METmatrix[3,2]
+```
+
+
+
+```{r roadInjuries, eval = FALSE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
+convertState <- function( stateCode ){
+
+stateCode <- as.character(stateCode)
+
+stateCodeMatrix <- matrix(c("Alabama","1","Nebraska","31","Alaska","2","Nevada","32","Arizona","4","New Hampshire","33","Arkansas","5","New Jersey","34","California","6","New Mexico","35","Colorado","8","New York","36","Connecticut","9","North Carolina","37","Delaware","10","North Dakota","38","District of Columbia","11", "Ohio", "39","Florida","12","Oklahoma","40","Georgia","13","Oregon","41","Hawaii","15","Pennsylvania","42","Idaho","16","Puerto Rico","43","Illinois","17","Rhode Island","44","Indiana","18","South Carolina","45","Iowa","19","South Dakota","46","Kansas","20","Tennessee","47","Kentucky","21","Texas","48","Louisiana","22","Utah","49","Maine","23","Vermont","50","Maryland","24","Virgin Islands (since 2004)","52","Massachusetts","25","Virginia","51","Michigan","26","Washington","53","Minnesota","27","West Virginia","54","Mississippi","28","Wisconsin","55","Missouri","29","Wyoming","56","Montana","30"), byrow = TRUE, ncol = 2)
+
+stateAbbrevMatrix <- matrix(c("Alabama","AL","Alaska","AK","Arizona","AZ","Arkansas","AR","California","CA","Colorado","CO","Connecticut","CT","Delaware","DE","District of Columbia","DC","Florida","FL","Georgia","GA","Hawaii","HI","Idaho","ID","Illinois","IL","Indiana","IN","Iowa","IA","Kansas","KS","Kentucky","KY","Louisiana","LA","Maine","ME","Maryland","MD","Massachusetts","MA","Michigan","MI","Minnesota","MN","Mississippi","MS","Missouri","MO","Montana","MT","Nebraska","NE","Nevada","NV","New Hampshire","NH","New Jersey","NJ","New Mexico","NM","New York","NY","North Carolina","NC"," North Dakota","ND","Ohio","OH","Oklahoma","OK","Oregon","OR","Pennsylvania","PA","Rhode Island","RI","South Carolina","SC","South Dakota","SD","Tennessee","TN","Texas","TX","Utah","UT","Vermont","VT","Virginia","VA","Washington","WA","West Virginia","WV","Wisconsin","WI","Wyoming","WY"), byrow = TRUE, ncol = 2)
+
+stateNames <- stateCodeMatrix[,1]
+names(stateNames) <- stateCodeMatrix[,2]
+
+stateAbbrevs <- stateAbbrevMatrix[,2]
+names(stateAbbrevs) <- stateAbbrevMatrix[,1]
+
+return(stateAbbrevs[stateNames[stateCode]])
+
+}
+
+roadFatalaties <- read.csv(file = "./../data/FARS/BikePedDeaths99-13.csv", na.strings = c("998","999"))
+roadFatalaties <- within(roadFatalaties, {
+  ageClass <- convertToAgeClass(AGE)
+  SEX <- ifelse(SEX == 1, "M", ifelse(SEX == 2, "F", NA))
+  SEX <- factor(SEX, levels = c("F","M"))
+  STATE <- as.factor(convertState(STATE))
+})
+roadFatalaties <- subset(roadFatalaties, !is.na(SEX) ) #& STATE %in% c("California", "New York"))
+
+p <- ggplot(roadFatalaties, aes(Type, fill = STATE))
+p + geom_bar(position = "dodge") + theme_bw()+ theme(axis.text.x  = element_text(angle=90, vjust=0.5))# + scale_x_discrete(name="", labels = c("0-4","5-14","15-29","30-44","45-59","60-69","70-79","80+")) #+ facet_grid( Type ~ ., scales = "free_y")
+
+walkTime <- unlist(lapply(meanWalkList, function(x) x[3,2]))
+
+foo <- data.frame(with(roadFatalaties, table(STATE,Type)))
+within(subset(foo, Type == "Ped"), Walk <- walkTime[as.character(STATE)])
+
+```
+
+### CDC Mortality
+
+Next we parse the output of a CDC Wonder query to estimate mortality rates.
+
+The data files in ~/Box Sync/work/CoBenefits/MaggieShare/VitalStats/CDCwonder/.
+
+#### Query Results File (HHSmetro_Age_sex_2010-14.csv)
+
+```{r CDC, eval = FALSE, echo = FALSE}
+wonder <- read.csv("./../data/CDCwonder/HHSmetro_Age_sex_2010-14.csv", header=T)
+names(wonder) <- c("HHSRegion", "HHSRegionCode", "gender", "genderCode","WONDERage","WONDERageCode","ICD10",  "ICD10Code", "deaths5yr", "population5yr", "crudeRate")
+
+wonder <- subset(wonder, WONDERageCode != "NS") # remove 'Not stated' Age entries
+```
+
+The following two recoding chunks should probably be redone.  They
+depend on the ordering of the factors which seems dangerous.
+
+```{r ITHIMCause, eval = FALSE, echo = FALSE}
+ITHIMcauseKey <- c("ColonCancer","LungCancer","BreastCancer","Diabetes","Dementia","IHD","InflammatoryHD","InflammatoryHD","HHD","Stroke","AcuteRespInfections","AcuteRespInfections","RespiratoryDisease","RespiratoryDisease","RTIs","RTIs")
+names(ITHIMcauseKey) <- unique(wonder$ICD10)
+wonder$ITHIMcause <- ITHIMcauseKey[as.character(wonder$ICD10)]
+```
+```{r recodeAge, eval = FALSE, echo = FALSE}
+ITHIMageKey <- c("ageClass1", "ageClass1", "ageClass2", "ageClass2", "ageClass3", "ageClass3", "ageClass3", "ageClass4", "ageClass4", "ageClass4", "ageClass5", "ageClass5", "ageClass5", "ageClass6", "ageClass6", "ageClass7", "ageClass7", "ageClass8", "ageClass8","ageClass8", "ageClass8", "ageClass8")
+names(ITHIMageKey) <- unique(wonder$WONDERage)
+wonder$ITHIMage <- ITHIMageKey[as.character(wonder$WONDERage)]
+```
+
+Depression was not in the WONDER data, since there are no deaths, have to add it manually.
+
+```{r wonder, eval = FALSE, echo = FALSE}
+wonder <- wonder[, c("HHSRegionCode","gender","ITHIMage","ITHIMcause","deaths5yr","population5yr")]
+depress <- expand.grid(HHSRegionCode=unique(wonder$HHSRegionCode), gender=unique(wonder$gender),ITHIMage = unique(wonder$ITHIMage), ITHIMcause = "Depression", deaths5yr = "0", population5yr = "0", stringsAsFactors=T)
+wonder <- rbind(wonder, depress)
+```
+
+Replace suppressed values with random number 1-9
+
+```{r suppressed, eval = FALSE, echo = FALSE, warning = FALSE}
+wonder <- within( wonder, {
+    newDeaths <- as.numeric(ifelse(deaths5yr == "Suppressed", sample(0:9), as.numeric(as.character(deaths5yr))))
+    })
+```
+
+10 HHS x 2 sex x 8 age x 13 disease = 2,080 strata.
+
+```{r summary2, eval = FALSE, echo = FALSE}
+wonderSummary <- ddply(wonder, .(HHSRegionCode, gender, ITHIMage, ITHIMcause), summarise,
+                       numberOfDeaths5yr = sum(as.numeric(as.character(newDeaths)), na.rm=T)
+)
+```
+
+#### Single Year Data File (HHSmetro_Age_sex_2014_AllCause.csv)
+
+Read in data for single year population.  Processed in Excel, to
+combine two WONDER queries, need to go back and script the processing
+of the raw WONDER output
+
+```{r singleyear, eval = FALSE, echo = FALSE}
+pop14 <- read.csv("./../data/CDCwonder/HHSmetro_Age_sex_2014_AllCause.csv", header=T)
+
+
+names(pop14) <- c("HHSRegion", "HHSRegionCode","gender", "genderCode","WONDERage","WONDERageCode", "deaths2014AllCause", "population2014", "crudeRate2014","random1","random2")
+```
+This is delicate(read sloppy), really need to check the order of age groups returned by the 'unique(pop14$WONDERage)' command.
+
+```{r sloppy, eval = FALSE, echo = FALSE}
+ITHIMageKey2 <- c("ageClass8", "ageClass1", "ageClass7", "ageClass7", "ageClass6", "ageClass6", "ageClass1", "ageClass5", "ageClass5","ageClass5","ageClass4", "ageClass3", "ageClass4", "ageClass2", "ageClass2", "ageClass3", "ageClass4", "ageClass3","ageClass8")
+names(ITHIMageKey2) <- unique(pop14$WONDERage)
+pop14$ITHIMage <- ITHIMageKey2[as.character(pop14$WONDERage)]
+```
+
+```{r foop, eval = FALSE, echo = FALSE}
+pop14 <-  pop14[, c("HHSRegionCode","gender","ITHIMage","deaths2014AllCause","population2014")]
+pop14$deaths2014 <- as.numeric(ifelse(pop14$deaths2014 == "Suppressed", sample(0:9), as.numeric(as.character(pop14$deaths2014))))
+
+popSummary <- ddply(pop14, .(HHSRegionCode, gender, ITHIMage), summarise,
+                    population2014 = sum(as.numeric(as.character(population2014)), na.rm=T),
+                   AllCauseDeaths2014 = sum(as.numeric(as.character(deaths2014AllCause)), na.rm=T)
+)
+
+HHSmetroCauseSpecific <- merge(wonderSummary, popSummary)
+```
+#### Read USGBD file (USGBD.csv)
+
+Presumably this comes from an EXCEL file.
+
+```{r USGBD, eval = FALSE, echo = FALSE}
+USGBD <- read.csv("./../data/CDCwonder/USGBD.csv", header=T)
+USGBD$ITHIMage <- as.character(USGBD$ITHIMage)
+USGBD$ITHIMcause <- as.character(USGBD$ITHIMcause)
+
+burden <- merge(HHSmetroCauseSpecific, USGBD, all.x=T)
+burden$deaths <- burden$numberOfDeaths5yr/5
+## neil uses 10, and if deaths<10 sets ratio to 1
+burden$ratio <- ifelse(burden$GBDdeaths == 0, 1, ((burden$deaths/burden$population2014)/(burden$GBDdeaths/burden$GBDpop)))
+burden$YLL <- burden$ratio * (burden$GBDyll/burden$GBDpop) * burden$population2014
+burden$YLD <- burden$ratio * (burden$GBDyld/burden$GBDpop) * burden$population2014
+burden$DALY <- burden$ratio * (burden$GBDdaly/burden$GBDpop) * burden$population2014
+
+burden$sex <- factor(ifelse(burden$gender == "Male","M","F"))
+levels(burden$sex)  <- c("M","F")
+
+burdenOut <- burden[,c("HHSRegionCode","ITHIMcause","sex","ITHIMage","deaths","YLL","YLD","DALY")]
+names(burdenOut) <- c("HHS","disease","sex","ageClass","dproj","yll","yld","daly")
+
+burdenOut <- burdenOut[order(burdenOut$HHS, burdenOut$disease, burdenOut$sex, burdenOut$ageClass),]
+burdenOut <- burdenOut[,c("HHS", "disease","sex","dproj","yll","yld","daly")]
+```
+
+Now we create an R list of GBD objects named by HHS region.
+
+```{r burdenList, eval = FALSE, echo = FALSE}
+GBDList <- lapply(split(burdenOut, burdenOut$HHS),function(x) lapply(split(x, x$disease), function(x) split(x, x$sex)))
+#saveRDS(GBDList, file = "../data/GBD.rds")
+```
+
+## Example (National)
+
+```{r instantiate2, eval = FALSE, echo = FALSE}
+ITHIM.baseline <- createITHIM()
+ITHIM.scenario <- createITHIM()
+```
+
+```{r RRs2, eval = FALSE, echo = FALSE}
+comparativeRisk <- compareModels(ITHIM.baseline,ITHIM.scenario)
+```
+
+### Deaths
+```{r show222, echo = FALSE, eval = FALSE}
+matrix(unlist(lapply(comparativeRisk$dproj.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
+```
+### DALY
+```{r show22, echo = FALSE, eval = FALSE}
+matrix(unlist(lapply(comparativeRisk$daly.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
+```
+### YLD
+```{r show23, echo = FALSE, eval = FALSE}
+matrix(unlist(lapply(comparativeRisk$yld.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
+```
+#### YLL
+```{r show24, echo = FALSE, eval = FALSE}
+matrix(unlist(lapply(comparativeRisk$yll.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
+```
+
+## Example
+
+```{r example, eval = FALSE, echo = FALSE}
+example("ITHIM-package")
+```
+
+### Creating Different Visions
+
+```{r vision, eval = FALSE, echo = FALSE}
+ITHIM.vision <- updateITHIM(ITHIM.scenario, "muwt", 2*ITHIM.scenario$parameters$muwt) # Double the mean walking time
+comparativeRisk <- compareModels(ITHIM.baseline,ITHIM.vision)
+```
+#### YLL
+```{r show233, echo = FALSE, eval = FALSE}
+matrix(unlist(lapply(comparativeRisk$yll.delta,function(x) lapply(x, function(x) sum(x[-(1:2)]) ))),nrow=5,ncol=2,byrow=TRUE,dimnames=list(names(comparativeRisk$dproj.delta),c("M","F")))
+```
+
+## Interrogate Parameters
+
+```{r params, eval = FALSE, echo = FALSE}
+names(ITHIM.baseline$parameters)
+ITHIM.baseline$parameters$NonTravelMETs
+ITHIM.baseline$parameters$Rwt
+```
+
+## Appendix
+
+### DETAILS ON WONDER QUERY
+
+```
+Dataset: Underlying Cause of Death, 1999-2014
+Query Parameters:
+Title: ITHIM2014_HHS_urb_age_sex_16years
+2013 Urbanization: All
+Autopsy: All
+Five-Year Age Groups: All
+Gender: Female, Male
+HHS Regions: All
+Hispanic Origin: All
+ICD-10 113 Cause List: Malignant neoplasms of colon, rectum and anus (C18-C21), Malignant neoplasms of trachea, bronchus and
+lung (C33-C34), Malignant neoplasm of breast (C50), #Diabetes mellitus (E10-E14), #Alzheimer's disease (G30), Other forms of
+chronic ischemic heart disease (I20,I25), Acute and subacute endocarditis (I33), Diseases of pericardium and acute myocarditis
+(I30-I31,I40), #Essential hypertension and hypertensive renal disease
+(I10,I12,I15), #Cerebrovascular diseases (I60-I69), Influenza and pneumonia (J09-J18), Other acute lower respiratory infections (J20-J22,U04), #Chronic lower respiratory diseases
+(J40-J47), Other diseases of respiratory system (J00-J06,J30- J39,J67,J70-J98), Motor vehicle accidents
+(V02-V04,V09.0,V09.2,V12-V14,V19.0-V19.2,V19.4-V19.6,V20-V79,V80.3-V80.5,V81.0-V81.1,V82.0-V82.1,V83-V86,V87.0-V87.8,V88.0-V88.8
+ V89.0,V89.2)
+Other land transport accidents
+(V01,V05-V06,V09.1,V09.3-V09.9,V10-V11,V15-V18,V19.3,V19.8-V19.9,V80.0-V80.2,V80.6-V80.9,V81.2-V81.9,V82.2-V82.9,V87.9,V88.9
+ V89.1,V89.3,V89.9)
+Place of Death: All
+Race: All
+Weekday: All
+Year/Month: All
+Group By: Five-Year Age Groups, Gender, HHS Region, 2013 Urbanization, ICD-10 113 Cause List
+Show Totals: Disabled
+Show Zero Values: True
+Show Suppressed: True
+Calculate Rates Per: 100,000
+Rate Options: Default intercensal populations for years 2001-2009 (except Infant Age Groups)
+---
+  Help: See http://wonder.cdc.gov/wonder/help/ucd.html for more information.
+---
+  Query Date: Jul 19, 2016 4:46:10 PM
+---
+  Suggested Citation: Centers for Disease Control and Prevention, National Center for Health Statistics. Underlying Cause of Death
+1999-2014 on CDC WONDER Online Database, released 2015. Data are from the Multiple Cause of Death Files, 1999-2014, as compiled
+from data provided by the 57 vital statistics jurisdictions through the Vital Statistics Cooperative Program. Accessed at
+http://wonder.cdc.gov/ucd-icd10.html on Jul 19, 2016 4:46:10 PM
+---
+  Messages:
+  1. Totals and Percent of Total are disabled when data are grouped by 113 or 130 Cause Lists. Check Caveats below for more
+information.
+2. Selections made to any variable in [HHS Regions, 2013 Urbanization] cause equivalent selections in the other variables. More
+Information: http://wonder.cdc.gov/wonder/help/faq.html#related-variables.
+3. Totals are not available for these results due to suppression constraints. More Information:
+  http://wonder.cdc.gov/wonder/help/faq.html#Privacy.
+---
+  Footnotes:
+  1. A '#' symbol preceding the label indicates a rankable cause of death. More information.
+---
+  Caveats:
+  1. Totals and Percent of Total are disabled when data are grouped by a 113 or 130 Cause List because both aggregate and detailed
+values are displayed in the table. Also be aware that charts and maps containing both aggregate and detail data could be
+misleading.
+2. Population and rates are labeled 'Not Applicable' when they include a subset of ages 85-100+ because populations are not
+available for those ages. More information: http://wonder.cdc.gov/wonder/help/ucd.html#Ages 85-100.
+3. Circumstances in Georgia for the years 2008 and 2009 have resulted in unusually high death counts for the ICD-10 cause of
+death code R99, "Other ill-defined and unspecified causes of mortality." Caution should be used in interpreting these data.
+More information: http://wonder.cdc.gov/wonder/help/ucd.html#Georgia-Reporting-Anomalies.
+4. Circumstances in New Jersey for the year 2009 have resulted in unusually high death counts for the ICD-10 cause of death code
+R99, "Other ill-defined and unspecified causes of mortality" and therefore unusually low death counts in other ICD-10 codes,
+most notably R95, "Sudden Infant Death Syndrome" and X40-X49, "Unintentional poisoning." Caution should be used in
+interpreting these data. More information: http://wonder.cdc.gov/wonder/help/ucd.html#New-Jersey-Reporting-Anomalies.
+5. Circumstances in California resulted in unusually high death counts for the ICD-10 cause of death code R99, "Other
+ill-defined and unspecified causes of mortality" for deaths occurring in years 2000 and 2001. Caution should be used in
+interpreting these data. More information: http://wonder.cdc.gov/wonder/help/ucd.html#California-Reporting-Anomalies.
+6. Data are Suppressed when the data meet the criteria for confidentiality constraints. More information:
+  http://wonder.cdc.gov/wonder/help/ucd.html#Assurance of Confidentiality.
+7. Death rates are flagged as Unreliable when the rate is calculated with a numerator of 20 or less. More information:
+  http://wonder.cdc.gov/wonder/help/ucd.html#Unreliable.
+8. Deaths of persons with Age "Not Stated" are included in "All" counts and rates, but are not distributed among age groups,
+so are not included in age-specific counts, age-specific rates or in any age-adjusted rates. More information:
+  http://wonder.cdc.gov/wonder/help/ucd.html#Not Stated.
+9. The population figures for year 2014 are bridged-race estimates of the July 1 resident population, from the Vintage 2014
+postcensal series released by NCHS on June 30, 2015. The population figures for year 2013 are bridged-race estimates of the July
+1 resident population, from the Vintage 2013 postcensal series released by NCHS on June 26, 2014. The population figures for
+year 2012 are bridged-race estimates of the July 1 resident population, from the Vintage 2012 postcensal series released by NCHS
+on June 13, 2013. The population figures for year 2011 are bridged-race estimates of the July 1 resident population, from the
+Vintage 2011 postcensal series released by NCHS on July 18, 2012. Population figures for 2010 are April 1 Census counts. The
+population figures for years 2001 - 2009 are bridged-race estimates of the July 1 resident population, from the revised
+intercensal county-level 2000 - 2009 series released by NCHS on October 26, 2012. Population figures for 2000 sssssare April 1 Census
+counts. Population figures for 1999 are from the 1990-1999 intercensal series of July 1 estimates. Population figures for the
+infant age groups are the number of live births. <br/><b>Note:</b> Rates and population figures for years 2001 - 2009 differ
+slightly from previously published reports, due to use of the population estimates which were available at the time of release.
+10. The population figures used in the calculation of death rates for the age group 'under 1 year' are the estimates of the
+resident population that is under one year of age. More information: http://wonder.cdc.gov/wonder/help/ucd.html#Age Group.
+```
+
+```{r appendix}
+date()
+sessionInfo()
+```
+
+<!--
+
+# Code Graveyard
+
+### Total Distribution
+
+```{r total, eval = FALSE, echo = FALSE}
+foo <- mapply(getTotalDistribution,
+  muTravel = matrix(35,nrow = 8, ncol = 2),
+  cvTravel = 1.72,
+  muNonTravel = matrix(100,nrow = 8, ncol = 2),
+  cvNonTravel = 1,
+  p = 1,
+  pWalk = rep(54.4/64.2,2),
+  vWalk = rep(2.88,2),
+  size = 1e5, SIMPLIFY = FALSE)
+```
+
+
+```{r vargo, echo = FALSE, eval = FALSE}
+library(ggplot2)
+library(reshape2)
+library(plyr)
+
+summaryFile <- "~/GHI/data/ATUS/atussum_2003.dat" # ~/Box Documents/work/CoBenefits/MaggieShare/MET Analysis/AmerTimeUse/atussum_2003.dat
+
+cpsFile <- "~/GHI/data/ATUS/atuscps_2003.dat" #~/Box Documents/work/CoBenefits/MaggieShare/MET Analysis/AmerTimeUse/atuscps_2003.dat
+
+stateResultFile <- "~/GHI/data/stateresults.csv" # ~/Box Documents/work/CoBenefits/MaggieShare/MET Analysis/AmerTimeUse/stateresults.csv
+
+stateResultFile2 <- "~/GHI/data/stateresults.csv" # ~/Box Documents/work/CoBenefits/MaggieShare/MET Analysis/AmerTimeUse/stateresults_quintile.csv"
+
+regionResultFile <- "~/GHI/data//regionresults_quintile.csv" #~/Box Documents/work/CoBenefits/MaggieShare/MET Analysis/AmerTimeUse/regionresults_quintile.csv
+
+#readLines("~/Box Documents/work/CoBenefits/MaggieShare/AmerTimeUse/atusact_2003.dat", n=10)
+# activity <- read.table("~/Box Documents/work/CoBenefits/MaggieShare/MET Analysis/AmerTimeUse/atusact_2003.dat", header=T, skip=0, sep=",")
+
+summary <- read.table(summaryFile, header=T, skip=0, sep=",")
+
+# respondants <- read.table("~/Box Documents/work/CoBenefits/MaggieShare/MET Analysis/AmerTimeUse/atusresp_2003.dat", header=T, skip=0, sep=",")
+
+# roster <- read.table("~/Box Documents/work/CoBenefits/MaggieShare/MET Analysis/AmerTimeUse/atusrost_2003.dat", header=T, skip=0, sep=",")
+
+CPS <- read.table(cpsFile, header=T, skip=0, sep=",")
+
+CPS.2 <- CPS[,c("TUCASEID", "GESTFIPS", "GEREG","GEMETSTA")]
+CPS.2$IDCHAR <- as.character(CPS.2[,"TUCASEID"])
+
+summary.2 <- summary[, c("TUCASEID", "TEAGE",    "TESEX",    "t050203",  "t130101",  "t130102",  "t130103",  "t130104",  "t130106",  "t130108", "t130109", "t130111", "t130113",  "t130115", "t130116",  "t130117", "t130119",  "t130120",  "t130122",  "t130123", "t130124",  "t130126",  "t130127", "t130128", "t130130",  "t130131",  "t130132", "t130133",  "t130134", "t130135", "t130136" , "t130199" , "t139999")]
+summary.2$IDCHAR <- as.character(summary.2[,"TUCASEID"])
+
+summary.2a <- summary.2[,c(1:3, length(summary.2))]
+summary.2b <- summary.2[,c(5:length(summary.2)-1)]
+minutes <- rowSums(summary.2b)
+summary.2a$minutes <- minutes
+
+metkey <- as.matrix(c(3.0,7.3,5.0,6.5,7.5,3.5,5.8,7.8,6.0,8.0,3.8,7.8,8.0,5.3,7.3,9.8,6.3,7.0,7.0,5.0,6.8,3.0,3.5,5.5,6.0,4.0,6.0,3.0,3.0,3.0), nrow = 1, ncol=30)
+
+
+summary.2c <- mapply(`*`,summary.2b,metkey)
+mets <- rowSums(summary.2c)
+summary.2a$mets <- mets
+
+summary.2a$agecat <- ifelse(summary.2a$TEAGE <5, 1,
+                     ifelse(summary.2a$TEAGE > 4 & summary.2a$TEAGE < 15, 2,
+                     ifelse(summary.2a$TEAGE > 14 & summary.2a$TEAGE < 30, 3,
+                     ifelse(summary.2a$TEAGE > 29 & summary.2a$TEAGE < 45, 4,
+                     ifelse(summary.2a$TEAGE > 44 & summary.2a$TEAGE < 60, 5,
+                     ifelse(summary.2a$TEAGE > 59 & summary.2a$TEAGE < 70, 6,
+                     ifelse(summary.2a$TEAGE > 69 & summary.2a$TEAGE < 80, 7, 8
+)))))))
+
+summary.2a$agecat2 <- ifelse(summary.2a$TEAGE <5, "age0-4",
+                     ifelse(summary.2a$TEAGE > 4 & summary.2a$TEAGE < 15, "age5-14",
+                     ifelse(summary.2a$TEAGE > 14 & summary.2a$TEAGE < 30, "age15-29",
+                     ifelse(summary.2a$TEAGE > 29 & summary.2a$TEAGE < 45, "age30-44",
+                     ifelse(summary.2a$TEAGE > 44 & summary.2a$TEAGE < 60, "age45-59",
+                     ifelse(summary.2a$TEAGE > 59 & summary.2a$TEAGE < 70, "age60-69",
+                     ifelse(summary.2a$TEAGE > 69 & summary.2a$TEAGE < 80, "age70-79", "age80+"
+)))))))
+
+use <- merge(summary.2a, CPS.2, by.x="TUCASEID", by.y="TUCASEID", all.x=T, sorted=F)
+
+use$sexcat <- ifelse(use$TESEX == 1, "male", "female")
+
+use$regcat <- ifelse(use$GEREG == 1, "northeast",
+              ifelse(use$GEREG == 2, "midwest",
+              ifelse(use$GEREG == 3, "south",  "west")))
+
+use$metcat <- ifelse(use$GEMETSTA == 1, "metro",
+              ifelse(use$GEMETSTA == 2, "non-metro", "unclassified"))
+
+
+use <- use[,c("minutes","mets","agecat2","GESTFIPS","sexcat","regcat","metcat")]
+
+#head(use)
+
+use.region <- ddply(use, .(sexcat, agecat2, regcat, metcat), summarise,
+             mean_min = mean(minutes, na.rm=T),
+             mean_mets = mean(mets, na.rm=T),
+             n = length(minutes)
+)
+
+
+use.state <- ddply(use, .(sexcat, agecat2, GESTFIPS, metcat), summarise,
+             mean_min = mean(minutes, na.rm=T),
+             mean_mets = mean(mets, na.rm=T),
+             n = length(minutes)
+)
+
+
+use2 <- subset(use, metcat == "metro")
+
+use.state2 <- ddply(use2, .(sexcat, agecat2, GESTFIPS), summarise,
+              percentile10 <- quantile(mets, 0.10, na.rm=T),
+              percentile30 <- quantile(mets, 0.3, na.rm=T),
+              percentile50 <- quantile(mets, 0.5, na.rm=T),
+              percentile70 <- quantile(mets, 0.7, na.rm=T),
+              percentile90 <- quantile(mets, 0.9, na.rm=T),
+              mean <- mean(mets, na.rm=T),
+              n = length(mets)
+)
+
+use.region2 <- ddply(use2, .(sexcat, agecat2, regcat), summarise,
+              percentile10 <- quantile(mets, 0.10, na.rm=T),
+              percentile30 <- quantile(mets, 0.3, na.rm=T),
+              percentile50 <- quantile(mets, 0.5, na.rm=T),
+              percentile70 <- quantile(mets, 0.7, na.rm=T),
+              percentile90 <- quantile(mets, 0.9, na.rm=T),
+              mean <- mean(mets, na.rm=T),
+              n = length(mets)
+)
+
+state.table <- subset(use.state, metcat == "metro")
+
+
+#write.csv(state.table, stateResultFile, row.names=F)
+
+#write.csv(use.state2, stateResultFile2, row.names=F)
+
+#write.csv(use.region2, regionResultFile, row.names=F)
+
+#ggplot(use.region, aes(x=factor(sexcat), y=mean_mets, fill=factor(agecat2))) + geom_bar(stat="identity", alpha=1) +facet_grid(regcat ~ metcat)
+
+#ggplot(subset(use.region, metcat != "unclassified"), aes(x=factor(sexcat), y=mean_mets, fill=factor(agecat2))) + geom_bar(stat="identity", alpha=1, position="dodge") +facet_grid(regcat ~ metcat)
+
+#ggplot(subset(use.state, metcat != "unclassified" & GESTFIPS == 17), aes(x=factor(sexcat), y=mean_min, fill=factor(agecat2))) + geom_bar(stat="identity", alpha=1, position="dodge") +facet_grid(GESTFIPS ~ metcat)
+```
+
+```{r figures, echo = FALSE, message = FALSE, eval = FALSE, warning = FALSE, error = TRUE}
+
+zeroMETs <- use$minutes == 0
+
+ggplot(use[!zeroMETs,], aes(x = mets, ..density.., colour = agecat2)) + geom_freqpoly(binwidth=200) + facet_grid(. ~ sexcat) + coord_cartesian(xlim = c(0, 1500))
+
+```
+
+```{r nonZeroMETsLogNormal, echo = FALSE, message = FALSE, eval = FALSE, warning = FALSE, error = TRUE}
+parameters <- ddply(use[!zeroMETs,], .(sexcat, agecat2), summarise,
+             mean_min = mean(minutes, na.rm=T),
+             mean_mets = mean(mets, na.rm=T),
+             sd_min = sd(minutes, na.rm=T),
+             sd_mets = sd(mets, na.rm=T)
+)
+cv_mets <- with(parameters, sd_mets/mean_mets)
+cv_min <- with(parameters, sd_min/mean_min)
+cv0_mets<- mean(cv_mets)
+
+mean_mets <- parameters$mean_mets
+sd_mets <- cv0_mets*mean_mets
+
+getLogNormal <- function(mu,sd){
+    dlnorm(seq(0,2000,length.out=1e3), log(mu/sqrt(1+sd^2/mu^2)), sqrt(log(1+sd^2/mu^2)))
+}
+
+foo <- as.data.frame(mapply(getLogNormal, mean_mets, sd_mets))
+names(foo) <- paste0(parameters$sexcat,parameters$agecat2)
+foo <- melt(foo)
+foo <- data.frame(foo, x = seq(0,2000,length.out = 1e3), sex = c(matrix(c("F","M"),nrow= nrow(foo)/2, ncol = 2, byrow = TRUE)), agecat = c(matrix(c("15-29","30-44","45-59","60-69","70-79", "80+"),nrow= nrow(foo)/12, ncol = 12, byrow = TRUE)))
+
+ggplot(foo, aes(x,value, colour = agecat)) + geom_line() + facet_grid( . ~ sex) + coord_cartesian(xlim = c(0, 1500))
+
+```
+
+```{r matrices, echo = FALSE, message = FALSE, eval = FALSE, warning = FALSE, error = TRUE}
+nonTravelMETs <- rbind(0,rbind(0,cbind(parameters$mean_mets[7:12], parameters$mean_mets[1:6])))
+nonTravelMETsNormalized <- nonTravelMETs/nonTravelMETs[3,2]
+meanNonTravelMETs <- nonTravelMETs[3,2]
+
+```
+
+```{r plotMatrix, echo = FALSE, message = FALSE, eval = FALSE, warning = FALSE, error = TRUE}
+D <- melt(nonTravelMETsNormalized)
+ggplot(D, aes(Var2, value)) + geom_bar(aes(fill=Var1), stat = "identity", position = "dodge")
+```
+
+```{r fooFunction, echo = FALSE, message = FALSE, eval = FALSE, warning = FALSE, error = TRUE}
+probActive <- 0.15
+METQuintiles <- mapply(getMETQuintiles, nonTravelMETsNormalized*nonTravelMETs, MoreArgs = list(cv = cv0_mets, p = probActive, size = 1e4), SIMPLIFY = FALSE)
+```
+
+
+```{r NHTSTables, eval = FALSE}
+HHV2PUB <- read.csv(file = "~/GHI/data/NHTS/Ascii/HHV2PUB.CSV", na.strings = "-9")
+names(HHV2PUB) <- c("HOUSEID","VARSTRAT","WTHHFIN","DRVRCNT","CDIVMSAR","CENSUS_D","CENSUS_R","HH_HISP","HH_RACE","HHFAMINC","HHRELATD","HHRESP","HHSIZE","HHSTATE","HHSTFIPS","HHVEHCNT","HOMEOWN","HOMETYPE","MSACAT","MSASIZE","NUMADLT","RAIL","RESP_CNT","SCRESP","TRAVDAY","URBAN","URBANSIZE","URBRUR","WRKCOUNT","TDAYDATE","FLAG100","LIF_CYC","CNTTDHH","HBHUR","HTRESDN","HTHTNRNT","HTPPOPDN","HTEEMPDN","HBRESDN","HBHTNRNT","HBPPOPDN","HH_CBSA","HHC_MSA")
+
+VEHV2PUB <- read.csv(file = "~/GHI/data/NHTS/Ascii/VEHV2PUB.CSV", na.strings = "-9")
+names(VEHV2PUB) <- c("HOUSEID","WTHHFIN","VEHID","DRVRCNT","HHFAMINC","HHSIZE","HHVEHCNT","NUMADLT","FLAG100","CDIVMSAR","CENSUS_D","CENSUS_R","HHSTATE","HHSTFIPS","HYBRID","MAKECODE","MODLCODE","MSACAT","MSASIZE","OD_READ","RAIL","TRAVDAY","URBAN","URBANSIZE","URBRUR","VEHCOMM","VEHOWNMO","VEHYEAR","WHOMAIN","WRKCOUNT","TDAYDATE","VEHAGE","PERSONID","HH_HISP","HH_RACE","HOMEOWN","HOMETYPE","LIF_CYC","ANNMILES","HBHUR","HTRESDN","HTHTNRNT","HTPPOPDN","HTEEMPDN","HBRESDN","HBHTNRNT","HBPPOPDN","BEST_FLG","BESTMILE","BEST_EDT","BEST_OUT","FUELTYPE","GSYRGAL","GSCOST","GSTOTCST","EPATMPG","EPATMPGF","EIADMPG","VEHTYPE","HH_CBSA","HHC_MSA")
+```
+
+```{r NHTSArchive, echo = FALSE, eval = FALSE}
+nMatrix <- ddply( subset(NHTS.person, !is.na(AGE) & !is.na(SEX)), .(SEX, AGE), summarise, count = length(PERSONID))
+sum(nMatrix$count) # 305649 number of people in the PERSON table
+
+foo <- group_by(NHTS.trips, HOUSEID,PERSONID)
+foobar <- dplyr::summarise(foo, n = n())
+nrow(foobar) # 262,934 number of people with trip data
+
+NHTS %>% group_by(HOUSEID, PERSONID) %>% dplyr::summarise( n = n()) # 260,576 people in merged data
+ggplot(NHTS, aes(x = TRVL_MIN, ..density.., colour = AGE)) + geom_freqpoly(binwidth = 15) + facet_grid( SEX ~ AT) + labs(x = "Foo", colour = "Age") + coord_cartesian(xlim = c(0, 75))
+NHTS %>% group_by(SEX, AGE) %>% dplyr::summarize(count = countPeople(data.frame(HOUSEID = HOUSEID, PERSONID = PERSONID)))
+```
+
+### Relative Risk Model
+```{r explore, eval = FALSE}
+names(ITHIM.baseline$parameters)
+```
+```{r RRFigure, echo = FALSE, eval = FALSE}
+phi <- function(x,k=0.5,phi0=comparativeRisk$RR.baseline$BreastCancer$F[1,1]) phi0^{x^k}
+plot(x = xvec <- seq(0,xmax <- 10,length.out=1e3), y = phi(xvec, k = 0.25), main = "Relative Risk Models for MET Exposure", xlab = "METs per week", ylab = "Breast Cancer Relative Risk", type = "l", lwd = 2, col = 1, ylim = c(0.9,1),xlim=c(0,xmax))
+lines(x = xvec <- seq(0,xmax,length.out=1e3), y = phi(x = xvec, k = 0.375), lwd = 2, col = 3)
+lines(x = xvec <- seq(0,xmax,length.out=1e3), y = phi(x = xvec, k = 0.5), lwd = 2, col = 2)
+lines(x = xvec <- seq(0,xmax,length.out=1e3), y = phi(x = xvec, k = 1), lwd = 2, col = 4)
+legend(x="topright",legend=paste0("k=",c("0.25","0.375","0.5","1")), col=1:4,lty=1,lwd=2)
+```
+
+### Tinkering
+
+Note that some of the AF values will disagree with the EXCEL
+spreadsheet because Diabetes, HHD_Air, CVD_Air and Stroke_Air do not
+combine travel METs with non-travel METs.
+
+```{r parlist, eval = FALSE}
+AF.sum <- numeric(1e3); i <- 0;
+muwt.vec <- seq(107.1,150,length.out=length(AF.sum))
+#muct.vec <- seq(2.7,3.0,length.out=length(AF.sum))
+for(muwt in muwt.vec){
+i <- i+1
+parameters <- createParameterList(baseline = FALSE)
+
+parameters <- setParameter(parName="muwt", parValue = muwt, parList = parameters)
+ITHIM.scenario <- list(
+  parameters = parameters <- parameters,
+  means = means <- computeMeanMatrices(parameters),
+  quintiles = quintiles <- getQuintiles(means)
+)
+comparativeRisk <- compareModels(ITHIM.baseline,ITHIM.scenario)
+AF.sum[i] <- with(comparativeRisk, sum(100*AF$BreastCancer))
+}
+D <- data.frame(mu.wt = muwt.vec,AF.sum=AF.sum)
+p <- ggplot(D, aes(x = mu.wt, y = AF.sum))
+p + geom_point()
+```
+
+```{r AF, echo = FALSE, eval = FALSE}
+with(comparativeRisk, as.data.frame(lapply(AF[c("BreastCancer","Depression")], function(x) 100*round(x[-(1:2),],4))))
+```
+
+To see the help page for a function use help().
+```{r help, eval = FALSE}
+help(createParameterList)
+```
+
+### Example
+To run the example contained in the _ITHIM_ package run the following.
+
+```{r package, eval = FALSE}
+example("ITHIM-package")
+```
+### Figures
+
+```{r plot2, echo = FALSE, fig.width = 12, eval = FALSE}
+plotRR(comparativeRisk$RR.baseline$Depression,comparativeRisk$RR.scenario$Depression) + coord_cartesian(ylim = c(0.75, 1.05))+ggtitle("Depression")
+```
+
+```{r plot3, echo = FALSE, fig.width = 12, eval = FALSE}
+plotRR(comparativeRisk$RR.baseline$BreastCancer,comparativeRisk$RR.scenario$BreastCancer) + coord_cartesian(ylim = c(0.75, 1.05)) + ggtitle("Breast Cancer")
+```
+
+```{r plot4, echo = FALSE, fig.height = 12, eval = FALSE}
+D<-melt(comparativeRisk$AF)
+names(D)<- c("age","sex","AF","disease")
+p <- ggplot(D, aes(age,AF)) + geom_bar(aes(fill=sex), stat = "identity") + facet_grid( disease ~ .) + coord_cartesian(ylim = c(0, 0.1))
+p
+```
+### Road Injury Array
+```{r road, eval = FALSE}
+baselineInjuries <- array(dim=c(6,7,3,2))
+injury <- c("fatal","serious")
+road <- c("minor road","major road","motorway")
+vehicle <- c("walk","cycle","bus","car","HGV","mbike")
+dimnames(baselineInjuries) <- list(vehicle,c(vehicle,"NOV"),road,injury)
+
+fatalities <- array(c(0,0,0.6666666667,34,6.3333333333,0,0.3333333333,0,0,0,0,0,4.3333333333,0,0,0.3333333333,0,0,0,0,0.3333333333,0.3333333333,0,0,0.6666666667,0,0.3333333333,0,0,0,48.6666666667,2,0,5.6666666667,0,35.6666666667,0,0,0,2.3333333333,0.6666666667,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,6.3333333333,0,0,0,0,0,0,0,0,0,0,0,0.3333333333,11.3333333333,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.3333333333,18.6666666667,1.3333333333,0,2,0,7.3333333333,0,0,0,0.6666666667,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.3333333333,0,0.3333333333,0,0.3333333333,0.3333333333,20,3,0,0,0,0,0,0.3333333333,0.3333333333,20,3,0,0,0,0,0,0,0,1,0.3333333333,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,42.3333333333,4.6666666667,0,2,0,26.3333333333,0,0,0,3.3333333333,0.3333333333,0,0.3333333333,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,3,0,0,0,6.3333333333,0,0,0.6666666667,0,0),dim=c(9,8,3))
+
+fatalaties <- apply(fatalities,c(1,3),t)
+
+
+
+serious <- array(c(0,0,0,6.3333333333,0,0,0.6666666667,0,0,0,0,0,0,0,0,0.3333333333,0,0,0,0,0.3333333333,0,0,0,0,0,0,0,0,0,40,0.6666666667,0,0.6666666667,0,11.6666666667,0,0,0,0.6666666667,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.3333333333,0,0,0,0,0.3333333333,0,0,0,0.6666666667,0,0,0,0,0,0,0,0,0.6666666667,0,0,0,0,0,0,0,0,0.3333333333,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0.3333333333,0,0.6666666667,0,3.6666666667,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.6666666667,0.3333333333,0,0,0,0,0,0,0,0.6666666667,0.3333333333,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,29.6666666667,1,0,0,0,11,0,0,0,0,0,0,0,0,0.3333333333,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.3333333333,0,0,0,0,0,0,0,0,0),dim=c(9,8,3))
+
+serious <- apply(serious,c(1,3),t)
+
+
+baselineInjuries[,,,1] <- fatalaties
+baselineInjuries[,,,2] <- serious
+
+Data.RoadType <- data.frame(local=c(0.75,0.53,0.0,0.09,0.29,NA,0.09,NA), arterial=c(0.25,0.47,0.96,0.31,0.42,NA,0.31,NA), highway=c(0.0,0,0.04,0.60,0.29,NA,0.60,NA),row.names=c("walk","cycle","bus","car","HGV","LGV","mbike","elec.bike") )
+
+Data.Occupancy <- data.frame(occupancy = c(1.0,1.0,18.9,1.3,1.0,NA,1.0,NA), row.names = c("walk","cycle","bus","car","HGV","LGV","mbike","elec.bike"))
+
+
+```
+
+
+### Active Transport Estimates (Speed and Distance by Transport Mode)
+```{r plot1, echo = FALSE, eval = FALSE}
+D <- melt(ITHIM.baseline$means$meanActiveTransportTime, c("age","sex"), value.name = "activeTransportTime")
+p <- ggplot(D, aes(age,  activeTransportTime)) + geom_bar(aes(fill=sex), stat = "identity", position = "dodge")
+p + coord_cartesian(ylim = c(0.75, 1.05))
+```
+
+These data were ripped out of the EXCEL workbook and vary per scenario.
+```{r transportData, eval = FALSE, echo = FALSE}
+
+transportMode <- c("walk","cycle","bus","minibus","train","car.driver","car.passenger","mbike","elec.bike.scooter","LGV","HGV.rigid","HGV.articulated")
+
+speed <- c(1.35299774571063,5.39374775150058,5.22298847623309,NA,9.94147658251227,17.36906017290580,14.51012134295660,NA,NA,NA,NA,NA)
+
+dist <- c(2.44072161538462,1.19969769230769,4.37851867307692,NA,5.58545353846154,111.91985351923100,39.12264265384620,0.00000000000000,0.00000000000000,NA,1.05479452054795,NA) # miles per week
+
+Data.Speed <- data.frame(speed,dist, row.names = transportMode)
+```
+
+```{r headDataSpeed, eval = FALSE}
+Data.Speed
+```
+
+```{r transportTime, echo = FALSE, results = "hide", eval = FALSE}
+head(transportTime <- Data.Speed$dist/Data.Speed$speed*60)
+```
+
+
+
+### Emissions Data
+
+
+
+```{r roadAndCO2Data, echo = FALSE, eval = FALSE, results = "hide"}
+
+CO2 <- c(957.686509527760,221.578783667454,203.624526028894,247.869842164617,333.468424533125,90.000000000000,835.014773125786)
+
+Data.CO2 <- data.frame(CO2, row.names = c("bus","Cars.urban","Cars.mway","LGVs.urban","LGVs.mway","motorbike","HGV"))
+
+Data.RoadType <- data.frame(local=c(0.75,0.53,0.0,0.09,0.29,NA,0.09,NA), arterial=c(0.25,0.47,0.96,0.31,0.42,NA,0.31,NA), highway=c(0.0,0,0.04,0.60,0.29,NA,0.60,NA),row.names=c("walk","cycle","bus","car","HGV","LGV","mbike","elec.bike") )
+
+Data.Occupancy <- data.frame(occupancy = c(1.0,1.0,18.9,1.3,1.0,NA,1.0,NA), row.names = c("walk","cycle","bus","car","HGV","LGV","mbike","elec.bike"))
+
+```
+
+The amount of carbon emissions varies by transport mode and road type.
+To accomodate this we need the distribution of road type by transport
+mode.  At some point we need the expected number of passengers per
+transport mode and we create it here, arbitrarily perhaps.
+
+```{r showData, echo = TRUE, eval = FALSE, results = "show"}
+Data.CO2
+Data.RoadType
+Data.Occupancy
+```
+
+
+### Non-(Active Transport) METs
+
+The file NonTravelMETs.csv was created from the tripleWin EXCEL file.
+These data are used in a table look-up for a given county.  The data
+represent the non-travel-related energy expenditures as measured in
+METs.  The data are stratified by age and sex.  Variable names were
+not given for the 7 numerical variables listed.  Here we name them x1
+through x7.
+
+```{r nonTravelMETs, eval = FALSE, echo = FALSE}
+nonTravelMETs <- data.frame(scan(file="./data/NonTravelMETs.csv", sep = ",", what = list("","","","",1,1,1,1,1,1,1), skip = 1))
+names(nonTravelMETs) <- c("ID","sexcat","agecat2","GESTFIPS", paste0("x",1:7))
+```
+
+```{r ggplot, fig.width=12, fig.height=12, echo = FALSE, message = FALSE, warning = FALSE, results = "hide", eval = FALSE}
+D <- melt(nonTravelMETs)
+p <- ggplot(D, aes(x = variable, y = value, colour = agecat2), outlier.colour = "red", outlier.shape = 1 )
+p + geom_boxplot()
+```
+
+Who is the outlier?  Perhaps it is a cohort of laborers, e.g., a county of coal miners?
+
+```{r foo, eval = FALSE, echo = TRUE, eval = FALSE}
+nonTravelMETs[which.max(nonTravelMETs$x5),]
+```
+
+Strange that it is group of middle-aged men.  I see this as a red
+flag.  I remove this datum and redraw the boxplots, but this time only
+for x5, x6 and x7, the others seemed less interesting.
+
+```{r fips, eval = FALSE, echo = FALSE, results = "hide"}
+fips <- read.csv("./data/fips_codes_website.csv")
+any(fips$County.FIPS.Code==38)
+```
+
+```{r Nontravelmets, echo = FALSE, message = FALSE, warning = FALSE, results = "hide", fig.width=12, fig.height=6, eval = FALSE}
+D <- melt(nonTravelMETs[-which.max(nonTravelMETs$x5),-(5:8)])
+p <- ggplot(D, aes(x = variable, y = value, colour = agecat2), outlier.colour = "red", outlier.shape = 1 ) + geom_boxplot()
+
+p + facet_grid(. ~ sexcat)
+```
+
+Thoughts?
+
+### Relative Risk of MET Exposure
+
+In the worksheet _Phy activity RRs_ we see estimates for relative risk
+for various disease outcomes.  My guess is that some transformation is
+being made to convert the exposure from active transport time to METs.
+I don't know why this is needed yet.  I can't make much progress here
+until I understand that better.
+
+### Coefficient of Variation
+
+An estimate for the coefficient of variation is provided without much
+explanation.  The literature cites an empirical result.  The feeling
+is that as mean active transport increases in the population people
+are fitter and there is less variance in active transport time.  I
+guess this has been shown in the same refernce for the coefficient of
+variation estimate.
+
+### Vital Statistics Data
+
+
+#### 2001 Data with Vargo Script
+
+```{r vitalstats, eval = FALSE, echo = FALSE}
+source("../vargo/process_2001_vital_stats.r")
+saveRDS(mortality2001, file = "./data/mortality2001.rds")
+```
+
+
+#### 2011 (VS11MORT.DUSMCPUB)
+
+Lets read in the CDC data using the file VS11MORT.DUSMCPUB and see whats up.
+
+```{r VS11, echo = FALSE, eval = FALSE}
+tapePosition <- list(state = c(29:30), skippedVars = c(31:34), county = c(35:37), skippedVars = c(38:68), sex = 69, ageUnit = 70, ageValue = c(71:73), skippedVars = c(74:145), ICD = c(146:149), skippedVars = c(150:444), race = c(445:446)) # Magic number!!!
+colClasses <- c("factor","factor","factor", "factor","integer", "character", "factor")
+fileWidth <- 488 # Magic number!!!
+```
+
+```{r VS11Classes, echo = FALSE, eval = FALSE}
+names(colClasses) <- names(tapePosition)[-which(names(tapePosition)=="skippedVars")]
+colClasses
+```
+
+To include more variables edit the above lines.  The variable listed
+must be contiguous.
+
+```{r convertAge, warning = FALSE, eval = FALSE, echo = FALSE}
+
+varWidths <- unlist(lapply(tapePosition, "length"))
+varWidths <- ifelse(names(tapePosition) == "skippedVars", -varWidths, varWidths)
+widths <- c(-(min(tapePosition[[1]])-1),c(varWidths))
+widths <- c(widths,-(fileWidth-sum(abs(widths))))
+
+Data.Mortality <- read.fwf(file = "~/ITHIM/R/data/VS11MORT.DUSMCPUB.first100", widths = widths, col.names = names(colClasses), header = FALSE, colClasses = colClasses)
+Data.Mortality <- data.frame(Data.Mortality, convertedAge = with(Data.Mortality, convertAge(value = ageValue, unit = ageUnit)))
+
+p <- ggplot(Data.Mortality, aes(x = convertedAge)) + geom_histogram(binwidth = 1)
+p + facet_grid(. ~ sex)
+
+```
+
+```{r ICD, fig.width = 12, echo = FALSE, eval = FALSE}
+Data.IDC.Codes <- read.csv(file="./data/IDC_Codes_key.csv", header = TRUE, colClasses = c("character","character","character"), na.string = "")
+Data.IDC.Codes <- subset(Data.IDC.Codes, Include == "1" & !is.na(ITHIMCause))
+ITHIMCauseOfDeath <- Data.IDC.Codes$ITHIMCause
+names(ITHIMCauseOfDeath) <- Data.IDC.Codes$cause.of.death
+Data.Mortality <- data.frame(Data.Mortality, CauseofDeathITHIM = ITHIMCauseOfDeath[Data.Mortality$ICD])
+Data.Mortality <- subset(Data.Mortality, !is.na(CauseofDeathITHIM) & !is.na(convertedAge))
+D <- data.frame(disease = Data.Mortality$CauseofDeathITHIM)
+p <- ggplot(D, aes(disease))
+p + geom_bar()
+
+```
+
+```{r CoDTable, eval = FALSE}
+with(Data.Mortality, table(CauseofDeathITHIM))
+```
+
+```{r ageClass, fig.width = 12, echo = FALSE, eval = FALSE}
+ageClass <- c(rep("00-04",5),rep("05-14",10),rep("15-29",15),rep("30-44",15),rep("45-59",15),rep("60-69",10),rep("70-79",10),rep("80+",121))
+names(ageClass) <- as.character(0:200)
+Data.Mortality <- data.frame(Data.Mortality, ageClass = as.factor(ageClass[as.character(as.integer(Data.Mortality$convertedAge))]))
+with(Data.Mortality, table(ageClass))
+
+D <- data.frame(ageClass = Data.Mortality$ageClass, disease = Data.Mortality$CauseofDeathITHIM)
+p <- ggplot(D, aes(disease))
+p + geom_bar(aes(fill=ageClass))
+```
+
+```{r histbyDisease, fig.width = 12, echo = FALSE, eval = FALSE}
+D <- data.frame(convertedAge = Data.Mortality$convertedAge, disease = Data.Mortality$CauseofDeathITHIM)
+p <- ggplot(D, aes(convertedAge, ..density.., colour = disease)) + geom_histogram(binwidth=5, show.legend = TRUE)
+p + facet_grid( . ~ disease)
+```
+
+```{r counties, eval = FALSE}
+Data.AgeSex <- read.csv("./data/county_age_sex2002.csv", header=T, col.names = c("county.name","state.name", "MSA","sex","all.ages","age0-4","age5-14","age15-29","age30-44","age45-59","age60-69","age70-79","age80+", "STATE","COUNTY"), colClasses = c("factor","factor","factor","factor","integer","integer","integer","integer","integer","integer","integer","integer","integer", "factor", "factor"))
+
+age.sex.2 <- melt(age.sex[,c(14,15,4,6:13)], id=c("STATE","COUNTY","sex"))
+
+#age.sex.3 <- dcast(age.sex.2, STATE + COUNTY + variable ~ sex, mean)
+
+mort.age <- merge(mort.ITHIM, age.sex.3, by.x=c("state","county", "ITHIM.age"), by.y=c("STATE","COUNTY","variable"))
+
+mort.age$year <- 2001
+
+mort.age$app.pop <- ifelse(mort.age$sex ==1, mort.age$male, mort.age$female)
+
+```
+
+```{r tabulate, eval = FALSE}
+Data.Mortality.Table <- as.data.frame(ftable(with(Data.Mortality, table(sex,ageClass,CauseofDeathITHIM))))
+```
+
+```{r saveMortality, echo = FALSE, eval = FALSE}
+saveRDS(object = Data.Mortality, file = "./data/Data.Mortality.rds")
+saveRDS(object = Data.Mortality.Table, file = "./data/Data.Mortality.Table.rds")
+```
+-->
