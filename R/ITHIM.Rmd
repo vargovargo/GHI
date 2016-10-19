@@ -435,7 +435,7 @@ pWalk <- ITHIM.national$means$pWalk[3,2]
 
 DALYs <- c(); DALYs.quints <- c();
 atVec <- seq(45, 120, length.out = 5)
-muNonTravelVec <- c(1, 10, 50, 100, 150, 200)
+muNonTravelVec <- c(1, 5, 10)
 DTotal <- data.frame()
 
 for(at in atVec ){  # minutes active transport/week
@@ -468,19 +468,24 @@ p + stat_smooth( method = loess) + geom_point() + theme_bw() + scale_y_continuou
 
 ## Figure 2
 
-```{r displayMeans, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
-D <- rbind(getWalkTime(ITHIM.default),getWalkSpeed(ITHIM.default),getCycleTime(ITHIM.default),getNonTravelMETs(ITHIM.default))
+```{r displayMeans, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = phi, warning = FALSE, message = FALSE, echo = FALSE}
+
+ITHIM.national <- updateITHIM(ITHIM.national, "muNonTravel", 5)
+
+D <- rbind(getWalkTime(ITHIM.national),getWalkSpeed(ITHIM.national),getCycleTime(ITHIM.national),getNonTravelMETs(ITHIM.national))
 D <- within(D, sex <- factor(sex, levels = c("F","M")))
 
 p <- ggplot(D, aes(x = ageClass, y = mu, fill = sex)) + geom_bar(stat= "identity", position = "dodge")
-p + theme_bw() + scale_x_discrete(name="", labels = c("0-4","5-14","15-29","30-44","45-59","60-69","70-79","80+")) + scale_y_continuous(name="Travel Time per Week (minutes)") + theme(axis.text.x  = element_text(angle = 90, vjust = 0.5, size = 10)) + facet_grid( type ~ ., scales = "free_y")
+p + theme_bw() + scale_x_discrete(name="", labels = c("0-4","5-14","15-29","30-44","45-59","60-69","70-79","80+")) + scale_y_continuous(name="") + theme(axis.text.x  = element_text(angle = 90, vjust = 0.5, size = 8)) + facet_grid( type ~ ., scales = "free")
 ```
 
+## Figure 3
+
 ```{r displayGBD, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
-D <- melt(ITHIM.default$parameters$GBD)
+D <- melt(ITHIM.national$parameters$GBD)
 names(D) <- c("disease","sex","ageClass","type","burden", "sex2", "disease2")
 D <- within(D, sex <- factor(sex, levels = c("F","M")))
 
-p <- ggplot(subset(D,disease %in% c("BreastCancer","ColonCancer","Dementia","Depression","Diabetes")), aes(x = ageClass, y = burden, fill = sex)) + geom_bar(stat= "identity", position = "dodge")
-p + theme_bw() + scale_x_discrete(name="", labels = c("0-4","5-14","15-29","30-44","45-59","60-69","70-79","80+")) + scale_y_continuous(name="") + theme(axis.text.x  = element_text(angle = 90, vjust = 0.5, size = 10)) + facet_grid( type ~ disease, scales = "free_y")
+p <- ggplot(subset(D, disease %in% c("BreastCancer","ColonCancer","Dementia","Depression","Diabetes")), aes(x = ageClass, y = burden/1e3, fill = sex)) + geom_bar(stat= "identity", position = "dodge")
+p + theme_bw() + scale_x_discrete(name="", labels = c("0-4","5-14","15-29","30-44","45-59","60-69","70-79","80+")) + scale_y_continuous(name="Nationwide Burden (thousands)") + theme(axis.text.x  = element_text(angle = 90, vjust = 0.5, size = 10)) + facet_grid( type ~ disease, scales = "free_y")
 ```

@@ -31,11 +31,10 @@ clean:
 	rm -rf ./data/ATUS/
 	rm -rf ./data/NHTS/
 	rm -rf ./R/figure/
-	rm -rf ./R/data/*
-	mkdir -p ./data/ATUS/
-	mkdir -p ./data/NHTS/
 	mkdir -p ./R/figure/
 	mkdir -p ./R/data/
+	mkdir -p ./data/ATUS/
+	mkdir -p ./data/NHTS/
 
 .PHONY: data
 
