@@ -27,6 +27,10 @@ data:
 ITHIM-discussion: ./slides/ITHIM-discussion/ITHIM-discussion.tex
 	cd ./slides/ITHIM-discussion; make ITHIM-discussion.pdf
 
+webpage: html/index.txt
+	perl ~/lib/Markdown_1.0.1/Markdown.pl ./html/index.txt > ./html/index.html
+	perl ~/lib/Markdown_1.0.1/Markdown.pl ./html/tableau/tableau.txt > ./html/tableau/tableau.html
+
 clean:
 	rm -rf ./data/ATUS/
 	rm -rf ./data/NHTS/
@@ -39,8 +43,3 @@ clean:
 .PHONY: data
 
 .PHONY2: clean
-
-# webpage: html/index.txt html/tableau/tableau.txt
-# 	perl ~/lib/Markdown_1.0.1/Markdown.pl ./html/index.txt > ./html/index.html
-# 	perl ~/lib/Markdown_1.0.1/Markdown.pl ./html/tableau/tableau.txt > ./html/tableau/tableau.html
-

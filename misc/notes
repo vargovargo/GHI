@@ -77,7 +77,7 @@ tree ~/ITHIM/docs/
             └── WoodcockPlosOne.PDF
 
 9 directories, 18 files
-rsync -av syounkin@45.55.5.232:~/share/data/ ~/ITHIM/R/data/ &> ~/log/rsync.log 
+rsync -av syounkin@45.55.5.232:~/share/data/ ~/ITHIM/R/data/ &> ~/log/rsync.log
 brew cask install mactex
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -109,3 +109,28 @@ mixing leisure and travel activities
 
 scaling to objective data
 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Thursday, 10/20
+
+Alex Karner
+  transportation justice advocates
+  disadvantaged unicorporated communities
+  spreadsheet
+disaggergation
+small samples
+small magnitude
+what scenarios did they use?
+judy robinson sacramento county
+
+unique things
+stakeholders sacog
+
+p.a. epi program calibrtation of p.a.
+
+ITHIM mailing list
+
+monthly meeting
+paper list

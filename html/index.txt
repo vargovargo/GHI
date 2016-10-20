@@ -2,32 +2,27 @@
 Integrated Transport & Health Impacts Model
 ===========================================
 
-References
+R Packages
 ----------
-- [CEDAR][cedar]
+- [ITHIM][ithim]
 
 Dashboard
 ---------
 - [Shiny App][shiny]
 
-R Packages
-----------
-- [ITHIM][ithim]
-- [manual][manual]
-
-Tableau
--------
-- [Figures][tableau]
-
 Documentation
 -------------
-- [Tutorial][tut]
+- [manual][manual]
 - [Compendium][comp]
+- [Script for Methods Paper][rep]
 
-[tut]: ./ITHIM.html
+References
+----------
+- [CEDAR][cedar]
+
+[rep]: ./ITHIM.html
 [comp]: ./ITHIM-compendium.pdf
 [ithim]: https://github.com/syounkin/ITHIM
 [shiny]: https://ithim.shinyapps.io/ITHIM-UI/
 [manual]: ./ITHIM.pdf
 [cedar]: http://www.cedar.iph.cam.ac.uk/research/modelling/ithim/
-[tableau]: ./tableau/tableau.html
