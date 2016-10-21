@@ -1,8 +1,11 @@
-all : clean data report methods second ITHIM-discussion
+all : clean data report methods second tutorial ITHIM-discussion
 tex : methods second ITHIM-discussion
 
 report: R/ITHIM.Rmd R/ITHIM.R
 	cd R; R --vanilla -e 'source("ITHIM.R")'
+
+tutorial: R/tutorial.Rmd R/tutorial.R
+	cd R; R --vanilla -e 'source("tutorial.R")'
 
 methods: methodsPaper/manuscript.tex tex/ITHIM.bib ./methodsPaper/tex/abstract.tex ./methodsPaper/tex/conclusion.tex ./methodsPaper/tex/discussion.tex ./methodsPaper/tex/introduction.tex ./methodsPaper/tex/materialsAndMethods.tex ./methodsPaper/tex/results.tex ./methodsPaper/tex/supportingInformation.tex ./methodsPaper/figures/fig1.pdf
 	cd methodsPaper; make methodsPaper.pdf

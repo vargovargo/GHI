@@ -12,7 +12,8 @@ Dashboard
 
 Documentation
 -------------
-- [manual][manual]
+- [tutorial][tut]
+- [manual][man]
 - [Compendium][comp]
 - [Script for Methods Paper][rep]
 
@@ -24,5 +25,7 @@ References
 [comp]: ./ITHIM-compendium.pdf
 [ithim]: https://github.com/syounkin/ITHIM
 [shiny]: https://ithim.shinyapps.io/ITHIM-UI/
-[manual]: ./ITHIM.pdf
+[man]: ./ITHIM.pdf
+[tut]: ./tutorial.html
 [cedar]: http://www.cedar.iph.cam.ac.uk/research/modelling/ithim/
+
