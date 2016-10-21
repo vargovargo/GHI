@@ -1,4 +1,6 @@
+## ITHIM Tutorial
 
+### Installing the package
 
 ```{r figwidth, eval = TRUE,  warning = FALSE, message = FALSE, echo = FALSE}
 fig.width <- 6
@@ -20,6 +22,14 @@ library("devtools")
 install_github(repo = "syounkin/ITHIM")
 library("ITHIM")
 ```
+
+### Built-in Example
+
+```{r example, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
+example("ITHIM-package")
+```
+
+### Step-by-step
 
 Now that ITHIM is installed and loaded the first step is to create the
 baseline model.  To do so, using defaults built into the package, use
