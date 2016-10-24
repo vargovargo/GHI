@@ -1,5 +1,41 @@
 # Appendix
 
+```{r summary, fig.width = 20, fig.height = 10, eval = compute, echo = FALSE, message = FALSE, warning = FALSE}
+walkHours <- with(subset(NHTS.trips, {
+    AT == "walk" & TRPMILES < 10 & TRPMILES/TRVL_MIN*60 < 8 & TRVL_MIN > 5 #& TRPMILES/TRVL_MIN*60 > 0.5
+}), TRVL_MIN/60)
+
+walkMiles <- with(subset(NHTS.trips, {
+    AT == "walk" & TRPMILES < 10 & TRPMILES/TRVL_MIN*60 < 8 & TRVL_MIN > 5 #& TRPMILES/TRVL_MIN*60 > 0.5
+}), TRPMILES)
+
+cycleHours <- with(subset(NHTS.trips, {
+      AT == "cycle" & TRPMILES < 25 & TRPMILES/TRVL_MIN*60 < 25 & TRVL_MIN > 5 #& TRPMILES/TRVL_MIN*60 > 1
+}), TRVL_MIN/60)
+
+cycleMiles <- with(subset(NHTS.trips, {
+      AT == "cycle" & TRPMILES < 25 & TRPMILES/TRVL_MIN*60 < 25 & TRVL_MIN > 5 #& TRPMILES/TRVL_MIN*60 > 1
+}), TRPMILES)
+
+walkSpeed <- median(walkMiles/walkHours, na.rm = TRUE)
+cycleSpeed <- median(cycleMiles/cycleHours, na.rm = TRUE)
+
+Dwalk <- data.frame(Hours = walkHours, Miles = walkMiles, Speed = walkMiles/walkHours, mode = "walk")
+Dcycle <- data.frame(Hours = cycleHours, Miles = cycleMiles, Speed = cycleMiles/cycleHours, mode = "cycle")
+
+D <- rbind(Dwalk,Dcycle)
+
+Dspeed <- data.frame(speed = c(1,1), intercept = log10(c(walkSpeed,cycleSpeed)), mode = c("walk","cycle"))
+
+g <- ggplot(D, aes(Hours, Miles, colour = mode)) + geom_point()
+g <- g + geom_abline(aes(slope = speed, intercept = intercept, colour = mode), Dspeed) + facet_grid(. ~ mode)
+g + scale_y_log10() + scale_x_log10() + theme_bw()
+
+g <- ggplot(D, aes(Speed, ..density.., fill = mode)) + geom_histogram() + theme_bw() + scale_x_continuous(name="Speed") + scale_y_continuous(name="Density") + facet_grid(. ~ mode, scales = "free")
+g
+
+```
+
 ## Non-Travel METs
 
 ```{r newMETs, echo = TRUE, eval = FALSE, echo = FALSE}

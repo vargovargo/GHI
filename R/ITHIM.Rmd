@@ -82,7 +82,7 @@ NHTS.trips <- with(DAYV2PUB,{
                         ifelse(TRPTRANS == "23", "walk",
                         ifelse(!is.na(TRPTRANS), "other", NA))),
                    TRVL_MIN = as.numeric(TRVL_MIN),
-                   TRVLCMIN = ifelse(as.numeric(TRVLCMIN) != 0, as.numeric(TRVLCMIN), NA),
+                   #TRVLCMIN = as.numeric(TRVLCMIN),
                    URBRUR  = as.factor(URBRUR),
                    MSACAT = as.factor(MSACAT),
                    MSA = ifelse(MSASIZE %in% 1:5, TRUE, FALSE),
@@ -107,52 +107,16 @@ NHTS.person <- with(PERV2PUB,{
 
 ```
 
-```{r summary, fig.width = 20, fig.height = 10, eval = compute, echo = FALSE, message = FALSE, warning = FALSE}
-walkHours <- with(subset(NHTS.trips, {
-    AT == "walk" & TRPMILES < 10 & TRPMILES/TRVL_MIN*60 < 8 & TRVL_MIN > 5 #& TRPMILES/TRVL_MIN*60 > 0.5
-}), TRVL_MIN/60)
-
-walkMiles <- with(subset(NHTS.trips, {
-    AT == "walk" & TRPMILES < 10 & TRPMILES/TRVL_MIN*60 < 8 & TRVL_MIN > 5 #& TRPMILES/TRVL_MIN*60 > 0.5
-}), TRPMILES)
-
-cycleHours <- with(subset(NHTS.trips, {
-      AT == "cycle" & TRPMILES < 25 & TRPMILES/TRVL_MIN*60 < 25 & TRVL_MIN > 5 #& TRPMILES/TRVL_MIN*60 > 1
-}), TRVL_MIN/60)
-
-cycleMiles <- with(subset(NHTS.trips, {
-      AT == "cycle" & TRPMILES < 25 & TRPMILES/TRVL_MIN*60 < 25 & TRVL_MIN > 5 #& TRPMILES/TRVL_MIN*60 > 1
-}), TRPMILES)
-
-walkSpeed <- median(walkMiles/walkHours, na.rm = TRUE)
-cycleSpeed <- median(cycleMiles/cycleHours, na.rm = TRUE)
-
-Dwalk <- data.frame(Hours = walkHours, Miles = walkMiles, Speed = walkMiles/walkHours, mode = "walk")
-Dcycle <- data.frame(Hours = cycleHours, Miles = cycleMiles, Speed = cycleMiles/cycleHours, mode = "cycle")
-
-D <- rbind(Dwalk,Dcycle)
-
-Dspeed <- data.frame(speed = c(1,1), intercept = log10(c(walkSpeed,cycleSpeed)), mode = c("walk","cycle"))
-
-g <- ggplot(D, aes(Hours, Miles, colour = mode)) + geom_point()
-g <- g + geom_abline(aes(slope = speed, intercept = intercept, colour = mode), Dspeed) + facet_grid(. ~ mode)
-g + scale_y_log10() + scale_x_log10() + theme_bw()
-
-g <- ggplot(D, aes(Speed, ..density.., fill = mode)) + geom_histogram() + theme_bw() + scale_x_continuous(name="Speed") + scale_y_continuous(name="Density") + facet_grid(. ~ mode, scales = "free")
-g
-
-```
-
 #### Subset and Merge
 
 We now correct for zero trip times in NHTS.
 
 ```{r subset, eval = compute, fig.width = 10, echo = FALSE}
 NHTS.person <- subset( NHTS.person, MSA == TRUE )
-NHTS.trips <- subset(NHTS.trips, !is.na(TRPMILES))
+NHTS.trips <- subset(NHTS.trips, !is.na(TRVL_MIN))
 
 NHTS <- merge(NHTS.person, NHTS.trips, by = c("HOUSEID","PERSONID"), all.x = TRUE)
-NHTS <- within(NHTS, TRPMILES <- ifelse(is.na(TRPMILES), 0, TRPMILES))
+NHTS <- within(NHTS, TRVL_MIN <- ifelse(is.na(TRVL_MIN), 0, TRVL_MIN))
 saveRDS(NHTS, file = "./data/NHTS.rds")
 ```
 
