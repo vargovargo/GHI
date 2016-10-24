@@ -145,19 +145,14 @@ g
 
 #### Subset and Merge
 
-The PERSON table contains the family members of the person surveyed,
-right?  We want only the peole who were surveyed for their travel
-times.  So, we can\'t use everyone in the PERSON table.  If someone
-had zero trip time they would not exist in the TRIP table.  So, if we
-use just the TRIP table we miss people with zero trip time. So how do
-we merge?  We use an inner join and assume that their is a negligible
-number of people with zero trip time.  Not very many people never stay
-in the house all day.  Please correct me if I am mistaken abiout the
-nature of the PERSON or TRIP tables.
+We now correct for zero trip times in NHTS.
 
 ```{r subset, eval = compute, fig.width = 10, echo = FALSE}
 NHTS.person <- subset( NHTS.person, MSA == TRUE )
-NHTS <- merge(NHTS.person, NHTS.trips, by = c("HOUSEID","PERSONID"))
+NHTS.trips <- subset(NHTS.trips, !is.na(TRPMILES))
+
+NHTS <- merge(NHTS.person, NHTS.trips, by = c("HOUSEID","PERSONID"), all.x = TRUE)
+NHTS <- within(NHTS, TRPMILES <- ifelse(is.na(TRPMILES), 0, TRPMILES))
 saveRDS(NHTS, file = "./data/NHTS.rds")
 ```
 
