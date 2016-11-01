@@ -1,7 +1,13 @@
-The ITHIM model uses the comparative risk assesment framework to
-estimate the population attributable fraction, $\af$.  In our case the
-$\af$ represents the proportional change in national disease burden if
-age and sex-specific active transport time means were changed.
+As with the original ITHIM implementation we employed a comparative
+risk analysis (CRA) across scenarios defined by mean active
+transportation time, i.e., walking and cycling.
+
+We compute the proportional change in national disease burden between
+the baseline model and alternative scenarios, or population
+attributable fraction, $\af$.  The population attributable fraction is
+defined below, and computed for each disease included in the model,
+namely Breast Cancer, Colon Cancer, Depression, Dementia, Diabetes and
+Cardiovascular disease.
 
 \begin{equation}
 \af = \frac{\int \! R(x)P(x) \, \mathrm{d}x  - \int \! R(x)Q(x) \, \mathrm{d}x}{\int \! R(x)P(x) \, \mathrm{d}x}
@@ -24,6 +30,15 @@ a \logNormal{} distribution with constant coefficient of variation
 across age-sex strata.  Travel-related exposure is estimated from
 active transport time using assumptions about how much physical
 activity is required for cycling and walking.
+
+\paragraph{Disease Burden Estimation}
+\begin{equation}
+B_1 = B_0(1-\af)\frac{\RR_1}{\sum_j \RR_j}
+\end{equation}
+
+$B_j = \gamma_jB_1$, where $\gamma_i = \frac{\RR_i}{\RR_1}$.  The
+overall burden is then computed as the sum across quintiles,
+$B=\sum B_j$.  Finally, $B_0$ is estimated from CDC data\ldots
 
 
 \begin{figure}[t]
