@@ -1,13 +1,12 @@
 As with the original ITHIM implementation we employed a comparative
 risk analysis (CRA) across scenarios defined by mean active
-transportation time, i.e., walking and cycling.
-
-We compute the proportional change in national disease burden between
-the baseline model and alternative scenarios, or population
-attributable fraction, $\af$.  The population attributable fraction is
-defined below, and computed for each disease included in the model,
-namely Breast Cancer, Colon Cancer, Depression, Dementia, Diabetes and
-Cardiovascular disease.
+transportation time, i.e., walking and cycling.  To do so we
+investigate the proportional change in national disease burden between
+the baseline model and a given alternative scenario, i.e., the
+population attributable fraction, $\af$.  The population attributable
+fraction is defined below and computed for each disease included in
+the model, namely Breast Cancer, Colon Cancer, Depression, Dementia,
+Diabetes and Cardiovascular disease.
 
 \begin{equation}
 \af = \frac{\int \! R(x)P(x) \, \mathrm{d}x  - \int \! R(x)Q(x) \, \mathrm{d}x}{\int \! R(x)P(x) \, \mathrm{d}x}
@@ -30,6 +29,12 @@ a \logNormal{} distribution with constant coefficient of variation
 across age-sex strata.  Travel-related exposure is estimated from
 active transport time using assumptions about how much physical
 activity is required for cycling and walking.
+
+\paragraph{Approximation of $\af$ Integral}
+
+\begin{equation}
+1 - \af \approx \frac{\sum R(x_i)}{\sum R(x_i^\prime)}
+\end{equation}
 
 \paragraph{Disease Burden Estimation}
 \begin{equation}
