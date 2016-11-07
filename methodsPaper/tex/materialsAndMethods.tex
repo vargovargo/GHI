@@ -56,7 +56,7 @@ change in disease burden, $\delta$, may be approximated as follows,
 where $R$ is the risk function for total activity.
 
 \begin{equation}
-\delta = 1 - \af \approx \frac{\sum R(x_i)}{\sum R(x_i^\prime)}
+\delta = 1 - \af \approx \frac{\sum_{i=1}^n R(x_i)}{\sum_{i=1}^n R(x_i^\prime)}
 \end{equation}
 
 The disease burden, in this case DALYs, is found for each of the
@@ -68,12 +68,27 @@ quintiles, $B=\sum_{j=1}^n B_j$.
 B_j = \delta B_0\frac{\RR_j}{\sum_{k=1}^n \RR_k}\label{burden}
 \end{equation}
 
+\paragraph{Risk Functions}
+
+We assign risk based on dose-response curves for each of the diseases
+included in the model.
+
+\begin{equation}
+\RR(x) = \mathrm{e}^{-r \tilde{x}}
+\end{equation}
+
+where $\tilde{x} = x^k$, $k=\frac{1}{2}$ and $r$ varies by age-sex
+class and disease.  For a table of $r$ values see supplementary
+material.
+
+\paragraph{Nationwide Health Benefits to Active Transport}
+
 For the purposes of this implementation we limited our analyses to
 metropolitan regions of the United States. To idenfity urban
 populations we used the National Center for Health Statistics 2013
 Urban-Rural Classification Scheme for Counties \cite{ingram2014}. We
 eliminated counties in the US with the classifcation of
-'nonmetropolitan' (noncore or micropolitan). We used this and similar
+`nonmetropolitan' (noncore or micropolitan). We used this and similar
 classification schemes as well as county and state identifiers in
 other datsets (NHTS, ATUS, CDC WONDER) to ensure consistency in our
 estimates for input parameters.
@@ -85,19 +100,9 @@ active travel time input parameters for alternate scenarios using
 states with large sample sizes. From these examples we were able to
 approximate low and high active travel scenarios. Finally we applied
 these active travel times to the US metro population to perform the
-comparative risk assessment agains the baseline US numbers. We then
+comparative risk assessment against the baseline US numbers. We then
 examined the sensitivity of disease burden estimates to input
 parameters including the active travel time and non-travel activity.
-
-We report total change (averted or increased) in diability adjusted
-life years (DALYs) as an estimate of dissease burden change with
-alternative scenarions. To estimate DALYs we use a methodology adopted
-from previous US implementations of ITHIM which scale Global Budern of
-Disease Estimates for the US to smaller populations using mortality
-rate ratios \cite{maizlish2013}. Age, sex, and casuse specific
-mortalities were obtained form the CDC WONDER database for US metro
-counties for the years 2010-2014. Cells with less than 10 deaths were
-imputed using R's random integer generator.
 
 \begin{figure}[t]
   \centerline{\includegraphics[width=\textwidth]{./figures/fig1}}
