@@ -18,14 +18,15 @@ data:
 	mkdir -p ./data/NHTS
 	unzip Ascii.zip -d ./data/NHTS/
 	mv -v Ascii.zip ./data/NHTS/
-	wget http://www.bls.gov/tus/special.requests/atuscps_2003.zip
+	wget http://www.bls.gov/tus/special.requests/atuscps_2015.zip
 	mkdir -p ./data/ATUS/
-	unzip  atuscps_2003.zip -d ./data/ATUS/
-	mv -v atuscps_2003.zip ./data/ATUS
-	wget http://www.bls.gov/tus/special.requests/atussum_2003.zip
+	unzip  atuscps_2015.zip -d ./data/ATUS/
+	mv -v atuscps_2015.zip ./data/ATUS
+	wget http://www.bls.gov/tus/special.requests/atussum_2015.zip
 	mkdir -p ./data/ATUS/
-	unzip  atussum_2003.zip -d ./data/ATUS/
-	mv -v atussum_2003.zip ./data/ATUS
+	unzip  atussum_2015.zip -d ./data/ATUS/
+	mv -v atussum_2015.zip ./data/ATUS
+
 
 ITHIM-discussion: ./slides/ITHIM-discussion/ITHIM-discussion.tex
 	cd ./slides/ITHIM-discussion; make ITHIM-discussion.pdf
