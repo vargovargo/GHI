@@ -10,7 +10,7 @@ results, questions, interpreations, notes, etc.-->
 
 ```{r libs, eval = TRUE, echo = FALSE, results = "hide", warning = FALSE, error = FALSE, message = FALSE}
 options(repos='http://cran.rstudio.com/')
-# install.packages(c("knitr","ggplot2","dplyr","openssl","httr", "git2r","devtools"))
+install.packages(c("knitr","ggplot2","dplyr","openssl","httr", "git2r", "devtools", "roxygen2"))
 library("ggplot2")
 library("devtools")
 library("reshape2")
@@ -38,7 +38,7 @@ First we use NHTS to estimate mean walking and cycling times.
 ### NHTS
 
 ```{r compute, echo = FALSE, eval = TRUE}
-compute <- FALSE
+compute <- TRUE
 ```
 
 #### Create a handful of functions to help parse data
