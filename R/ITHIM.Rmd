@@ -393,7 +393,7 @@ ITHIM.scenario.quints <- updateITHIM(ITHIM.scenario, "quantiles", seq(1,9,by=1)/
 pWalk <- ITHIM.national$means$pWalk[3,2]
 
 DALYs <- c(); DALYs.quints <- c();
-atVec <- seq(45, 120, length.out = 5)
+atVec <- seq(35, 120, length.out = 10)
 muNonTravelVec <- c(1, 5, 10)
 DTotal <- data.frame()
 
@@ -420,7 +420,11 @@ for(at in atVec ){  # minutes active transport/week
   }
 }
 
-p <- ggplot(DTotal, aes(x = at,y = -DALYs/1e3, colour = quants))
+DTotal <- within(DTotal, muNonTravel <- factor(muNonTravel, levels = c(1,5,10), labels = c("low","medium","high")))
+DTotal <- subset(DTotal, quants == "percentiles")
+
+
+p <- ggplot(DTotal, aes(x = at,y = -DALYs/1e3))#, colour = quants))
 p + stat_smooth( method = loess) + geom_point() + theme_bw() + scale_y_continuous(name="DALYs Averted Nationwide (Thousands)") + scale_x_continuous(name="Active Transport (minutes/week) (Referent Group)") + facet_grid( . ~ muNonTravel) + theme(axis.text.x  = element_text(angle = 90, vjust = 0.5, size = 8))
 
 ```
