@@ -424,8 +424,11 @@ DTotal <- within(DTotal, muNonTravel <- factor(muNonTravel, levels = c(1,5,10), 
 DTotal <- subset(DTotal, quants == "percentiles")
 
 
-p <- ggplot(DTotal, aes(x = at,y = -DALYs/1e3))#, colour = quants))
-p + stat_smooth( method = loess) + geom_point() + theme_bw() + scale_y_continuous(name="DALYs Averted Nationwide (Thousands)") + scale_x_continuous(name="Active Transport (minutes/week) (Referent Group)") + facet_grid( . ~ muNonTravel) + theme(axis.text.x  = element_text(angle = 90, vjust = 0.5, size = 8))
+p <- ggplot(DTotal, aes(x = at, y = -DALYs/1e3, colour = muNonTravel), colour = muNonTravel)
+p + geom_line() + geom_point() + theme_bw() + scale_y_continuous(name="DALYs Averted Nationwide (Thousands)") + scale_x_continuous(name="Active Transport (minutes/week) (Referent Group)") + theme(axis.text.x  = element_text(angle = 90, vjust = 0.5, size = 8)) #+ facet_grid( . ~ muNonTravel)
+
+
+#p + stat_smooth( method = loess) + geom_point() + theme_bw() + scale_y_continuous(name="DALYs Averted Nationwide (Thousands)") + scale_x_continuous(name="Active Transport (minutes/week) (Referent Group)") + theme(axis.text.x  = element_text(angle = 90, vjust = 0.5, size = 8)) #+ facet_grid( . ~ muNonTravel)
 
 ```
 
