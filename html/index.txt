@@ -2,9 +2,10 @@
 Integrated Transport & Health Impacts Model
 ===========================================
 
-R Packages
-----------
+Repositories
+------------
 - [ITHIM][ithim]
+- [GHI][ghi]
 
 Dashboard
 ---------
@@ -14,8 +15,8 @@ Documentation
 -------------
 - [tutorial][tut]
 - [manual][man]
-- [Compendium][comp]
-- [Script for Methods Paper][rep]
+<!--- - [Compendium][comp] -->
+<!--- - [Script for Methods Paper][rep] -->
 
 References
 ----------
@@ -24,6 +25,7 @@ References
 [rep]: ./ITHIM.html
 [comp]: ./ITHIM-compendium.pdf
 [ithim]: https://github.com/syounkin/ITHIM
+[ghi]: https://github.com/syounkin/GHI
 [shiny]: https://ithim.shinyapps.io/ITHIM-UI/
 [man]: ./ITHIM.pdf
 [tut]: ./tutorial.html

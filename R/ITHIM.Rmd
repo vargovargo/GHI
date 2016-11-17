@@ -10,7 +10,7 @@ results, questions, interpreations, notes, etc.-->
 
 ```{r libs, eval = TRUE, echo = FALSE, results = "hide", warning = FALSE, error = FALSE, message = FALSE}
 options(repos='http://cran.rstudio.com/')
-# install.packages(c("knitr","ggplot2","dplyr","openssl","httr", "git2r","devtools"))
+#install.packages(c("knitr","ggplot2","dplyr","openssl","httr", "git2r", "devtools", "roxygen2"))
 library("ggplot2")
 library("devtools")
 library("reshape2")
@@ -38,7 +38,7 @@ First we use NHTS to estimate mean walking and cycling times.
 ### NHTS
 
 ```{r compute, echo = FALSE, eval = TRUE}
-compute <- TRUE
+compute <- FALSE
 ```
 
 #### Create a handful of functions to help parse data
@@ -82,7 +82,7 @@ NHTS.trips <- with(DAYV2PUB,{
                         ifelse(TRPTRANS == "23", "walk",
                         ifelse(!is.na(TRPTRANS), "other", NA))),
                    TRVL_MIN = as.numeric(TRVL_MIN),
-                   TRVLCMIN = ifelse(as.numeric(TRVLCMIN) != 0, as.numeric(TRVLCMIN), NA),
+                   #TRVLCMIN = as.numeric(TRVLCMIN),
                    URBRUR  = as.factor(URBRUR),
                    MSACAT = as.factor(MSACAT),
                    MSA = ifelse(MSASIZE %in% 1:5, TRUE, FALSE),
@@ -107,57 +107,16 @@ NHTS.person <- with(PERV2PUB,{
 
 ```
 
-```{r summary, fig.width = 20, fig.height = 10, eval = compute, echo = FALSE, message = FALSE, warning = FALSE}
-walkHours <- with(subset(NHTS.trips, {
-    AT == "walk" & TRPMILES < 10 & TRPMILES/TRVL_MIN*60 < 8 & TRVL_MIN > 5 #& TRPMILES/TRVL_MIN*60 > 0.5
-}), TRVL_MIN/60)
-
-walkMiles <- with(subset(NHTS.trips, {
-    AT == "walk" & TRPMILES < 10 & TRPMILES/TRVL_MIN*60 < 8 & TRVL_MIN > 5 #& TRPMILES/TRVL_MIN*60 > 0.5
-}), TRPMILES)
-
-cycleHours <- with(subset(NHTS.trips, {
-      AT == "cycle" & TRPMILES < 25 & TRPMILES/TRVL_MIN*60 < 25 & TRVL_MIN > 5 #& TRPMILES/TRVL_MIN*60 > 1
-}), TRVL_MIN/60)
-
-cycleMiles <- with(subset(NHTS.trips, {
-      AT == "cycle" & TRPMILES < 25 & TRPMILES/TRVL_MIN*60 < 25 & TRVL_MIN > 5 #& TRPMILES/TRVL_MIN*60 > 1
-}), TRPMILES)
-
-walkSpeed <- median(walkMiles/walkHours, na.rm = TRUE)
-cycleSpeed <- median(cycleMiles/cycleHours, na.rm = TRUE)
-
-Dwalk <- data.frame(Hours = walkHours, Miles = walkMiles, Speed = walkMiles/walkHours, mode = "walk")
-Dcycle <- data.frame(Hours = cycleHours, Miles = cycleMiles, Speed = cycleMiles/cycleHours, mode = "cycle")
-
-D <- rbind(Dwalk,Dcycle)
-
-Dspeed <- data.frame(speed = c(1,1), intercept = log10(c(walkSpeed,cycleSpeed)), mode = c("walk","cycle"))
-
-g <- ggplot(D, aes(Hours, Miles, colour = mode)) + geom_point()
-g <- g + geom_abline(aes(slope = speed, intercept = intercept, colour = mode), Dspeed) + facet_grid(. ~ mode)
-g + scale_y_log10() + scale_x_log10() + theme_bw()
-
-g <- ggplot(D, aes(Speed, ..density.., fill = mode)) + geom_histogram() + theme_bw() + scale_x_continuous(name="Speed") + scale_y_continuous(name="Density") + facet_grid(. ~ mode, scales = "free")
-g
-
-```
-
 #### Subset and Merge
 
-The PERSON table contains the family members of the person surveyed,
-right?  We want only the peole who were surveyed for their travel
-times.  So, we can\'t use everyone in the PERSON table.  If someone
-had zero trip time they would not exist in the TRIP table.  So, if we
-use just the TRIP table we miss people with zero trip time. So how do
-we merge?  We use an inner join and assume that their is a negligible
-number of people with zero trip time.  Not very many people never stay
-in the house all day.  Please correct me if I am mistaken abiout the
-nature of the PERSON or TRIP tables.
+We now correct for zero trip times in NHTS.
 
 ```{r subset, eval = compute, fig.width = 10, echo = FALSE}
 NHTS.person <- subset( NHTS.person, MSA == TRUE )
-NHTS <- merge(NHTS.person, NHTS.trips, by = c("HOUSEID","PERSONID"))
+NHTS.trips <- subset(NHTS.trips, !is.na(TRVL_MIN))
+
+NHTS <- merge(NHTS.person, NHTS.trips, by = c("HOUSEID","PERSONID"), all.x = TRUE)
+NHTS <- within(NHTS, TRVL_MIN <- ifelse(is.na(TRVL_MIN), 0, TRVL_MIN))
 saveRDS(NHTS, file = "./data/NHTS.rds")
 ```
 
@@ -434,8 +393,8 @@ ITHIM.scenario.quints <- updateITHIM(ITHIM.scenario, "quantiles", seq(1,9,by=1)/
 pWalk <- ITHIM.national$means$pWalk[3,2]
 
 DALYs <- c(); DALYs.quints <- c();
-atVec <- seq(45, 120, length.out = 5)
-muNonTravelVec <- c(1, 5, 10)
+atVec <- seq(37.5, 120, length.out = 10)
+muNonTravelVec <- c(1, 10, 25)
 DTotal <- data.frame()
 
 for(at in atVec ){  # minutes active transport/week
@@ -461,8 +420,12 @@ for(at in atVec ){  # minutes active transport/week
   }
 }
 
-p <- ggplot(DTotal, aes(x = at,y = -DALYs/1e3, colour = quants))
-p + stat_smooth( method = loess) + geom_point() + theme_bw() + scale_y_continuous(name="DALYs Averted Nationwide (Thousands)") + scale_x_continuous(name="Active Transport (minutes/week) (Referent Group)") + facet_grid( . ~ muNonTravel) + theme(axis.text.x  = element_text(angle = 90, vjust = 0.5, size = 8))
+DTotal <- within(DTotal, muNonTravel <- factor(muNonTravel, levels = as.character(muNonTravelVec), labels = c("low","medium","high")))
+DTotal <- subset(DTotal, quants == "percentiles")
+
+
+p <- ggplot(DTotal, aes(x = at, y = -DALYs/1e3, colour = muNonTravel))
+p + geom_line() + geom_point() + theme_bw() + scale_y_continuous(name="DALYs Averted Nationwide (Thousands)") + scale_x_continuous(name="Active Transport (minutes/week) (Referent Group)")  + scale_colour_discrete(name="Baseline Activity") #+ theme(axis.text.x  = element_text(angle = 90, vjust = 0.5, size = 8))
 
 ```
 
@@ -481,11 +444,125 @@ p + theme_bw() + scale_x_discrete(name="", labels = c("0-4","5-14","15-29","30-4
 
 ## Figure 3
 
-```{r displayGBD, eval = TRUE, dev=c('pdf', 'png'), fig.width = (fig.width+1), fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
+```{r displayGBD, eval = TRUE, dev=c('pdf', 'png'), fig.width = 1.2*fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
 D <- melt(ITHIM.national$parameters$GBD)
 names(D) <- c("disease","sex","ageClass","type","burden", "sex2", "disease2")
 D <- within(D, sex <- factor(sex, levels = c("F","M")))
 
-p <- ggplot(subset(D, disease %in% c("BreastCancer","ColonCancer","Dementia","Depression","Diabetes")), aes(x = ageClass, y = burden/1e3, fill = sex)) + geom_bar(stat= "identity", position = "dodge")
-p + theme_bw() + scale_x_discrete(name="", labels = c("0-4","5-14","15-29","30-44","45-59","60-69","70-79","80+")) + scale_y_continuous(name="Nationwide Burden (thousands)") + theme(axis.text.x  = element_text(angle = 90, vjust = 0.5, size = 8)) + facet_grid( type ~ disease, scales = "free_y")
+p <- ggplot(subset(D, disease %in% c("BreastCancer","ColonCancer","Dementia","Depression","Diabetes", "CVD") & type == "daly"), aes(x = ageClass, y = burden/1e3, fill = sex)) + geom_bar(stat= "identity", position = "dodge")
+p + theme_bw() + scale_x_discrete(name="", labels = c("0-4","5-14","15-29","30-44","45-59","60-69","70-79","80+")) + scale_y_continuous(name="Nationwide Burden (thousands)") + theme(axis.text.x  = element_text(angle = 90, vjust = 0.5, size = 8)) + facet_grid( . ~ disease, scales = "free_y")
+```
+
+## Non-Travel METs
+
+```{r newMETs, echo = TRUE, eval = FALSE, echo = FALSE}
+newMETsFile <- "ATUS_to_METS_key.csv"
+
+newMETsFile <- system.file(newMETsFile, package="ITHIM")
+
+newMETs <- read.csv(file = newMETsFile, stringsAsFactors = FALSE, colClasses = c("character","character","character","character","numeric","character","character","character"))
+dataColumns <- c(1,5)
+D <- newMETs[,dataColumns]
+metaData <- newMETs[,-dataColumns]
+newMETs <- list(Data = D, metaData = metaData)
+activityCode <- ifelse(nchar(newMETs$Data$X6.digit.activity.code)==5,paste0("t0",newMETs$Data$X6.digit.activity.code),paste0("t",newMETs$Data$X6.digit.activity.code))
+
+rownames(newMETs$Data) <- activityCode
+rownames(newMETs$metaData) <- activityCode
+
+newMETs$metaData <- within(newMETs$metaData, {
+  Travel.related..Y.N. <- as.factor(Travel.related..Y.N.)
+})
+
+metKey <- newMETs$Data$AinsworthMETS
+names(metKey) <- activityCode
+
+
+```
+
+```{r readnewMETs, echo = TRUE, eval = FALSE, echo = FALSE}
+cpsFile <- "~/GHI/data/ATUS/atuscps_2015.dat"
+cps <- read.table(cpsFile, header=T, skip=0, sep="," )
+cps <- within(cps, {
+    TUCASEID <- as.character(TUCASEID)
+    TULINENO <- as.character(TULINENO)
+    GEREG <- as.factor(GEREG)
+    })
+cps <- subset(cps, TULINENO == "1")
+
+summaryFile <- "~/GHI/data/ATUS/atussum_2015.dat"
+summary <- read.table(summaryFile, header=T, skip=0, sep=",")
+metaDataColumns <- 1:24
+summaryList <- list(Data = summary[,-metaDataColumns], metaData = summary[,metaDataColumns])
+
+summaryList$metaData <- within(summaryList$metaData,{
+    TESEX <- as.factor(ifelse(TESEX == 1, "male", ifelse(TESEX == 2, "female",NA)))
+    AGECAT <- ifelse(TEAGE <5, "00-04",
+                     ifelse(TEAGE > 4 & TEAGE < 15, "05-14",
+                     ifelse(TEAGE > 14 & TEAGE < 30, "15-29",
+                     ifelse(TEAGE > 29 & TEAGE < 45, "30-44",
+                     ifelse(TEAGE > 44 & TEAGE < 60, "45-59",
+                     ifelse(TEAGE > 59 & TEAGE < 70, "60-69",
+                     ifelse(TEAGE > 69 & TEAGE < 80, "70-79", "80+"
+                            )))))))})
+
+
+```
+
+We shift the MET estimates by the minimum value so that the new minimum MET estimate is zero.
+
+```{r metKey, echo = TRUE, eval = FALSE, echo = FALSE}
+allActivities <- colnames(summaryList$Data)
+nonTravelActivities <- rownames(newMETs$metaData)[which(newMETs$metaData$Travel.related..Y.N. == "N")]
+nonTravelActivities <- nonTravelActivities[which(nonTravelActivities %in% allActivities)]
+
+activities <- nonTravelActivities
+
+metKeyVector <- (metKey[activities] - min(metKey, na.rm = TRUE))/60*7
+names(metKeyVector) <- activities
+metKeyMatrix <- matrix(metKeyVector, nrow = nrow(summaryList$Data), ncol = length(metKeyVector), byrow = TRUE)
+dimnames(metKeyMatrix) <- list( NULL, activities)
+
+
+METs <- data.frame(METs = rowSums(summaryList$Data[,activities] * metKeyMatrix[,activities], na.rm = TRUE), AGE = summaryList$metaData$TEAGE, SEX = summaryList$metaData$TESEX, AGECAT = summaryList$metaData$AGECAT, row.names = summaryList$metaData$TUCASEID )
+
+D <- merge(cps, METs, by.y = "row.names", by.x = "TUCASEID")
+ggplot(D, aes(x = METs, ..density.., colour = AGECAT)) + geom_freqpoly(binwidth = 10) + facet_grid( SEX ~ .) + labs(x = "Non-Travel Marginal MET-hrs./week", colour = "Age") + coord_cartesian(xlim = c(0, 400))
+
+```
+
+```{r parameters, eval = FALSE, echo = FALSE}
+parameters <- ddply(D, .(SEX, AGECAT), summarise,
+             mean = mean(METs, na.rm=T),
+             sd = sd(METs, na.rm=T)
+             )
+
+(METmatrix <- rbind(matrix(0,nrow = 2, ncol = 2), matrix(parameters$mean, ncol = 2)))
+
+colnames(METmatrix) <- c(as.character(parameters$SEX[1]),as.character(rev(parameters$SEX)[1]))
+
+METmatrix <- METmatrix[,c("male","female")]
+
+METmatrix <- METmatrix/METmatrix[3,2]
+
+```
+
+```{r doseresponse, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, echo = TRUE, warning = FALSE}
+RR1vec <- unique(unlist(createActiveTransportRRs()))
+lapply(createActiveTransportRRs(),function(x) lapply(x, function(x) unique(c(x))))
+#~~~~~~~~~~~~~~~~~~~~~~~
+# Manual bullshit!
+#~~~~~~~~~~~~~~~~~~~~~~~
+RR1vec <- RR1vec[RR1vec != 1]
+names(RR1vec) <- c("BreastCancer","ColonCancer.M","ColonCancer.F", "CVD", "Dementia", "Depression.young", "Depression.old", "Diabetes")
+
+RRx <- function(x, RR1, k) exp(log(RR1)*x^k)
+x <- seq(0,25,0.1)
+RRmat <- outer(x, RR1vec, RRx, k = 0.5)
+rownames(RRmat) <- x
+D <- melt(RRmat)
+names(D) <- c("x","disease","RR")
+
+p <- ggplot(D, aes(x = x, y = RR, colour = disease))
+p + geom_line()  + theme_bw() + scale_y_continuous(name="Relative Risk") + scale_x_continuous(name="Physical Activity (MET-hrs./week)")
 ```
