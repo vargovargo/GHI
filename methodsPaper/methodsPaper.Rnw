@@ -160,7 +160,10 @@ Jonathan Patz\textsuperscript{1, 2}%,3\textcurrency},
 \end{flushleft}
 
 \section*{Abstract}
-\input{lib/abstract}
+
+\Sexpr{knit_child('lib/abstract.Rnw')}
+
+%\input{lib/abstract}
 
 % Please keep the Author Summary between 150 and 200 words
 % Use first person. PLOS ONE authors please skip this step.
@@ -171,24 +174,28 @@ Jonathan Patz\textsuperscript{1, 2}%,3\textcurrency},
 \linenumbers
 
 \section*{Introduction}
-\input{lib/introduction.tex}
+\Sexpr{knit_child('lib/introduction.Rnw')}
 
 \section*{Materials and Methods}
-\input{lib/materialsAndMethods}
+
+\Sexpr{knit_child('lib/materialsAndMethods.Rnw')}
+
+
+%\input{lib/materialsAndMethods}
 
 \section*{Results}
 
-\input{lib/results}
+%\input{lib/results}
 
 \section*{Discussion}
-\input{lib/discussion}
+%\input{lib/discussion}
 
 \section*{Conclusion}
-\input{lib/conclusion}
+%\input{lib/conclusion}
 
 %\section*{Supporting Information}
 
-\input{lib/supportingInformation}
+%\input{lib/supportingInformation}
 
 \section*{Acknowledgments}
 

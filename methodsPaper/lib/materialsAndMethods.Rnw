@@ -1,3 +1,9 @@
+<<load, echo = FALSE, eval = FALSE>>=
+setwd("~/GHI/methodsPaper")
+NHTS <- readRDS(file = "../R/data/NHTS.rds")
+head(NHTS)
+@ 
+
 As with the original ITHIM implementation we employ a comparative risk
 analysis (CRA) across scenarios defined by mean active transportation
 time, i.e., walking and cycling.  To do so we estimate the

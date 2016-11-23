@@ -43,6 +43,8 @@ clean:
 	mkdir -p ./R/data/
 	mkdir -p ./data/ATUS/
 	mkdir -p ./data/NHTS/
+	rm -rf ./methodsPaper/methodsPaper.tex
+	rm -rf ./methodsPaper/lib/*.tex
 
 .PHONY: data
 
