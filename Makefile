@@ -7,7 +7,7 @@ report: R/ITHIM.Rmd R/ITHIM.R
 tutorial: R/tutorial.Rmd R/tutorial.R
 	cd R; R --vanilla -e 'source("tutorial.R")'
 
-methods: methodsPaper/manuscript.tex tex/ITHIM.bib ./methodsPaper/tex/abstract.tex ./methodsPaper/tex/conclusion.tex ./methodsPaper/tex/discussion.tex ./methodsPaper/tex/introduction.tex ./methodsPaper/tex/materialsAndMethods.tex ./methodsPaper/tex/results.tex ./methodsPaper/tex/supportingInformation.tex ./methodsPaper/figures/fig1.pdf
+methods:
 	cd methodsPaper; make methodsPaper.pdf
 
 second: secondPaper/manuscript.tex tex/ITHIM.bib ./secondPaper/tex/abstract.tex ./secondPaper/tex/discussion.tex ./secondPaper/tex/introduction.tex ./secondPaper/tex/methods.tex ./secondPaper/tex/publicHealthImplications.tex ./secondPaper/tex/results.tex

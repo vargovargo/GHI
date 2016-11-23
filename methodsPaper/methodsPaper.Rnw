@@ -89,7 +89,6 @@
 
 %% END MACROS SECTION
 
-\usepackage{Sweave}
 \begin{document}
 \vspace*{0.2in}
 
