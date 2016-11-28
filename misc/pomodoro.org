@@ -1,0 +1,35 @@
+==
+
+Schedule
+* 10:11:31 - 10:31
+Pomodoro 1 (Create Pomodoro List)
+* 10:38:05 - 10:55
+Pomodoro 2
+* 10:55 - 11:10
+Long Break
+* 11:10-11:30
+Pomodoro 3
+
+Tasks
+
+==
+
+Tasks
+* Email James abut visit (0.5)
+* Comment on ITHIM survey (0.5)
+* Update Methods Pomodoro List (0.5)
+See [[https://cobenefitsithim.slack.com/files/syounkin/F2WEBBFBN/Methods_Paper_To-Do_List][Methods Paper To-Do List]].
+* Employment Status Change (0.5)
+Read up on the change that is happening 12/1.
+* Email Jonathan about Appointment (0.5)
+* Clean UW inbox (0.5)
+* Get in touch with Yizheng & Liming (0.5)
+* Cambridge Trip Deliverables (1)
+
+==
+
+Pomodoros (Mon Nov 28)
+* Create Pomodoro List [X]
+* Employment Status Change/Email Jonathan about Appointment [ ]
+* Email James & Deliverables [ ]
+* Update Methods Pomodor List [ ]
