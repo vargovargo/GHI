@@ -1,4 +1,4 @@
-all : clean data report methods second tutorial ITHIM-discussion
+all : clean data report methods tex
 tex : methods second ITHIM-discussion
 
 report: R/ITHIM.Rmd R/ITHIM.R
