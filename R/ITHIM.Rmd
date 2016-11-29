@@ -287,8 +287,8 @@ sumDALY <- function(ITHIM.baseline, ITHIM.scenario){
 ```
 
 ```{r ITHIMObjs, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, echo = TRUE, warning = FALSE}
-stateVec <- c("CA","TX","NY","FL") #c("CA","TX","NY","FL","VA","NC","AZ")
-stateVecOrdered <- c("TX","FL","NY","CA") #c("NC","TX","VA","FL","AZ","NY","CA")
+stateVec <- c("CA","TX","NY","FL","WI","MI") #c("CA","TX","NY","FL","VA","NC","AZ")
+stateVecOrdered <- c("TX","FL","NY","CA","WI","MI") #c("NC","TX","VA","FL","AZ","NY","CA")
 
 upper <- 10; length <- 5; wd <- upper/length;
 
@@ -380,6 +380,8 @@ p + theme_bw() + scale_x_discrete(name="", labels = c("5-14","15-29","30-44","45
 ```{r California, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = phi, warning = FALSE, message = FALSE, echo = FALSE}
 ITHIM.national <- updateITHIM(ITHIM.national, parName = "muNonTravel", 10)
 
+#~~~~~~~~~~
+
 ITHIM.CA <- ITHIMList[["CA"]]
 ITHIM.CA <- updateITHIM(ITHIM.CA, parName = "muNonTravel", 10)
 foo1 <- compareModels(ITHIM.national,ITHIM.CA)
@@ -387,6 +389,8 @@ foobar1 <- data.frame(cbind(melt(foo1$daly.delta),paste0("ageClass",1:8)),State 
 
 foobar <- foobar1
 names(foobar) <- c("delta.DALY","Sex","Disease","ageClass","State")
+
+#~~~~~~~~~~
 
 ITHIM.NY <- ITHIMList[["NY"]]
 ITHIM.NY <- updateITHIM(ITHIM.NY, parName = "muNonTravel", 10)
@@ -400,6 +404,8 @@ foobar <- within(foobar, {
   Disease[Disease == "ColonCancer"] <- "Colon Cancer"
   Disease <- factor(Disease, levels = c("Breast Cancer", "Colon Cancer", "Dementia", "Depression", "Diabetes", "CVD"))
 })
+
+#~~~~~~~~~~
 
 p <- ggplot( subset(foobar,ageClass != "ageClass1"), aes(ageClass,-delta.DALY/1e3, fill = State))
 
@@ -526,57 +532,26 @@ p <- ggplot(D, aes(x = x, y = RR, colour = disease))
 p + geom_line()  + theme_bw() + scale_y_continuous(name="Relative Risk") + scale_x_continuous(name="Physical Activity (MET-hrs./week)")
 ```
 
+## Wisconsin & Michigan
 
-### Appendix
 
-Do it again, but with quintiles
+```{r wimi, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, echo = TRUE, warning = FALSE}
 
-```{r ITHIMObjsQuintiles, eval = FALSE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, echo = TRUE, warning = FALSE}
-DALYsTotal2 <- data.frame()
-ITHIMList <- list()
+ITHIM.NY <- ITHIMList[["NY"]]
+ITHIM.CA <- ITHIMList[["CA"]]
+ITHIM.MI <- ITHIMList[["MI"]]
+ITHIM.WI <- ITHIMList[["WI"]]
 
-ITHIM.default <- updateITHIM(ITHIM.default, "quantiles", seq(1, 9, by = 2)/10 )
+MItoCA <- data.frame(lapply(compareModels(ITHIM.MI,ITHIM.CA)$daly.delta, function(x) sum(x$M + x$F)), baseline = "MI", scenario = "CA")
+WItoCA <- data.frame(lapply(compareModels(ITHIM.WI,ITHIM.CA)$daly.delta, function(x) sum(x$M + x$F)), baseline = "WI", scenario = "CA")
+MItoNY <- data.frame(lapply(compareModels(ITHIM.MI,ITHIM.NY)$daly.delta, function(x) sum(x$M + x$F)), baseline = "MI", scenario = "NY")
+WItoNY <- data.frame(lapply(compareModels(ITHIM.WI,ITHIM.NY)$daly.delta, function(x) sum(x$M + x$F)), baseline = "WI", scenario = "NY")
 
-ITHIM.national <- ITHIM.default
-ITHIM.national <- updateITHIM(ITHIM.national, "muwt", muwtNational)
-ITHIM.national <- updateITHIM(ITHIM.national, "muct", muctNational)
-ITHIM.national <- updateITHIM(ITHIM.national, "Rwt", RwtNational)
-ITHIM.national <- updateITHIM(ITHIM.national, "Rct", RctNational)
+D <- melt(rbind(MItoCA,WItoCA,MItoNY,WItoNY))
+names(D) <- c("baseline","scenario","disease","DALYs")
 
-for (HHSTATE in stateVec){
-    ITHIMList[[HHSTATE]] <- ITHIM.default
-    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "muwt", muwtList[[HHSTATE]])
-    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "muct", muctList[[HHSTATE]])
-    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "Rwt", RwtList[[HHSTATE]])
-    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "Rct", RctList[[HHSTATE]])
-    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "GBD", ITHIM.national$parameters$GBD)
-  }
+p <- ggplot(D, aes(x = disease, y = -DALYs/1e3, fill = scenario)) + geom_bar(stat= "identity", position = "dodge")
+p + theme_bw() + scale_y_continuous(name="DALYs Averted (thousands)") + facet_grid( . ~ baseline) + theme(axis.text.x  = element_text(angle = 90, vjust = 0.5, size = 8))
 
-for( muNonTravel in seq(0, upper, by = wd)){
-
-  rm(DALYs)
-
-  for (HHSTATE in stateVec){
-    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "muNonTravel", muNonTravel)
-  }
-
-  ITHIM.national <- updateITHIM(ITHIM.national, "muNonTravel", muNonTravel)
-
-  DALYs <- lapply(ITHIMList, sumDALY, ITHIM.baseline = ITHIM.national)
-  DALYs <- data.frame(State = names(DALYs), muNonTravel = muNonTravel, DALY = unlist(DALYs))
-  DALYsTotal2 <- rbind(DALYsTotal2, DALYs)
-}
-
-DALYsTotal2 <- within(DALYsTotal2, {
-  State <- factor(State, levels = stateVecOrdered)
-})
-
-DALYsTotal <- rbind(data.frame(DALYsTotal,quints="Percentiles"), data.frame(DALYsTotal2,quints="Quintiles"))
-
-p <- ggplot(DALYsTotal, aes(x = muNonTravel, y = DALY/1e3, colour = State))
-
-p + stat_smooth( method = loess) + theme_bw() + scale_x_continuous(name="Mean Non-Travel METs (MET-hrs./week) (Referent Group)") + scale_y_continuous(name="Change in National DALYs (Thousands)") + coord_cartesian(xlim = c(0, upper)) + facet_grid( . ~ quints)
-
-p + stat_smooth( method = loess) + theme_bw() + scale_x_continuous(name="Mean Non-Travel METs (MET-hrs./week) (Referent Group)") + scale_y_continuous(name="Change in National DALYs (Thousands)") + coord_cartesian(xlim = c(0, upper)) + geom_point() + facet_grid( . ~ quints)
-
+#+ scale_x_discrete(name="", labels = c("0-4","5-14","15-29","30-44","45-59","60-69","70-79","80+")) + theme(axis.text.x  = element_text(angle = 270, vjust = 0.5, size = 8)) + facet_grid( . ~ disease, scales = "free_y")
 ```
