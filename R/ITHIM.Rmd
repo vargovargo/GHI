@@ -287,8 +287,8 @@ sumDALY <- function(ITHIM.baseline, ITHIM.scenario){
 ```
 
 ```{r ITHIMObjs, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, echo = TRUE, warning = FALSE}
-stateVec <- c("CA","TX","NY","FL","WI","MI") #c("CA","TX","NY","FL","VA","NC","AZ")
-stateVecOrdered <- c("TX","FL","NY","CA","WI","MI") #c("NC","TX","VA","FL","AZ","NY","CA")
+stateVec <- c("CA","TX","NY","FL","WI","MI", "OH") #c("CA","TX","NY","FL","VA","NC","AZ")
+stateVecOrdered <- c("TX","FL","NY","CA","WI","MI", "OH") #c("NC","TX","VA","FL","AZ","NY","CA")
 
 upper <- 10; length <- 5; wd <- upper/length;
 
@@ -541,17 +541,26 @@ ITHIM.NY <- ITHIMList[["NY"]]
 ITHIM.CA <- ITHIMList[["CA"]]
 ITHIM.MI <- ITHIMList[["MI"]]
 ITHIM.WI <- ITHIMList[["WI"]]
+ITHIM.WI <- ITHIMList[["OH"]]
 
-MItoCA <- data.frame(lapply(compareModels(ITHIM.MI,ITHIM.CA)$daly.delta, function(x) sum(x$M + x$F)), baseline = "MI", scenario = "CA")
-WItoCA <- data.frame(lapply(compareModels(ITHIM.WI,ITHIM.CA)$daly.delta, function(x) sum(x$M + x$F)), baseline = "WI", scenario = "CA")
-MItoNY <- data.frame(lapply(compareModels(ITHIM.MI,ITHIM.NY)$daly.delta, function(x) sum(x$M + x$F)), baseline = "MI", scenario = "NY")
-WItoNY <- data.frame(lapply(compareModels(ITHIM.WI,ITHIM.NY)$daly.delta, function(x) sum(x$M + x$F)), baseline = "WI", scenario = "NY")
+prop <- 1/50
+state1Vec <- c("MI","WI","OH")
+state2Vec <- c("NY","CA")
 
-D <- melt(rbind(MItoCA,WItoCA,MItoNY,WItoNY))
+foobar <- data.frame()
+
+for( state1 in state1Vec ){
+    for( state2 in state2Vec ){
+        foo <- data.frame(lapply(compareModels(ITHIMList[[state1]],ITHIMList[[state2]])$daly.delta, function(x) sum(x$M + x$F)*prop), baseline = state1, scenario = state2)
+        foobar <- rbind(foobar,foo)
+    }
+}
+
+D <- melt(foobar)
 names(D) <- c("baseline","scenario","disease","DALYs")
 
 p <- ggplot(D, aes(x = disease, y = -DALYs/1e3, fill = scenario)) + geom_bar(stat= "identity", position = "dodge")
-p + theme_bw() + scale_y_continuous(name="DALYs Averted (thousands)") + facet_grid( . ~ baseline) + theme(axis.text.x  = element_text(angle = 90, vjust = 0.5, size = 8))
+p + theme_bw() + scale_y_continuous(name="DALYs Averted (thousands)") + facet_grid( . ~ baseline) + theme(axis.text.x  = element_text(angle = 90, vjust = 0.5, size = 8)) + theme(legend.title=element_blank()) + scale_x_discrete(name="Disease")
 
-#+ scale_x_discrete(name="", labels = c("0-4","5-14","15-29","30-44","45-59","60-69","70-79","80+")) + theme(axis.text.x  = element_text(angle = 270, vjust = 0.5, size = 8)) + facet_grid( . ~ disease, scales = "free_y")
+#+ theme(axis.text.x  = element_text(angle = 270, vjust = 0.5, size = 8)) + facet_grid( . ~ disease, scales = "free_y")
 ```

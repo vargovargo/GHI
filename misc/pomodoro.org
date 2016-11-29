@@ -7,7 +7,7 @@
 ** 10:10 - 10:25 #3
 ** 10:25 - 10:45 (Long Break)
 ** 10:45 - 11:00 #4
-** 11:05 - 11:20 #5
+** 11:05 - 11:20 #5 (interrupted with 5 minutes to go)
 ** 11:25 - 11:40 #6
 ** 11:40 - 12:00 (Long Break)
 ** 12:00 - 12:15 #7
@@ -46,9 +46,8 @@ Pomodoros
 ** Results [ ] [ ]
 ** Conclusions [ ] [ ]
 * Create a six-month plan for work at GHI [ ]
-* MI and WI vs. CA and NY analysis [X] [X] [ ]
+* MI and WI vs. CA and NY analysis [X] [X] [X] [ ]
 * Reply to James abut visit
-
 * ITHIM Suite of R Packages
 Four working and documented R packages on GitHub
 ** ITHIM
