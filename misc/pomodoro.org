@@ -1,54 +1,45 @@
-==
 
 * Schedule
 15 min pomodoros, 5 min short break, 20 min long break
-** 9:30 -  9:45  #1
-** 9:53 -  10:08 #2
-** 10:10 - 10:25 #3
-** 10:25 - 10:45 (Long Break)
+** 9:17 -  9:32  #1
+** 9:37 -  9:52  #2
+** 10:06 - 10:21 #3
+** 10:21 - 10:35 (Long Break)
 ** 10:45 - 11:00 #4
-** 11:05 - 11:20 #5 (interrupted with 5 minutes to go)
-** 11:25 - 11:40 #6
-** 11:40 - 12:00 (Long Break)
-** 12:00 - 12:15 #7
-** 12:20 - 12:35 #8
-** 12:40 - 12:55 #9
-
-* TODO Reply to James abut visit (0.5)
-* TODO Comment on ITHIM survey (0.5)
-* TODO Update Methods Pomodoro List (0.5)
-See [[https://cobenefitsithim.slack.com/files/syounkin/F2WEBBFBN/Methods_Paper_To-Do_List][Methods Paper To-Do List]].
-* DONE Employment Status Change (0.5)
-Read up on the change that is happening 12/1.
-* TODO Email Karen Aune
-* DONE Email Jonathan about FLSA Change (0.5)
-* TODO Clean UW inbox (0.5)
-* TODO Get in touch with Yizheng & Liming (0.5)
-* TODO Cambridge Trip Deliverables (1)
-* TODO Email Jonthan previous appointment letter
-* TODO Cambridge visit arrangements (2)
-* TODO MI and WI vs. CA and NY analysis
-* TODO Six month plan
+** 11:05 - 11:20 #5
 
 Pomodoros
+* Create Pomodoro List & Misc Personal [X]
+** DONE Reschedule haircut
+* Admin [X] [X]
+** DONE Email Jonathan previous appointment letter
+** DONE Reply to James abut visit
+** DONE Reply to Jonathan about OH, MI analysis
+* Admin 2 [X]
+** DONE Email Jonathan/Monet about Cambridge trip arrangements
+** DONE Email Karen Aune
+** DONE Email Jason about burden values
+** DONE Put ITHIM (GHI) meetings on calendar
+** DONE Slack about scheduling ITHIM (All-Team) meeting
+* Misc [X]
+** DONE Clean UW Inbox
+** DONE Update calendar
 
-* Create Pomodoro List [X]
-* Create deliverables document [ ] [ ]
-* Email Jonathan previous appointment letter & Email Karen Aune [ ]
-* Misc [ ]
-** Clean UW Inbox
-** Get in touch with Y & L
-** Email Jonathan/Monet about Cambridge trip arrangements
 * Update methods paper To-Do List [ ]
-* Edit methods paper [7]
+* Create deliverables document [ ] [ ]
+* ITHIM Meeting [ ]
+** TODO Put on calendar
+** TODO Add agenda items
+* MI and WI vs. CA and NY analysis [ ] [ ]
+** Create new figure
+* Edit methods paper [7] 
 ** Materials & Methods [ ] [ ]
 ** Introduction & Abstract [ ]
 ** Results [ ] [ ]
 ** Conclusions [ ] [ ]
 * Create a six-month plan for work at GHI [ ]
-* MI and WI vs. CA and NY analysis [X] [X] [X] [ ]
-* Reply to James abut visit
-* ITHIM Suite of R Packages
+
+* ITHIM Suite of R Packages 
 Four working and documented R packages on GitHub
 ** ITHIM
 Define classes and store default parameters
