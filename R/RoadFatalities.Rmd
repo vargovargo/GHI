@@ -1,0 +1,58 @@
+## Road Fatalities
+
+```{r libs, eval = TRUE, echo = FALSE, results = "hide", warning = FALSE, error = FALSE, message = FALSE}
+options(repos='http://cran.rstudio.com/')
+#install.packages(c("knitr","ggplot2","dplyr","openssl","httr", "git2r", "devtools", "roxygen2"))
+library("ggplot2")
+library("devtools")
+library("reshape2")
+library("plyr")
+library("dplyr")
+```
+
+```{r loadITHIM, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = FALSE}
+#document("~/ITHIM/")
+#install("~/ITHIM/")
+install_github("syounkin/ITHIM", ref="devel")
+install_github("smbache/magrittr", ref="master")
+#library("magrittr")
+library("ITHIM")
+fig.width <- 6 # inches
+phi <- (1+sqrt(5))/2 # the golden ratio ;)
+```
+
+
+```{r roadFat, eval = TRUE, dev=c('png'), fig.width = fig.width, fig.asp = 1/phi, echo = TRUE, warning = FALSE}
+pedDeath <- readRDS(file = "./data/BikePedDeathModelData.rds")
+pedDeath <- subset(pedDeath, urbSubRur == "Urban")
+pedDeath <- within(pedDeath, pedDeathLogical <- pedDeaths0913 > 0)
+pedDeath <- within(pedDeath,{
+  deathsTotal <- pedDeaths0913 + bikeDeaths0913
+  deathsTotalLogical <- deathsTotal > 0
+  pctATToWork <- pctWalkToWork + pctBikeToWork
+AT <- ifelse(pctATToWork > 0  & pctATToWork <= 0.10 , "low" ,
+ifelse(pctATToWork > 0.10  & pctATToWork <= 0.50 , "medium" ,
+ifelse(pctATToWork > 0.50  & pctATToWork <= 1 , "high" , NA)))
+
+
+})
+
+D <- melt(pedDeath)
+
+
+chisq.test(with(pedDeath, table(deathsTotalLogical, activeTract)))
+
+
+p <- ggplot(pedDeath, aes(pedDeaths0913, ..density..,colour = AT))
+p #+ geom_freqpoly(binwidth = 10) #+ facet_grid( SEX ~ .)
+
+ggplot(D, aes(x = METs, ..density.., colour = AGECAT)) +
+
+
+
+```
+
+
+AT <- ifelse( ( pctWalkToWork + pctBikeToWork ) > 0  &  ( pctWalkToWork + pctBikeToWork ) <= 0.10 , "low" ,
+ifelse( ( pctWalkToWork + pctBikeToWork ) > 0.10  &  ( pctWalkToWork + pctBikeToWork ) <= 0.50 , "medium" ,
+ifelse( ( pctWalkToWork + pctBikeToWork ) > 0.50  &  ( pctWalkToWork + pctBikeToWork ) <= 1 , "high" , NA)))

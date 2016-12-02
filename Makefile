@@ -4,6 +4,9 @@ tex : methods second ITHIM-discussion
 report: R/ITHIM.Rmd R/ITHIM.R
 	cd R; R --vanilla -e 'source("ITHIM.R")'
 
+RoadFatalities: R/RoadFatalities.Rmd R/RoadFatalities.R
+	cd R; R --vanilla -e 'source("RoadFatalities.R")'
+
 tutorial: R/tutorial.Rmd R/tutorial.R
 	cd R; R --vanilla -e 'source("tutorial.R")'
 
@@ -26,6 +29,8 @@ data:
 	mkdir -p ./data/ATUS/
 	unzip  atussum_2015.zip -d ./data/ATUS/
 	mv -v atussum_2015.zip ./data/ATUS
+	wget https://ithim.ghi.wisc.edu/data/BikePedDeathModelData.rds
+	mv -v BikePedDeathModelData.rds ./R/data/
 
 
 ITHIM-discussion: ./slides/ITHIM-discussion/ITHIM-discussion.tex
@@ -39,6 +44,7 @@ clean:
 	rm -rf ./data/ATUS/
 	rm -rf ./data/NHTS/
 	rm -rf ./R/figure/
+	rm -rf ./R/data/
 	mkdir -p ./R/figure/
 	mkdir -p ./R/data/
 	mkdir -p ./data/ATUS/
