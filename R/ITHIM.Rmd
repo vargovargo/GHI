@@ -564,3 +564,25 @@ p + theme_bw() + scale_y_continuous(name="DALYs Averted (thousands)") + facet_gr
 
 #+ theme(axis.text.x  = element_text(angle = 270, vjust = 0.5, size = 8)) + facet_grid( . ~ disease, scales = "free_y")
 ```
+
+## Road Fatalities
+
+```{r roadFat}
+pedDeath <- readRDS(file = "./data/BikePedDeathModelData.rds")
+pedDeath <- subset(pedDeath, urbSubRur == "Urban")
+pedDeath <- within(pedDeath, pedDeathLogical <- pedDeaths0913 > 0)
+pedDeath <- within(pedDeath,{
+  deathsTotal <- pedDeaths0913 + bikeDeaths0913
+  deathsTotalLogical <- deathsTotal > 0
+  activeTract <- (pctWalkToWork + pctBikeToWork ) > 0
+})
+
+D <- melt(pedDeath)
+
+
+chisq.test(with(pedDeath, table(deathsTotalLogical, activeTract)))
+
+
+p <- ggplot(subset(D, variable %in% c("vehMiles","pctWalkToWork","activeTract")), aes(deathsTotalLogical, value, colour = deathsTotalLogical))
+p + geom_boxplot() + facet_grid(variable ~ ., scales = "free_y")
+```
