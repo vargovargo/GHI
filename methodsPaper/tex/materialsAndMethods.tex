@@ -1,12 +1,12 @@
-As with the original ITHIM implementation we employed a comparative
-risk analysis (CRA) across scenarios defined by mean active
-transportation time, i.e., walking and cycling.  To do so we
+As with the original ITHIM implementation we, employed a comparative
+risk assessment (CRA) across scenarios defined by mean active
+transportation time, i.e., combined walking and cycling.  To do so we
 investigate the proportional change in national disease burden between
 the baseline model and a given alternative scenario, i.e., the
 population attributable fraction, $\af$.  The population attributable
-fraction is defined below and computed for each disease included in
-the model, namely Breast Cancer, Colon Cancer, Depression, Dementia,
-Diabetes and Cardiovascular disease.  For readability we omit an index
+fraction is defined below and computed for each disease (ICD-10) included in
+the model, namely Breast Cancer (C50), Colon Cancer (C18-C21), Depression (??), Dementia (G30),
+Diabetes (E10-E14) and Cardiovascular disease (I10, I12, I15, I20-I25, I30-I31, I33, I40).  For readability we omit an index
 indicating disease.
 
 \begin{equation}
@@ -30,7 +30,7 @@ X_{ij}^{\mathrm{non-travel}} \sim \logNormalMath\left(\mu_{ij}, \gamma \mu_{ij}\
 Within each age-sex class the non-travel-related exposure is modeled
 with a \logNormal{} distribution.  The age-sex specific mean ratios,
 $r_{ij} = \frac{\mu_{ij}}{\mu_0}$ and $\gamma$ are estimated from the
-American Time USe Survey data \cite{ATUS}.
+American Time Use Survey data \cite{ATUS}.
 
 % latex table generated in R 3.3.1 by xtable 1.8-2 package
 % Tue Nov  8 09:38:46 2016
@@ -114,11 +114,11 @@ other datsets (NHTS, ATUS, CDC WONDER) to ensure consistency in our
 estimates for input parameters.
 
 To test the new implementation of ITHIM's active transportation
-component, we used the UW national metro population estimates for
+component, we used the US national metro population estimates for
 active travel time (walking and cycling) as the baseline. We obtained
 active travel time input parameters for alternate scenarios using
 states with large sample sizes. From these examples we were able to
-approximate low and high active travel scenarios. Finally we applied
+approximate low and high active travel scenarios. Finally, we applied
 these active travel times to the US metro population to perform the
 comparative risk assessment against the baseline US numbers. We then
 examined the sensitivity of disease burden estimates to input
