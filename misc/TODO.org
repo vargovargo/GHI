@@ -1,3 +1,26 @@
+
+* TODO Reply to James abut visit (0.5)
+* TODO Comment on ITHIM survey (0.5)
+* TODO Update Methods Pomodoro List (0.5)
+See [[https://cobenefitsithim.slack.com/files/syounkin/F2WEBBFBN/Methods_Paper_To-Do_List][Methods Paper To-Do List]].
+* DONE Employment Status Change (0.5)
+Read up on the change that is happening 12/1.
+* TODO Email Karen Aune
+* DONE Email Jonathan about FLSA Change (0.5)
+* TODO Clean UW inbox (0.5)
+* TODO Get in touch with Yizheng & Liming (0.5)
+* TODO Cambridge Trip Deliverables (1)
+* TODO Email Jonthan previous appointment letter
+* TODO Cambridge visit arrangements (2)
+* TODO MI and WI vs. CA and NY analysis
+* TODO Six month plan
+
+
+
+
+
+
+
 * Model Input
 ** Regional Parameters
 *** Tw, Tc

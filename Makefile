@@ -1,13 +1,16 @@
-all : clean data report methods second tutorial ITHIM-discussion
+all : clean data report methods tex
 tex : methods second ITHIM-discussion
 
 report: R/ITHIM.Rmd R/ITHIM.R
 	cd R; R --vanilla -e 'source("ITHIM.R")'
 
+RoadFatalities: R/RoadFatalities.Rmd R/RoadFatalities.R
+	cd R; R --vanilla -e 'source("RoadFatalities.R")'
+
 tutorial: R/tutorial.Rmd R/tutorial.R
 	cd R; R --vanilla -e 'source("tutorial.R")'
 
-methods: methodsPaper/manuscript.tex tex/ITHIM.bib ./methodsPaper/tex/abstract.tex ./methodsPaper/tex/conclusion.tex ./methodsPaper/tex/discussion.tex ./methodsPaper/tex/introduction.tex ./methodsPaper/tex/materialsAndMethods.tex ./methodsPaper/tex/results.tex ./methodsPaper/tex/supportingInformation.tex ./methodsPaper/figures/fig1.pdf
+methods:
 	cd methodsPaper; make methodsPaper.pdf
 
 second: secondPaper/manuscript.tex tex/ITHIM.bib ./secondPaper/tex/abstract.tex ./secondPaper/tex/discussion.tex ./secondPaper/tex/introduction.tex ./secondPaper/tex/methods.tex ./secondPaper/tex/publicHealthImplications.tex ./secondPaper/tex/results.tex
@@ -26,6 +29,8 @@ data:
 	mkdir -p ./data/ATUS/
 	unzip  atussum_2015.zip -d ./data/ATUS/
 	mv -v atussum_2015.zip ./data/ATUS
+	wget https://ithim.ghi.wisc.edu/data/BikePedDeathModelData.rds
+	mv -v BikePedDeathModelData.rds ./R/data/
 
 
 ITHIM-discussion: ./slides/ITHIM-discussion/ITHIM-discussion.tex
@@ -39,10 +44,13 @@ clean:
 	rm -rf ./data/ATUS/
 	rm -rf ./data/NHTS/
 	rm -rf ./R/figure/
+	rm -rf ./R/data/
 	mkdir -p ./R/figure/
 	mkdir -p ./R/data/
 	mkdir -p ./data/ATUS/
 	mkdir -p ./data/NHTS/
+	rm -rf ./methodsPaper/methodsPaper.tex
+	rm -rf ./methodsPaper/lib/*.tex
 
 .PHONY: data
 

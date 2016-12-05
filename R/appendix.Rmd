@@ -1,3 +1,57 @@
+### Appendix
+
+Do it again, but with quintiles
+
+```{r ITHIMObjsQuintiles, eval = FALSE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, echo = TRUE, warning = FALSE}
+DALYsTotal2 <- data.frame()
+ITHIMList <- list()
+
+ITHIM.default <- updateITHIM(ITHIM.default, "quantiles", seq(1, 9, by = 2)/10 )
+
+ITHIM.national <- ITHIM.default
+ITHIM.national <- updateITHIM(ITHIM.national, "muwt", muwtNational)
+ITHIM.national <- updateITHIM(ITHIM.national, "muct", muctNational)
+ITHIM.national <- updateITHIM(ITHIM.national, "Rwt", RwtNational)
+ITHIM.national <- updateITHIM(ITHIM.national, "Rct", RctNational)
+
+for (HHSTATE in stateVec){
+    ITHIMList[[HHSTATE]] <- ITHIM.default
+    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "muwt", muwtList[[HHSTATE]])
+    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "muct", muctList[[HHSTATE]])
+    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "Rwt", RwtList[[HHSTATE]])
+    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "Rct", RctList[[HHSTATE]])
+    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "GBD", ITHIM.national$parameters$GBD)
+  }
+
+for( muNonTravel in seq(0, upper, by = wd)){
+
+  rm(DALYs)
+
+  for (HHSTATE in stateVec){
+    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "muNonTravel", muNonTravel)
+  }
+
+  ITHIM.national <- updateITHIM(ITHIM.national, "muNonTravel", muNonTravel)
+
+  DALYs <- lapply(ITHIMList, sumDALY, ITHIM.baseline = ITHIM.national)
+  DALYs <- data.frame(State = names(DALYs), muNonTravel = muNonTravel, DALY = unlist(DALYs))
+  DALYsTotal2 <- rbind(DALYsTotal2, DALYs)
+}
+
+DALYsTotal2 <- within(DALYsTotal2, {
+  State <- factor(State, levels = stateVecOrdered)
+})
+
+DALYsTotal <- rbind(data.frame(DALYsTotal,quints="Percentiles"), data.frame(DALYsTotal2,quints="Quintiles"))
+
+p <- ggplot(DALYsTotal, aes(x = muNonTravel, y = DALY/1e3, colour = State))
+
+p + stat_smooth( method = loess) + theme_bw() + scale_x_continuous(name="Mean Non-Travel METs (MET-hrs./week) (Referent Group)") + scale_y_continuous(name="Change in National DALYs (Thousands)") + coord_cartesian(xlim = c(0, upper)) + facet_grid( . ~ quints)
+
+p + stat_smooth( method = loess) + theme_bw() + scale_x_continuous(name="Mean Non-Travel METs (MET-hrs./week) (Referent Group)") + scale_y_continuous(name="Change in National DALYs (Thousands)") + coord_cartesian(xlim = c(0, upper)) + geom_point() + facet_grid( . ~ quints)
+
+```
+
 # Appendix
 
 ```{r summary, fig.width = 20, fig.height = 10, eval = compute, echo = FALSE, message = FALSE, warning = FALSE}

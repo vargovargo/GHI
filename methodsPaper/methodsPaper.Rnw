@@ -83,6 +83,8 @@
 
 % added by sgy
 \usepackage{url}
+\usepackage{mathtools}
+\usepackage{rotating}
 \input{../tex/sgy}
 
 %% END MACROS SECTION
@@ -102,6 +104,7 @@ States} % Please use "title case" (capitalize all terms in the title except conj
 Samuel Younkin\textsuperscript{1},\ %,2\Yinyang},
 Jason Vargo\textsuperscript{1, 2}\ %\Yinyang},
 Neil Maizlish\textsuperscript{3},\ %\Yinyang},
+\ldots,\
 Jonathan Patz\textsuperscript{1, 2}%,3\textcurrency},
 %Name4 Surname\textsuperscript{2},
 %#Name5 Surname\textsuperscript{2\ddag},
@@ -157,35 +160,42 @@ Jonathan Patz\textsuperscript{1, 2}%,3\textcurrency},
 \end{flushleft}
 
 \section*{Abstract}
-\input{tex/abstract}
+
+\Sexpr{knit_child('lib/abstract.Rnw')}
+
+%\input{lib/abstract}
 
 % Please keep the Author Summary between 150 and 200 words
 % Use first person. PLOS ONE authors please skip this step.
 % Author Summary not valid for PLOS ONE submissions.
 % \section*{Author Summary}
-% \input{tex/authorSummary}
+% \input{lib/authorSummary}
 
 \linenumbers
 
 \section*{Introduction}
-\input{tex/introduction.tex}
+\Sexpr{knit_child('lib/introduction.Rnw')}
 
 \section*{Materials and Methods}
-\input{tex/materialsAndMethods}
+
+\Sexpr{knit_child('lib/materialsAndMethods.Rnw')}
+
+
+%\input{lib/materialsAndMethods}
 
 \section*{Results}
 
-\input{tex/results}
+%\input{lib/results}
 
 \section*{Discussion}
-\input{tex/discussion}
+%\input{lib/discussion}
 
 \section*{Conclusion}
-\input{tex/conclusion}
+%\input{lib/conclusion}
 
 %\section*{Supporting Information}
 
-\input{tex/supportingInformation}
+%\input{lib/supportingInformation}
 
 \section*{Acknowledgments}
 

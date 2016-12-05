@@ -1,4 +1,5 @@
-methodsPaper.pdf: methodsPaper.tex ../tex/ITHIM.bib ./tex/abstract.tex ./tex/conclusion.tex ./tex/discussion.tex ./tex/introduction.tex ./tex/materialsAndMethods.tex ./tex/results.tex ./tex/supportingInformation.tex figures/fig1.pdf
+methodsPaper.pdf: ./methodsPaper.Rnw ../tex/ITHIM.bib ./lib/materialsAndMethods.Rnw ./lib/abstract.Rnw ./lib/introduction.Rnw ./lib/results.Rnw
+	R -e 'library("knitr"); setwd("~/GHI/methodsPaper"); knit("~/GHI/methodsPaper/methodsPaper.Rnw")'
 	pdflatex methodsPaper.tex
 	bibtex methodsPaper.aux
 	pdflatex methodsPaper.tex
