@@ -31,7 +31,8 @@ data:
 	mv -v atussum_2015.zip ./data/ATUS
 	wget https://ithim.ghi.wisc.edu/data/BikePedDeathModelData.rds
 	mv -v BikePedDeathModelData.rds ./R/data/
-
+	wget https://ithim.ghi.wisc.edu/data/stateMetroBurdens2014.rds
+	mv -v stateMetroBurdens2014.rds ./R/data/
 
 ITHIM-discussion: ./slides/ITHIM-discussion/ITHIM-discussion.tex
 	cd ./slides/ITHIM-discussion; make ITHIM-discussion.pdf

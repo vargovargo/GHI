@@ -185,6 +185,7 @@ Jonathan Patz\textsuperscript{1, 2}%,3\textcurrency},
 
 \section*{Results}
 
+\Sexpr{knit_child('lib/results.Rnw')}
 %\input{lib/results}
 
 \section*{Discussion}
