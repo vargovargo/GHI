@@ -1,21 +1,31 @@
 15 min pomodoros, 5 min short break, 15 min long break every 3
-pomodoros
+pomodoros with a goal of 12 sets per week (12 x 3 = 36 pomodoros per
+week)
 
 * Schedule
 ** Set 1
 *** Pomodoro #1
+1:00
 *** Pomodoro #2
+1:20
 *** Pomodoro #3
+1:40
 ** Long Break
 ** Set 2
 *** Pomodoro #4
+2:00
 *** Pomodoro #5
+2:20
 *** Pomodoro #6
+2:40
 ** Long Break
 ** Set 3
 *** Pomodoro #7
+3:00
 *** Pomodoro #8
+3:20
 *** Pomodoro #9
+3:40
 * Current Pomodoro List
 ** Create Pomodoro List and Misc. [ ]
 *** Misc
@@ -40,13 +50,8 @@ Re: Christmas and Madison Trip
 *** TODO Travel arrangements from Amsterdam <-> Wijk aan Zee
 
 ** Create a six-month plan for work at GHI [ ]
-
 ** ITHIM Meeting [ ]
 *** TODO Add agenda items
-
-
-Finished
-
 * Completed Pomodoro List
 ** Admin
 *** DONE Email Jonathan previous appointment letter
