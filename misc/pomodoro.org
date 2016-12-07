@@ -29,9 +29,9 @@ Wed 07 Dec 2016 03:51:31 PM CST
 *** Pomodoro #9
 Wed 07 Dec 2016 04:12:09 PM CST
 * Current Pomodoro List
-** Create Pomodoro List and Misc. [X]
-** MI, WI, OH Analysis [X] x 7
-*** TODO Create new figure
+** Create Pomodoro List and Misc. [ ]
+** MI, WI, OH Analysis [ ] x 4
+*** TODO Statewise CRA figure
 ** Edit methods paper [ ] x 3
 *** TODO Update methods paper To-Do List
 *** TODO Materials & Methods
@@ -54,6 +54,8 @@ Wed 07 Dec 2016 04:12:09 PM CST
 ** Action Items from Friday meeting with Vargo [ ]
 ** Create a six-month plan for work at GHI [ ]
 * Completed Pomodoro List
+** MI, WI, OH Analysis [X] x 8
+*** DONE Create new figure for GBD
 ** Admin
 *** DONE Email Jonathan previous appointment letter
 *** DONE Reply to James abut visit
