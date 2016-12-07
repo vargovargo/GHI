@@ -1,112 +1,76 @@
+15 min pomodoros, 5 min short break, 15 min long break every 3
+pomodoros
 
 * Schedule
-15 min pomodoros, 5 min short break, 20 min long break every 3
-pomodors
-** Pomodoro #1
-Mon Dec  5 10:42:08 2016
-** Pomodoro #2
-Mon Dec  5 11:01:37 2016
-** Pomodoro #3
-Mon Dec  5 11:22:45 2016
-** Pomodoro #4
-Mon Dec  5 11:59:42 2016
-** Pomodoro #5
-Mon Dec  5 12:22:45 2016
-** Pomodoro #6
-Mon Dec  5 12:44:56 2016
-** Pomodoro #7
-Mon Dec  5 13:20:33 2016
-** Pomodoro #8
-Mon Dec  5 13:48:23 2016
-** Pomodoro #9
-
-* Create Pomodoro List & Misc Personal [X]
-
-* Cambridge Trip Details [X] [X] [X] [ ]
-** TODO Email Woodcock
-** DONE Confirm dates with Julie
-Julie
-~~~~~
-Tuesday, 1/24 - 1/25 Madison -> Geneva
-Wednesday, 1/25 - 1/28 Geneva
-Friday, 1/27 Geneva -> Amsterdam
-Friday, 1/27 Amsterdam -> Wijk aan Zee
-Friday - Sunday, 1/27 - 1/29 Wijk Aan Zee
-Sunday, 1/29 Wijk Aan Zee -> England
-Monday - Tuesday, 1/30 - 1/31 Oxford
-Tuesday, 1/31 - Wednesday, 2/1 Oxford -> Madison
-
-Sam
-~~~
-Thursday, 1/26 - 1/27 Madison -> Amsterdam
-Friday, 1/27 Amsterdam -> Wijk aan Zee
-Friday - Sunday, 1/27 - 1/29 Wijk Aan Zee
-Sunday, 1/29 Wijk Aan Zee -> England
-Monday, 1/30 - Thursday, 2/9 Cambridge
-Friday, 2/10 Cambridge -> Madison
-
-Kids
-~~~~
-Thursday, 1/25 - 2/2 (Steve & Linda)
-Wednesday, 2/2 - 2/10 (Julie only)
-
-
-* Misc. [X] [X] [X]
-** DONE Merge Vargo's edits
-** DONE Post methods paper for Vargo's inspection
-** DONE Inspect statewise GBD values from Vargo
-** DONE Doodle poll for Holiday party
-
-* MI and WI vs. CA and NY analysis [ ]
+** Set 1
+*** Pomodoro #1
+*** Pomodoro #2
+*** Pomodoro #3
+** Long Break
+** Set 2
+*** Pomodoro #4
+*** Pomodoro #5
+*** Pomodoro #6
+** Long Break
+** Set 3
+*** Pomodoro #7
+*** Pomodoro #8
+*** Pomodoro #9
+* Current Pomodoro List
+** Create Pomodoro List and Misc. [ ]
+*** Misc
+**** TODO Make files available for Maggie
+Introduction and Discussion
+** MI, WI, OH Analysis [ ] x 2
 *** TODO Create new figure
+** Edit methods paper [ ] x 3
+*** TODO Materials & Methods (Sam)
+*** TODO Abstract (Sam)
+*** TODO Results (Sam)
+** Update methods paper To-Do List [ ]
+* Future Pomodoro List
+** Cambridge Trip Details [ ]
+*** TODO Reserve tickets
+*** TODO Make To-Do List
+** Wijk aan Zee Trip Details [ ]
+*** TODO Book hotel in Wijk aan Zee
+*** TODO Book airfare from Amsterdam to London
+*** TODO Travel arrangements from Amsterdam <-> Wijk aan Zee
 
-* Create deliverables document [ ] [ ]
+** Create a six-month plan for work at GHI [ ]
 
-* Update methods paper To-Do List [ ]
-
-* Edit methods paper [ ] x 8
-** Materials & Methods [ ] [ ]
-** Introduction & Abstract [ ]
-** Results [ ] [ ]
-** Conclusions [ ] [ ]
-* Create a six-month plan for work at GHI [ ]
-
-* ITHIM Suite of R Packages
-Four working and documented R packages on GitHub
-** ITHIM
-Define classes and store default parameters
-** TransAct
-Active transportation comparative risk assessment
-** RoadFat
-Road injuries/fatalities
-** AirQ
-Air quality assessment
-
-* ITHIM Meeting [ ]
-** DONE Put on calendar
-** TODO Add agenda items
+** ITHIM Meeting [ ]
+*** TODO Add agenda items
 
 
+Finished
 
-
-
-
-
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-~~~~~~~~~ Archive ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* Admin [X] [X]
-** DONE Email Jonathan previous appointment letter
-** DONE Reply to James abut visit
-** DONE Reply to Jonathan about OH, MI analysis
-* Admin 2 [X]
-** DONE Email Jonathan/Monet about Cambridge trip arrangements
-** DONE Email Karen Aune
-** DONE Email Jason about burden values
-** DONE Put ITHIM (GHI) meetings on calendar
-** DONE Slack about scheduling ITHIM (All-Team) meeting
-* Misc [X]
-** DONE Clean UW Inbox
-** DONE Update calendar
+* Completed Pomodoro List
+** Admin
+*** DONE Email Jonathan previous appointment letter
+*** DONE Reply to James abut visit
+*** DONE Reply to Jonathan about OH, MI analysis
+*** DONE Email Jonathan/Monet about Cambridge trip arrangements
+*** DONE Email Karen Aune
+*** DONE Email Jason about burden values
+*** DONE Put ITHIM (GHI) meetings on calendar
+*** DONE Slack about scheduling ITHIM (All-Team) meeting
+** Misc
+*** DONE Investigate pomodoro app on Slack
+*** DONE Reply to Gary Tipler
+*** DONE Email Mom & Dad about trip to Madison
+*** DONE Clean Wunderlist
+*** DONE Clean Inboxes
+*** DONE Clean UW Inbox
+*** DONE Update calendar
+*** DONE Merge Vargo's edits
+*** DONE Post methods paper for Vargo's inspection
+*** DONE Inspect statewise GBD values from Vargo
+*** DONE Doodle poll for Holiday party
+*** DONE Email about benefits eligibility
+** Cambridge Trip Details
+*** DONE Email Jonathan/Monet to confirm purchase of airfare
+    Mentions the Amsterdam arrival
+    Includes paragraph justifying trip
+*** DONE Email Woodcock to confirm dates
+*** DONE Confirm dates with Julie
