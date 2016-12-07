@@ -21,6 +21,8 @@ pomodoros
 *** Misc
 **** TODO Make files available for Maggie
 Introduction and Discussion
+**** TODO Email Mom
+Re: Christmas and Madison Trip
 ** MI, WI, OH Analysis [ ] x 2
 *** TODO Create new figure
 ** Edit methods paper [ ] x 3
