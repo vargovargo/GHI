@@ -276,9 +276,6 @@ METmatrix
 
 ## GBD Estimates by State
 
-
-
-
 ```{r stateBurden, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, echo = TRUE, warning = FALSE}
 
 stateNameToAbbrev <- function( stateName ){
@@ -300,6 +297,7 @@ gbdParse <- function(gbd){
 gbdRDS <-  readRDS(file = "./data/stateMetroBurdens2014.rds")
 gbdRDS <- within(gbdRDS, state <- stateNameToAbbrev(state))
 gbdByState <- split(gbdRDS,gbdRDS$state)
+gbdByState <- lapply(gbdByState, function(x) x[,!names(x)=="state"])
 gbdList <- lapply(gbdByState, gbdParse)
 
 ```
@@ -316,10 +314,10 @@ sumDALY <- function(ITHIM.baseline, ITHIM.scenario){
 ```
 
 ```{r ITHIMObjs, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, echo = TRUE, warning = FALSE}
-stateVec <- c("CA","TX","NY","FL","WI","MI", "OH") #c("CA","TX","NY","FL","VA","NC","AZ")
-stateVecOrdered <- c("TX","FL","NY","CA","WI","MI", "OH") #c("NC","TX","VA","FL","AZ","NY","CA")
+stateVec <- c("CA","NY","WI","MI","OH") #c("CA","TX","NY","FL","VA","NC","AZ")
+stateVecOrdered <- stateVec #c("NY","CA","WI","MI","OH") #c("NC","TX","VA","FL","AZ","NY","CA")
 
-upper <- 10; length <- 5; wd <- upper/length;
+upper <- 10; length <- 2; wd <- upper/length;
 
 DALYsTotal <- data.frame()
 ITHIMList <- list()
@@ -342,7 +340,7 @@ for (HHSTATE in stateVec){
     ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "muct", muctList[[HHSTATE]])
     ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "Rwt", RwtList[[HHSTATE]])
     ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "Rct", RctList[[HHSTATE]])
-    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "GBD", ITHIM.national$parameters$GBD)
+    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "GBD", gbdList[[HHSTATE]])
   }
 
 for( muNonTravel in seq(0, upper, by = wd)){
@@ -372,6 +370,16 @@ p + stat_smooth( method = loess) + theme_bw() + scale_x_continuous(name="Mean No
 
 ```
 
+```{r statewiseGBD, eval = TRUE, dev=c('pdf', 'png'), fig.width = 2*fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
+D <- melt(lapply(ITHIMList, function(ITHIM) return(ITHIM$parameters$GBD)))
+names(D) <- c("disease","sex","ageClass","type", "burden", "sex2", "disease2", "state")
+
+D <- within(D, sex <- factor(sex, levels = c("F","M")))
+D <- within(D, state <- factor(state, levels = c("WI","MI","OH","NY","CA")))
+
+p <- ggplot(subset(D, disease %in% c("BreastCancer","ColonCancer","Dementia","Depression","Diabetes", "CVD") & type == "daly"), aes(x = ageClass, y = burden/1e3, fill = sex)) + geom_bar(stat= "identity", position = "dodge")
+p + theme_bw() + scale_x_discrete(name="", labels = c("0-4","5-14","15-29","30-44","45-59","60-69","70-79","80+")) + scale_y_continuous(name="DALYs Nationwide (thousands)") + theme(axis.text.x  = element_text(angle = 270, vjust = 0.5, size = 8)) + facet_grid( disease ~ state, scales = "free_y")
+```
 
 
 ### Visualization of trip time matrices
