@@ -18,18 +18,19 @@ Wed 07 Dec 2016 02:18:15 PM CST
 *** Pomodoro #5
 Wed 07 Dec 2016 02:40:42 PM CST
 *** Pomodoro #6
-2:40
+3:00
 ** Long Break
+Wed 07 Dec 2016 03:16:57 PM CST
 ** Set 3
 *** Pomodoro #7
-3:00
+Wed 07 Dec 2016 03:31:03 PM CST
 *** Pomodoro #8
-3:20
+Wed 07 Dec 2016 03:51:31 PM CST
 *** Pomodoro #9
-    3:40
+Wed 07 Dec 2016 04:12:09 PM CST
 * Current Pomodoro List
 ** Create Pomodoro List and Misc. [X]
-** MI, WI, OH Analysis [X] [X] [X] [ ] [ ]
+** MI, WI, OH Analysis [X] x 7
 *** TODO Create new figure
 ** Edit methods paper [ ] x 3
 *** TODO Update methods paper To-Do List
