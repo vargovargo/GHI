@@ -5,22 +5,22 @@ week)
 * Schedule
 ** Set 1
 *** Pomodoro #1
-    Wed 07 Dec 2016 01:04:02 PM CST
+Thu Dec  8 09:49:49 2016
 *** Pomodoro #2
-    Wed 07 Dec 2016 01:25:12 PM CST
+10:05 - 10:20
 *** Pomodoro #3
-    Wed 07 Dec 2016 01:47:45 PM CST
+none
 ** Long Break
-Wed 07 Dec 2016 02:03:28 PM CST
+10:30 - 12:00
 ** Set 2
 *** Pomodoro #4
-Wed 07 Dec 2016 02:18:15 PM CST
+
 *** Pomodoro #5
-Wed 07 Dec 2016 02:40:42 PM CST
+
 *** Pomodoro #6
-3:00
+
 ** Long Break
-Wed 07 Dec 2016 03:16:57 PM CST
+
 ** Set 3
 *** Pomodoro #7
 Wed 07 Dec 2016 03:31:03 PM CST
@@ -29,29 +29,27 @@ Wed 07 Dec 2016 03:51:31 PM CST
 *** Pomodoro #9
 Wed 07 Dec 2016 04:12:09 PM CST
 * Current Pomodoro List
-** Create Pomodoro List and Misc. [ ]
-** MI, WI, OH Analysis [ ] x 4
+** Create Pomodoro List and Misc. [X]
+*** DONE Run ITHIM.R
+*** TODO research laptops
+- System76 Lemur, $1,000 i7 dual, 16GB, ($7,500 for the cheap version)
+- 
+** Action Items from Friday meeting with Vargo [ ]
+** MI, WI, OH Analysis [ ] x 2
 *** TODO Statewise CRA figure
 ** Edit methods paper [ ] x 3
 *** TODO Update methods paper To-Do List
 *** TODO Materials & Methods
 *** TODO Abstract
 *** TODO Results
-** Incorporate Air Pollution [ ] [ ]
-** ITHIM Meeting [ ]
-*** TODO Add agenda
 * Future Pomodoro List
-** Cambridge Trip Details [ ]
-*** TODO Reserve tickets
-*** TODO Make To-Do List
+** Incorporate Air Pollution [ ] [ ]
+** Create ITHIM class [ ] [ ]
+** Create CRA method for two ITHIM objects[ ] [ ]
 ** Wijk aan Zee Trip Details [ ]
 *** TODO Book hotel in Wijk aan Zee
-*** TODO Book airfare from Amsterdam to London
 *** TODO Travel arrangements from Amsterdam <-> Wijk aan Zee
 
-** Create ITHIM class [ ] [ ]
-** Create CRA method [ ] [ ]
-** Action Items from Friday meeting with Vargo [ ]
 ** Create a six-month plan for work at GHI [ ]
 * Completed Pomodoro List
 ** MI, WI, OH Analysis [X] x 8
@@ -66,6 +64,7 @@ Wed 07 Dec 2016 04:12:09 PM CST
 *** DONE Put ITHIM (GHI) meetings on calendar
 *** DONE Slack about scheduling ITHIM (All-Team) meeting
 ** Misc
+*** DONE Poker Doodle
 *** DONE Investigate pomodoro app on Slack
 *** DONE Reply to Gary Tipler
 *** DONE Email Mom & Dad about trip to Madison
@@ -83,8 +82,11 @@ Re: Christmas and Madison Trip
 *** DONE Make files available for Maggie
 Introduction and Discussion
 ** Cambridge Trip Details
+*** DONE Book airfare from Amsterdam to London
+*** DONE Reserve tickets
 *** DONE Email Jonathan/Monet to confirm purchase of airfare
     Mentions the Amsterdam arrival
     Includes paragraph justifying trip
 *** DONE Email Woodcock to confirm dates
 *** DONE Confirm dates with Julie
+** Wijk aan Zee Details

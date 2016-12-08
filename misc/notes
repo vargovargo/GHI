@@ -150,3 +150,67 @@ Present tense!
 
 /MaggieShare/UW_ITHIM/SamITHIM/ACSdata/BikePedDeathModelData.rds
 
+
+~~~~~~~
+
+Notes from ITHIM Meeting
+Thu Dec  8 10:31:51 2016
+
+Woodcock:
+Cambridge Meeting, 8 people
+Injury Model from Analytica -> R
+UK Injury Data and US Natl. Injury Data
+Paper:
+  change in injuries vs. propensity of cycling measure
+  mode-switch propensity-based analysis...
+
+
+Road Injuries Parameters
+- Thiago's paper (sau Paulo)
+-
+
+"Whiskers" Data
+
+
+Who is Dagan?
+
+Scott Spak
+Oakridge Clustering 2009
+  HH size, etc.
+Apply to FARS
+
+Yet to find reliable traffic stats for US
+
+Sea Lion UNC for EPA
+
+AADT?
+
+Oregon Crash Data System
+
+
+Eric has access to Statewise data (OR)
+ - Can cobble togetehr data for a half-dozen states
+
+
+Questions
+
+Eric: Could you share some of the OR Crash Data System data?
+
+Action Items
+Schedule time for Woodcock to present Analytica R.I. model
+Read James's Analytica materials
+Reach out to Faris, Ali, Yizheng and Liming
+ICT Repository
+ITHIM Survey
+
+Jan 12 next meeting 10:30 CDT
+
+Monetization
+
+MOVES
+  emissions only
+
+RLINE
+ AirMod from UNC
+
+
