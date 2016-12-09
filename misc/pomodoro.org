@@ -9,23 +9,23 @@ week)
 *** Pomodoro #2
 
 *** Pomodoro #3
-2:25
+Fri 09 Dec 2016 02:27:01 PM CST
 ** Long Break
 2:40 - 2:55
 ** Set 2
 *** Pomodoro #4
-2:55
+Fri 09 Dec 2016 02:59:47 PM CST
 *** Pomodoro #5
-3:15
+Fri 09 Dec 2016 03:20:50 PM CST
 *** Pomodoro #6
-3:35
+Fri 09 Dec 2016 03:44:32 PM CST
 ** Long Break
-3:35-3:50
+3:40-3:55
 ** Set 3
 *** Pomodoro #7
-3:50
+3:55
 *** Pomodoro #8
-4:10
+4:15
 *** Pomodoro #9
 * Current Pomodoro List
 ** Create Pomodoro List and Set up [X]
@@ -34,7 +34,7 @@ week)
 ** Action Items [ ]
 *** TODO Friday meeting with Vargo
 *** TODO ITHIM meeting on Thursday
-** MI, WI, OH Analysis [ ] x 2
+** MI, WI, OH Analysis [X] [ ] [ ]
 *** TODO Statewise CRA figure
 ** Create ITHIM class [ ] [ ]
 * Future Pomodoro List
