@@ -5,46 +5,51 @@ week)
 * Schedule
 ** Set 1
 *** Pomodoro #1
-Thu Dec  8 09:49:49 2016
+    Fri 09 Dec 2016 01:45:25 PM CST
 *** Pomodoro #2
-10:05 - 10:20
+
 *** Pomodoro #3
-none
+2:25
 ** Long Break
-10:30 - 12:00
+2:40 - 2:55
 ** Set 2
 *** Pomodoro #4
-
+2:55
 *** Pomodoro #5
-
+3:15
 *** Pomodoro #6
-
+3:35
 ** Long Break
-
+3:35-3:50
 ** Set 3
 *** Pomodoro #7
-Wed 07 Dec 2016 03:31:03 PM CST
+3:50
 *** Pomodoro #8
-Wed 07 Dec 2016 03:51:31 PM CST
+4:10
 *** Pomodoro #9
-Wed 07 Dec 2016 04:12:09 PM CST
 * Current Pomodoro List
-** Create Pomodoro List and Misc. [X]
-*** DONE Run ITHIM.R
-*** TODO research laptops
-- System76 Lemur, $1,000 i7 dual, 16GB, ($7,500 for the cheap version)
-- 
-** Action Items from Friday meeting with Vargo [ ]
+** Create Pomodoro List and Set up [X]
+*** TODO make data
+*** TODO Run ITHIM.R
+** Action Items [ ]
+*** TODO Friday meeting with Vargo
+*** TODO ITHIM meeting on Thursday
 ** MI, WI, OH Analysis [ ] x 2
 *** TODO Statewise CRA figure
+** Create ITHIM class [ ] [ ]
+* Future Pomodoro List
+** Misc [ ]
+*** TODO research laptops
+- System76 Lemur, $1,000 i7 dual, 16GB, ($7,500 for the cheap version)
+- 8 GB, i5, 256 GB MacBook $1,599 (2.03 pounds)
+- MacBook Air $1,200, 8 GB, i5, 
+
 ** Edit methods paper [ ] x 3
 *** TODO Update methods paper To-Do List
 *** TODO Materials & Methods
 *** TODO Abstract
 *** TODO Results
-* Future Pomodoro List
 ** Incorporate Air Pollution [ ] [ ]
-** Create ITHIM class [ ] [ ]
 ** Create CRA method for two ITHIM objects[ ] [ ]
 ** Wijk aan Zee Trip Details [ ]
 *** TODO Book hotel in Wijk aan Zee
