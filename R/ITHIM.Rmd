@@ -405,16 +405,23 @@ foo <- within(foo, {
   state <- names(burdenList)
 })
 
-foo <- subset(foo, state %in% c("WI", "MI","OH"))
+foo <- subset(foo, state %in% c("MI","OH"))
 
 D <- melt(foo)
 
 cbPalette <- c("#0072B2", "#56B4E9", "#999999", "#E69F00", "#009E73", "#F0E442", "#D55E00", "#CC79A7")
 
 p <- ggplot(D, aes(state, value/1e3, fill = variable))
-p + geom_bar(stat= "identity") + scale_x_discrete(name="") + scale_y_continuous(name="Thousands of DALYs") + guides(fill=FALSE) + scale_fill_manual(values=cbPalette) + coord_cartesian(ylim = c(175, 600)) + theme(axis.text.y  = element_text(size = 16)) + theme(axis.text.x  = element_text(size = 16), axis.title.x  = element_text(size = 16)) + coord_flip() 
+p + geom_bar(stat= "identity") + scale_x_discrete(name="") + scale_y_continuous(name="Thousands of DALYs") + guides(fill=FALSE) + scale_fill_manual(values=cbPalette) + theme(axis.text.y  = element_text(size = 16)) + theme(axis.text.x  = element_text(size = 16), axis.title.x  = element_text(size = 16)) + coord_flip() # + coord_cartesian(ylim = c(175, 600))
+```
 
 
+```{r rustBelt2, eval = TRUE, dev=c('pdf', 'png'), fig.width = 2*fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
+
+D <- rbind(data.frame(getWalkTime(ITHIMList[["MI"]]),state = "MI"), data.frame(getWalkTime(ITHIMList[["WI"]]),state = "WI"), data.frame(getWalkTime(ITHIMList[["OH"]]),state = "OH"))
+
+p <- ggplot(subset(D, ageClass != "ageClass1"), aes(x = ageClass, y = mu, fill = state)) + geom_bar(stat= "identity", position = "dodge")
+p + theme_bw() + facet_grid( . ~ sex) + scale_x_discrete(name="", labels = c("5-14","15-29","30-44","45-59","60-69","70-79","80+")) + scale_y_continuous(name="Time Walking per Week (minutes)") + theme(axis.text.x  = element_text(angle = 90, vjust = 0.5, size = 8)) + scale_fill_manual(values=cbPalette[-3])
 ```
 
 ### Visualization of trip time matrices

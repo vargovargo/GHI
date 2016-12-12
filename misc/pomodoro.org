@@ -5,36 +5,38 @@ week)
 * Schedule
 ** Set 1
 *** Pomodoro #1
-    Fri 09 Dec 2016 01:45:25 PM CST
+Mon 12 Dec 2016 09:36:08 AM CST
 *** Pomodoro #2
-
+Mon 12 Dec 2016 09:57:35 AM CST
 *** Pomodoro #3
-Fri 09 Dec 2016 02:27:01 PM CST
+Mon 12 Dec 2016 10:19:04 AM CST
 ** Long Break
-2:40 - 2:55
+10:30
 ** Set 2
 *** Pomodoro #4
-Fri 09 Dec 2016 02:59:47 PM CST
+
 *** Pomodoro #5
-Fri 09 Dec 2016 03:20:50 PM CST
+
 *** Pomodoro #6
-Fri 09 Dec 2016 03:44:32 PM CST
+
 ** Long Break
-3:40-3:55
+
 ** Set 3
 *** Pomodoro #7
-3:55
+
 *** Pomodoro #8
-4:15
+
 *** Pomodoro #9
+
 * Current Pomodoro List
-** Create Pomodoro List and Set up [X]
+** Create Pomodoro List and Set up [ ]
 *** TODO make data
 *** TODO Run ITHIM.R
+** Figure for Jonathan [X] [X] [ ]
 ** Action Items [ ]
 *** TODO Friday meeting with Vargo
 *** TODO ITHIM meeting on Thursday
-** MI, WI, OH Analysis [X] [ ] [ ]
+** MI, WI, OH Analysis [ ] [ ] [ ]
 *** TODO Statewise CRA figure
 ** Create ITHIM class [ ] [ ]
 * Future Pomodoro List
