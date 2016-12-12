@@ -29,17 +29,18 @@ Mon 12 Dec 2016 10:19:04 AM CST
 *** Pomodoro #9
 
 * Current Pomodoro List
-** Create Pomodoro List and Set up [ ]
-*** TODO make data
-*** TODO Run ITHIM.R
-** Figure for Jonathan [X] [X] [ ]
+** Figure for Jonathan [X] [X] [X] [ ] [ ]
+*** DONE Send figures to Vargo
+*** TODO Answer questions from Vargo/Patz
+*** DONE Edit pomodoro list
 ** Action Items [ ]
 *** TODO Friday meeting with Vargo
 *** TODO ITHIM meeting on Thursday
-** MI, WI, OH Analysis [ ] [ ] [ ]
-*** TODO Statewise CRA figure
 ** Create ITHIM class [ ] [ ]
 * Future Pomodoro List
+** Create Pomodoro List and Set up [ ]
+*** TODO make data
+*** TODO Run ITHIM.R
 ** Misc [ ]
 *** TODO research laptops
 - System76 Lemur, $1,000 i7 dual, 16GB, ($7,500 for the cheap version)
