@@ -5,13 +5,13 @@ week)
 * Schedule
 ** Set 1
 *** Pomodoro #1
-Mon 12 Dec 2016 09:36:08 AM CST
+
 *** Pomodoro #2
-Mon 12 Dec 2016 09:57:35 AM CST
+
 *** Pomodoro #3
-Mon 12 Dec 2016 10:19:04 AM CST
+
 ** Long Break
-10:30
+
 ** Set 2
 *** Pomodoro #4
 
@@ -29,14 +29,14 @@ Mon 12 Dec 2016 10:19:04 AM CST
 *** Pomodoro #9
 
 * Current Pomodoro List
-** Figure for Jonathan [X] [X] [X] [ ] [ ]
-*** DONE Send figures to Vargo
-*** TODO Answer questions from Vargo/Patz
-*** DONE Edit pomodoro list
-** Action Items [ ]
-*** TODO Friday meeting with Vargo
-*** TODO ITHIM meeting on Thursday
-** Create ITHIM class [ ] [ ]
+** Action Items [ ] x 3
+*** TODO Read James's Analytica materials
+*** TODO Reach out to Faris, Ali, Yizheng and Liming
+*** TODO ICT Repository
+** Misc [ ]
+*** TODO White Elephant Party
+*** TODO Holiday Block Party
+** Create ITHIM class [ ] x 3
 * Future Pomodoro List
 ** Create Pomodoro List and Set up [ ]
 *** TODO make data
@@ -60,6 +60,10 @@ Mon 12 Dec 2016 10:19:04 AM CST
 
 ** Create a six-month plan for work at GHI [ ]
 * Completed Pomodoro List
+** Figure for Jonathan [X] [X] [X]
+*** DONE Send figures to Vargo
+*** DONE Answer questions from Vargo/Patz
+*** DONE Edit pomodoro list
 ** MI, WI, OH Analysis [X] x 8
 *** DONE Create new figure for GBD
 ** Admin
