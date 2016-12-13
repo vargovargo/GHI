@@ -296,9 +296,12 @@ gbdParse <- function(gbd){
 
 gbdRDS <-  readRDS(file = "./data/stateMetroBurdens2014.rds")
 gbdRDS <- within(gbdRDS, state <- stateNameToAbbrev(state))
+
+
 gbdByState <- split(gbdRDS,gbdRDS$state)
 gbdByState <- lapply(gbdByState, function(x) x[,!names(x)=="state"])
 gbdList <- lapply(gbdByState, gbdParse)
+
 
 ```
 
@@ -387,7 +390,7 @@ p + theme_bw() + scale_x_discrete(name="", labels = c("0-4","5-14","15-29","30-4
 
 ```{r rustBelt, eval = TRUE, dev=c('pdf', 'png'), fig.width = 2*fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
 
-ITHIMListScenario <- lapply(ITHIMList, function(ithim) updateITHIM(ithim, parName = "muwt", parValue = ithim$parameters$muwt + 10*7)) 
+ITHIMListScenario <- lapply(ITHIMList, function(ithim) updateITHIM(ithim, parName = "muwt", parValue = ithim$parameters$muwt + 10*7))
 
 deltaDALYList <- mapply(sumDALY, ITHIMList, ITHIMListScenario)
 

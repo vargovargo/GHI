@@ -38,6 +38,8 @@ week)
 *** TODO Holiday Block Party
 ** Create ITHIM class [ ] x 3
 * Future Pomodoro List
+** Error bars to travel estimates [ ] x 3
+** Make data package
 ** Create Pomodoro List and Set up [ ]
 *** TODO make data
 *** TODO Run ITHIM.R
@@ -45,7 +47,7 @@ week)
 *** TODO research laptops
 - System76 Lemur, $1,000 i7 dual, 16GB, ($7,500 for the cheap version)
 - 8 GB, i5, 256 GB MacBook $1,599 (2.03 pounds)
-- MacBook Air $1,200, 8 GB, i5, 
+- MacBook Air $1,200, 8 GB, i5,
 
 ** Edit methods paper [ ] x 3
 *** TODO Update methods paper To-Do List
