@@ -1,0 +1,38 @@
+# Integrated Transport and Health Impacts Model
+
+## R Package _ITHIM_
+<!-- This document will eventually serve as a compendium to the R package
+_ITHIM_.  It will describe how to use the package to implement the
+ITHIM model, as well as a detailed description of the model itself.
+
+As a working document it will serve as a place for SGY to post
+results, questions, interpreations, notes, etc.-->
+
+```{r libs, eval = TRUE, echo = FALSE, results = "hide", warning = FALSE, error = FALSE, message = FALSE}
+options(repos='http://cran.rstudio.com/')
+#install.packages(c("knitr","ggplot2","dplyr","openssl","httr", "git2r", "devtools", "roxygen2"))
+library("ggplot2")
+library("devtools")
+library("reshape2")
+library("plyr")
+library("dplyr")
+```
+
+```{r loadITHIM, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = FALSE}
+#document("~/ITHIM/")
+#install("~/ITHIM/")
+install_github("syounkin/ITHIM", ref="classes")
+install_github("smbache/magrittr", ref="master")
+
+library("magrittr")
+library("ITHIM")
+
+fig.width <- 6 # inches
+phi <- (1+sqrt(5))/2 # the golden ratio ;)
+```
+
+```{r tilePlot, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, echo = TRUE, warning = FALSE}
+ITHIM <- createITHIM()
+tilePlot(ITHIM, n = 50)
+```
+
