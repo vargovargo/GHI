@@ -19,9 +19,9 @@ library("dplyr")
 ```
 
 ```{r loadITHIM, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = FALSE}
-#document("~/ITHIM/")
-#install("~/ITHIM/")
-install_github("syounkin/ITHIM", ref="classes")
+document("~/ITHIM/")
+install("~/ITHIM/")
+#install_github("syounkin/ITHIM", ref="classes")
 install_github("smbache/magrittr", ref="master")
 
 library("magrittr")
@@ -35,4 +35,3 @@ phi <- (1+sqrt(5))/2 # the golden ratio ;)
 ITHIM <- createITHIM()
 tilePlot(ITHIM, n = 50)
 ```
-

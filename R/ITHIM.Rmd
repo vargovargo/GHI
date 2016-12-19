@@ -38,7 +38,7 @@ First we use NHTS to estimate mean walking and cycling times.
 ### NHTS
 
 ```{r compute, echo = FALSE, eval = TRUE}
-compute <- FALSE
+compute <- TRUE
 ```
 
 #### Create a handful of functions to help parse data
@@ -325,25 +325,25 @@ upper <- 10; length <- 2; wd <- upper/length;
 DALYsTotal <- data.frame()
 ITHIMList <- list()
 ITHIM.default <- createITHIM()
-ITHIM.default <- updateITHIM(ITHIM.default, "cvNonTravel", 3)
-ITHIM.default <- updateITHIM(ITHIM.default, "cv", 1.65)
-ITHIM.default <- updateITHIM(ITHIM.default, "muNonTravel", 4)
-ITHIM.default <- updateITHIM(ITHIM.default, "muNonTravelMatrix", METmatrix)
-ITHIM.default <- updateITHIM(ITHIM.default, "quantiles", (1:99)/100)
+ITHIM.default <- update(ITHIM.default, "cvNonTravel", 3)
+ITHIM.default <- update(ITHIM.default, "cv", 1.65)
+ITHIM.default <- update(ITHIM.default, "muNonTravel", 4)
+ITHIM.default <- update(ITHIM.default, "muNonTravelMatrix", METmatrix)
+ITHIM.default <- update(ITHIM.default, "quantiles", (1:99)/100)
 
 ITHIM.national <- ITHIM.default
-ITHIM.national <- updateITHIM(ITHIM.national, "muwt", muwtNational)
-ITHIM.national <- updateITHIM(ITHIM.national, "muct", muctNational)
-ITHIM.national <- updateITHIM(ITHIM.national, "Rwt", RwtNational)
-ITHIM.national <- updateITHIM(ITHIM.national, "Rct", RctNational)
+ITHIM.national <- update(ITHIM.national, "muwt", muwtNational)
+ITHIM.national <- update(ITHIM.national, "muct", muctNational)
+ITHIM.national <- update(ITHIM.national, "Rwt", RwtNational)
+ITHIM.national <- update(ITHIM.national, "Rct", RctNational)
 
 for (HHSTATE in stateVec){
     ITHIMList[[HHSTATE]] <- ITHIM.default
-    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "muwt", muwtList[[HHSTATE]])
-    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "muct", muctList[[HHSTATE]])
-    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "Rwt", RwtList[[HHSTATE]])
-    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "Rct", RctList[[HHSTATE]])
-    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "GBD", gbdList[[HHSTATE]])
+    ITHIMList[[HHSTATE]] <- update(ITHIMList[[HHSTATE]], "muwt", muwtList[[HHSTATE]])
+    ITHIMList[[HHSTATE]] <- update(ITHIMList[[HHSTATE]], "muct", muctList[[HHSTATE]])
+    ITHIMList[[HHSTATE]] <- update(ITHIMList[[HHSTATE]], "Rwt", RwtList[[HHSTATE]])
+    ITHIMList[[HHSTATE]] <- update(ITHIMList[[HHSTATE]], "Rct", RctList[[HHSTATE]])
+    ITHIMList[[HHSTATE]] <- update(ITHIMList[[HHSTATE]], "GBD", gbdList[[HHSTATE]])
   }
 
 for( muNonTravel in seq(0, upper, by = wd)){
@@ -351,10 +351,10 @@ for( muNonTravel in seq(0, upper, by = wd)){
   rm(DALYs)
 
   for (HHSTATE in stateVec){
-    ITHIMList[[HHSTATE]] <- updateITHIM(ITHIMList[[HHSTATE]], "muNonTravel", muNonTravel)
+    ITHIMList[[HHSTATE]] <- update(ITHIMList[[HHSTATE]], "muNonTravel", muNonTravel)
   }
 
-  ITHIM.national <- updateITHIM(ITHIM.national, "muNonTravel", muNonTravel)
+  ITHIM.national <- update(ITHIM.national, "muNonTravel", muNonTravel)
 
   DALYs <- lapply(ITHIMList, sumDALY, ITHIM.baseline = ITHIM.national)
   DALYs <- data.frame(State = names(DALYs), muNonTravel = muNonTravel, DALY = unlist(DALYs))
@@ -374,7 +374,7 @@ p + stat_smooth( method = loess) + theme_bw() + scale_x_continuous(name="Mean No
 ```
 
 ```{r statewiseGBD, eval = TRUE, dev=c('pdf', 'png'), fig.width = 2*fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
-D <- melt(lapply(ITHIMList, function(ITHIM) return(ITHIM$parameters$GBD)))
+D <- melt(lapply(ITHIMList, function(ITHIM) return(ITHIM@parameters@GBD)))
 names(D) <- c("disease","sex","ageClass","type", "burden", "sex2", "disease2", "state")
 
 D <- within(D, sex <- factor(sex, levels = c("F","M")))
@@ -390,13 +390,13 @@ p + theme_bw() + scale_x_discrete(name="", labels = c("0-4","5-14","15-29","30-4
 
 ```{r rustBelt, eval = TRUE, dev=c('pdf', 'png'), fig.width = 2*fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
 
-ITHIMListScenario <- lapply(ITHIMList, function(ithim) updateITHIM(ithim, parName = "muwt", parValue = ithim$parameters$muwt + 10*7))
+ITHIMListScenario <- lapply(ITHIMList, function(ithim) update(ithim, parName = "muwt", parValue = ithim@parameters@muwt + 10*7))
 
 deltaDALYList <- mapply(sumDALY, ITHIMList, ITHIMListScenario)
 
 
 getDALY <- function( ITHIM ){
-foo <- data.frame(lapply(ITHIM$parameters$GBD, function(x) x$M$daly + x$F$daly))
+foo <- data.frame(lapply(ITHIM@parameters@GBD, function(x) x$M$daly + x$F$daly))
 sum(foo[,names(foo) %in% c("BreastCancer","ColonCancer","Dementia","Depression","Diabetes", "CVD")])
 }
 
@@ -435,9 +435,9 @@ ITHIMList <- c(ITHIMList, list("Natl." = ITHIM.national))
 
 meanMatrix <- function(ITHIM, mode = "Walking"){
    if(mode == "Walking"){
-      return(with(ITHIM$parameters, data.frame(ageClass = factor(1:8), mode = mode, Rwt*muwt)))
+      return(with(as(ITHIM@parameters,"list"), data.frame(ageClass = factor(1:8), mode = mode, Rwt*muwt)))
    }else if (mode == "Cycling"){
-      return(with(ITHIM$parameters, data.frame(ageClass = factor(1:8), mode = mode, Rct*muct)))
+      return(with(as(ITHIM@parameters,"list"), data.frame(ageClass = factor(1:8), mode = mode, Rct*muct)))
    }else{
       message("error in meanMatrix function")
    }
@@ -460,12 +460,12 @@ p + theme_bw() + scale_x_discrete(name="", labels = c("5-14","15-29","30-44","45
 ```
 
 ```{r California, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = phi, warning = FALSE, message = FALSE, echo = FALSE}
-ITHIM.national <- updateITHIM(ITHIM.national, parName = "muNonTravel", 10)
+ITHIM.national <- update(ITHIM.national, parName = "muNonTravel", 10)
 
 #~~~~~~~~~~
 
 ITHIM.CA <- ITHIMList[["CA"]]
-ITHIM.CA <- updateITHIM(ITHIM.CA, parName = "muNonTravel", 10)
+ITHIM.CA <- update(ITHIM.CA, parName = "muNonTravel", 10)
 foo1 <- compareModels(ITHIM.national,ITHIM.CA)
 foobar1 <- data.frame(cbind(melt(foo1$daly.delta),paste0("ageClass",1:8)),State = "CA")
 
@@ -475,7 +475,7 @@ names(foobar) <- c("delta.DALY","Sex","Disease","ageClass","State")
 #~~~~~~~~~~
 
 ITHIM.NY <- ITHIMList[["NY"]]
-ITHIM.NY <- updateITHIM(ITHIM.NY, parName = "muNonTravel", 10)
+ITHIM.NY <- update(ITHIM.NY, parName = "muNonTravel", 10)
 foo2 <- compareModels(ITHIM.national,ITHIM.NY)
 foobar2 <- data.frame(cbind(melt(foo2$daly.delta),paste0("ageClass",1:8)),State = "NY")
 foobar <- rbind(foobar1,foobar2)
@@ -516,38 +516,38 @@ p + geom_bar(stat="identity", position = "dodge") + scale_x_discrete(name="", la
 ## Figure 1
 
 ```{r methodsPaper, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
-ITHIM.default <- updateITHIM(ITHIM.default, "quantiles", (1:99)/100)
+ITHIM.default <- update(ITHIM.default, "quantiles", (1:99)/100)
 
 ITHIM.national <- ITHIM.default
-ITHIM.national <- updateITHIM(ITHIM.national, "muwt", muwtNational)
-ITHIM.national <- updateITHIM(ITHIM.national, "muct", muctNational)
-ITHIM.national <- updateITHIM(ITHIM.national, "Rwt", RwtNational)
-ITHIM.national <- updateITHIM(ITHIM.national, "Rct", RctNational)
+ITHIM.national <- update(ITHIM.national, "muwt", muwtNational)
+ITHIM.national <- update(ITHIM.national, "muct", muctNational)
+ITHIM.national <- update(ITHIM.national, "Rwt", RwtNational)
+ITHIM.national <- update(ITHIM.national, "Rct", RctNational)
 
 
 ITHIM.scenario <- ITHIM.national
-ITHIM.national.quints <- updateITHIM(ITHIM.national, "quantiles", seq(1,9,by=1)/10)
-ITHIM.scenario.quints <- updateITHIM(ITHIM.scenario, "quantiles", seq(1,9,by=1)/10)
+ITHIM.national.quints <- update(ITHIM.national, "quantiles", seq(1,9,by=1)/10)
+ITHIM.scenario.quints <- update(ITHIM.scenario, "quantiles", seq(1,9,by=1)/10)
 
-pWalk <- ITHIM.national$means$pWalk[3,2]
+pWalk <- ITHIM.national@means$pWalk[3,2]
 
 DALYs <- c(); DALYs.quints <- c();
-atVec <- seq(45, 120, length.out = 10)
+atVec <- seq(45, 120, length.out = 3)
 muNonTravelVec <- c(1, 10, 25)
 DTotal <- data.frame()
 
 for(at in atVec ){  # minutes active transport/week
   for( muNonTravel in muNonTravelVec ){
 
-    ITHIM.scenario <- updateITHIM(ITHIM.scenario, "muwt", at*pWalk)
-    ITHIM.scenario <- updateITHIM(ITHIM.scenario, "muct", at*(1-pWalk))
-    ITHIM.scenario <- updateITHIM(ITHIM.scenario, "muNonTravel", muNonTravel)
+    ITHIM.scenario <- update(ITHIM.scenario, "muwt", at*pWalk)
+    ITHIM.scenario <- update(ITHIM.scenario, "muct", at*(1-pWalk))
+    ITHIM.scenario <- update(ITHIM.scenario, "muNonTravel", muNonTravel)
 
-    ITHIM.scenario.quints <- updateITHIM(ITHIM.scenario.quints, "muwt", at*pWalk)
-    ITHIM.scenario.quints <- updateITHIM(ITHIM.scenario.quints, "muct", at*(1-pWalk))
-    ITHIM.scenario.quints <- updateITHIM(ITHIM.scenario.quints, "muNonTravel", muNonTravel)
+    ITHIM.scenario.quints <- update(ITHIM.scenario.quints, "muwt", at*pWalk)
+    ITHIM.scenario.quints <- update(ITHIM.scenario.quints, "muct", at*(1-pWalk))
+    ITHIM.scenario.quints <- update(ITHIM.scenario.quints, "muNonTravel", muNonTravel)
 
-    ITHIM.national <- updateITHIM(ITHIM.national, "muNonTravel", muNonTravel)
+    ITHIM.national <- update(ITHIM.national, "muNonTravel", muNonTravel)
 
     DALYs <- sumDALY(ITHIM.national, ITHIM.scenario)
     DALYs.quints <- sumDALY(ITHIM.national.quints, ITHIM.scenario.quints)
@@ -572,7 +572,7 @@ p + geom_line() + geom_point() + theme_bw() + scale_y_continuous(name="DALYs Ave
 
 ```{r displayMeans, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = phi, warning = FALSE, message = FALSE, echo = FALSE}
 
-ITHIM.national <- updateITHIM(ITHIM.national, "muNonTravel", 10)
+ITHIM.national <- update(ITHIM.national, "muNonTravel", 10)
 
 D <- rbind(getWalkTime(ITHIM.national),getWalkSpeed(ITHIM.national),getCycleTime(ITHIM.national),getNonTravelMETs(ITHIM.national))
 D <- within(D, sex <- factor(sex, levels = c("F","M")))
@@ -584,7 +584,7 @@ p + theme_bw() + scale_x_discrete(name="", labels = c("0-4","5-14","15-29","30-4
 ## Figure 3
 
 ```{r displayGBD, eval = TRUE, dev=c('pdf', 'png'), fig.width = 1.2*fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
-D <- melt(ITHIM.national$parameters$GBD)
+D <- melt(ITHIM.national@parameters@GBD)
 names(D) <- c("disease","sex","ageClass","type","burden", "sex2", "disease2")
 D <- within(D, sex <- factor(sex, levels = c("F","M")))
 
