@@ -31,7 +31,7 @@ fig.width <- 6 # inches
 phi <- (1+sqrt(5))/2 # the golden ratio ;)
 ```
 
-```{r tilePlot, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, echo = TRUE, warning = FALSE}
+```{r tilePlot, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1, echo = TRUE, warning = FALSE}
 ITHIM <- createITHIM()
-tilePlot(ITHIM, n = 50)
+tilePlot(ITHIM, n = 25)
 ```

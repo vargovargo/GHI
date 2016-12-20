@@ -338,7 +338,7 @@ for( muNonTravel in seq(0, upper, by = wd)){
     ITHIMList[[HHSTATE]] <- update(ITHIMList[[HHSTATE]], list(muNonTravel = muNonTravel))
   }
 
-  ITHIM.national <- update(ITHIM.national, "muNonTravel", muNonTravel)
+  ITHIM.national <- update(ITHIM.national, list(muNonTravel = muNonTravel))
 
   DALYs <- lapply(ITHIMList, sumDALY, ITHIM.baseline = ITHIM.national)
   DALYs <- data.frame(State = names(DALYs), muNonTravel = muNonTravel, DALY = unlist(DALYs))
@@ -354,6 +354,8 @@ p <- ggplot(DALYsTotal, aes(x = muNonTravel, y = DALY/1e3, colour = State))
 p + stat_smooth( method = loess) + theme_bw() + scale_x_continuous(name="Mean Non-Travel METs (MET-hrs./week) (Referent Group)") + scale_y_continuous(name="Change in National DALYs (Thousands)") + coord_cartesian(xlim = c(0, upper))
 
 p + stat_smooth( method = loess) + theme_bw() + scale_x_continuous(name="Mean Non-Travel METs (MET-hrs./week) (Referent Group)") + scale_y_continuous(name="Change in National DALYs (Thousands)") + coord_cartesian(xlim = c(0, upper)) + geom_point()
+
+saveRDS(ITHIMList, file = "./data/ITHIMList.by.state.rds")
 
 ```
 
@@ -374,7 +376,7 @@ p + theme_bw() + scale_x_discrete(name="", labels = c("0-4","5-14","15-29","30-4
 
 ```{r rustBelt, eval = TRUE, dev=c('pdf', 'png'), fig.width = 2*fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
 
-ITHIMListScenario <- lapply(ITHIMList, function(ithim) update(ithim, parName = "muwt", parValue = ithim@parameters@muwt + 10*7))
+ITHIMListScenario <- lapply(ITHIMList, function(ithim) update(ithim, list(muwt = ithim@parameters@muwt + 10*7)))
 
 deltaDALYList <- mapply(sumDALY, ITHIMList, ITHIMListScenario)
 
@@ -444,12 +446,12 @@ p + theme_bw() + scale_x_discrete(name="", labels = c("5-14","15-29","30-44","45
 ```
 
 ```{r California, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = phi, warning = FALSE, message = FALSE, echo = FALSE}
-ITHIM.national <- update(ITHIM.national, parName = "muNonTravel", 10)
+ITHIM.national <- update(ITHIM.national, list(muNonTravel = 10))
 
 #~~~~~~~~~~
 
 ITHIM.CA <- ITHIMList[["CA"]]
-ITHIM.CA <- update(ITHIM.CA, parName = "muNonTravel", 10)
+ITHIM.CA <- update(ITHIM.CA, list(muNonTravel = 10))
 foo1 <- compareModels(ITHIM.national,ITHIM.CA)
 foobar1 <- data.frame(cbind(melt(foo1$daly.delta),paste0("ageClass",1:8)),State = "CA")
 
@@ -459,7 +461,7 @@ names(foobar) <- c("delta.DALY","Sex","Disease","ageClass","State")
 #~~~~~~~~~~
 
 ITHIM.NY <- ITHIMList[["NY"]]
-ITHIM.NY <- update(ITHIM.NY, parName = "muNonTravel", 10)
+ITHIM.NY <- update(ITHIM.NY, list(muNonTravel = 10))
 foo2 <- compareModels(ITHIM.national,ITHIM.NY)
 foobar2 <- data.frame(cbind(melt(foo2$daly.delta),paste0("ageClass",1:8)),State = "NY")
 foobar <- rbind(foobar1,foobar2)
@@ -500,18 +502,15 @@ p + geom_bar(stat="identity", position = "dodge") + scale_x_discrete(name="", la
 ## Figure 1
 
 ```{r methodsPaper, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
-ITHIM.default <- update(ITHIM.default, "quantiles", (1:99)/100)
+ITHIM.default <- update(ITHIM.default, list(quantiles = (1:99)/100))
 
 ITHIM.national <- ITHIM.default
-ITHIM.national <- update(ITHIM.national, "muwt", muwtNational)
-ITHIM.national <- update(ITHIM.national, "muct", muctNational)
-ITHIM.national <- update(ITHIM.national, "Rwt", RwtNational)
-ITHIM.national <- update(ITHIM.national, "Rct", RctNational)
+ITHIM.national <- update(ITHIM.national, list(muwt = muwtNational, muct = muctNational,Rwt = RwtNational,Rct = RctNational))
 
 
 ITHIM.scenario <- ITHIM.national
-ITHIM.national.quints <- update(ITHIM.national, "quantiles", seq(1,9,by=1)/10)
-ITHIM.scenario.quints <- update(ITHIM.scenario, "quantiles", seq(1,9,by=1)/10)
+ITHIM.national.quints <- update(ITHIM.national, list(quantiles = seq(1,9,by=2)/10))
+ITHIM.scenario.quints <- update(ITHIM.scenario, list(quantiles = seq(1,9,by=2)/10))
 
 pWalk <- ITHIM.national@means$pWalk[3,2]
 
@@ -523,15 +522,12 @@ DTotal <- data.frame()
 for(at in atVec ){  # minutes active transport/week
   for( muNonTravel in muNonTravelVec ){
 
-    ITHIM.scenario <- update(ITHIM.scenario, "muwt", at*pWalk)
-    ITHIM.scenario <- update(ITHIM.scenario, "muct", at*(1-pWalk))
-    ITHIM.scenario <- update(ITHIM.scenario, "muNonTravel", muNonTravel)
+    ITHIM.scenario <- update(ITHIM.scenario, list(muwt = at*pWalk, muct = at*(1-pWalk), muNonTravel = muNonTravel))
 
-    ITHIM.scenario.quints <- update(ITHIM.scenario.quints, "muwt", at*pWalk)
-    ITHIM.scenario.quints <- update(ITHIM.scenario.quints, "muct", at*(1-pWalk))
-    ITHIM.scenario.quints <- update(ITHIM.scenario.quints, "muNonTravel", muNonTravel)
+    ITHIM.scenario.quints <- update(ITHIM.scenario.quints, list(muwt = at*pWalk, muct = at*(1-pWalk), muNonTravel = muNonTravel))
 
-    ITHIM.national <- update(ITHIM.national, "muNonTravel", muNonTravel)
+
+    ITHIM.national <- update(ITHIM.national, list(muNonTravel = muNonTravel))
 
     DALYs <- sumDALY(ITHIM.national, ITHIM.scenario)
     DALYs.quints <- sumDALY(ITHIM.national.quints, ITHIM.scenario.quints)
@@ -556,7 +552,7 @@ p + geom_line() + geom_point() + theme_bw() + scale_y_continuous(name="DALYs Ave
 
 ```{r displayMeans, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = phi, warning = FALSE, message = FALSE, echo = FALSE}
 
-ITHIM.national <- update(ITHIM.national, "muNonTravel", 10)
+ITHIM.national <- update(ITHIM.national, list(muNonTravel = 10))
 
 D <- rbind(getWalkTime(ITHIM.national),getWalkSpeed(ITHIM.national),getCycleTime(ITHIM.national),getNonTravelMETs(ITHIM.national))
 D <- within(D, sex <- factor(sex, levels = c("F","M")))
