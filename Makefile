@@ -33,8 +33,8 @@ data:
 	mv -v BikePedDeathModelData.rds ./R/data/
 	wget https://ithim.ghi.wisc.edu/data/stateMetroBurdens2014.rds
 	mv -v stateMetroBurdens2014.rds ./R/data/
-	wget https://www.ithim.ghi.wisc.edu/data/ITHIMList.by.state.rds
-	mv -v ITHIMList.by.state.rds ./R/data/
+	# wget https://www.ithim.ghi.wisc.edu/data/ITHIMList.by.state.rds
+	# mv -v ITHIMList.by.state.rds ./R/data/
 
 ITHIM-discussion: ./slides/ITHIM-discussion/ITHIM-discussion.tex
 	cd ./slides/ITHIM-discussion; make ITHIM-discussion.pdf
