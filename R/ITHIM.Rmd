@@ -508,6 +508,7 @@ ITHIM.default <- update(ITHIM.default, list(quantiles = (1:99)/100))
 ITHIM.national <- ITHIM.default
 ITHIM.national <- update(ITHIM.national, list(muwt = muwtNational, muct = muctNational,Rwt = RwtNational,Rct = RctNational))
 
+saveRDS(ITHIM.national, file = "./data/ITHIM.national.rds")
 
 ITHIM.scenario <- ITHIM.national
 ITHIM.national.quints <- update(ITHIM.national, list(quantiles = seq(1,9,by=2)/10))
