@@ -19,7 +19,7 @@ Now load the package and install ITHIM.
 
 ```{r libs2, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
 library("devtools")
-install_github(repo = "syounkin/ITHIM")
+install_github(repo = "syounkin/ITHIM", ref = devel)
 library("ITHIM")
 ```
 
