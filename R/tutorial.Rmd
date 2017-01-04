@@ -19,14 +19,8 @@ Now load the package and install ITHIM.
 
 ```{r libs2, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
 library("devtools")
-install_github(repo = "syounkin/ITHIM", ref = devel)
+install_github(repo = "syounkin/ITHIM", ref = "devel")
 library("ITHIM")
-```
-
-### Built-in Example
-
-```{r example, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
-example("ITHIM-package")
 ```
 
 ### Step-by-step
@@ -38,6 +32,14 @@ createITHIM as follows.
 ```{r create, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
 ITHIM.baseline <- createITHIM()
 ```
+
+```{r class, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
+
+```
+
+
+
+
 
 There are currently fourteen parameters, many of which are matrices,
 in the model.  (Recall that we are only using the physical activity
