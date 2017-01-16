@@ -36,9 +36,9 @@ week)
 * Current Pomodoro List
 ** Cambridge Trip [ ]
 *** TODO Reserve bed and breakfast
-*** TODO Email James itinerary
+*** DONE Email James itinerary
 ** Eric Main [ ]
-*** TODO Email about Slack message
+*** DONE Email about Slack message
 *** TODO Update the tutorial
 ** DiCaprio Proposal [ ]
 *** TODO Read
