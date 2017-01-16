@@ -5,51 +5,62 @@ week)
 * Schedule
 ** Set 1
 *** Pomodoro #1
-Wed Jan  4 08:59:55 2017
+9:45
 *** Pomodoro #2
-Wed Jan  4 09:23:14 2017
+10:05
 *** Pomodoro #3
-9:43
+10:25
 ** Long Break
-10:00 - 10:30
-** Meeting
-10:30 - 11:30
+10:40 - 11:00
 ** Set 2
 *** Pomodoro #4
-11:30
+11:00
 *** Pomodoro #5
-11:50
+11:20
 *** Pomodoro #6
-12:10
+11:40
 ** Long Break
-12:15 - 1:00
+11:55 - 12:15
 ** Set 3
 *** Pomodoro #7
-
+12:15
 *** Pomodoro #8
-
+12:35
 *** Pomodoro #9
+12:55
+~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 * Current Pomodoro List
-** Create Pomodoro list and Misc [X]
-*** Misc
-**** DONE make data
-**** DONE Run ITHIM.R
-**** TODO Schedule car to Phoenix
-**** DONE Schedule boiler inspection
-**** TODO Schedule flu shot
-**** DONE Clean Wunderlist
+** Cambridge Trip [ ]
+*** TODO Reserve bed and breakfast
+*** TODO Email James itinerary
+** Eric Main [ ]
+*** TODO Email about Slack message
+*** TODO Update the tutorial
+** DiCaprio Proposal [ ]
+*** TODO Read
+*** TODO Comment
 ** Action Items [ ] x 2
 *** TODO Read James's Analytica materials
 *** TODO Reach out to Faris, Ali, Yizheng and Liming
 *** TODO ICT Repository
 
+~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Future Pomodoro List
+** Create Pomodoro list and Misc [ ]
+*** Misc
+**** DONE make data
+**** DONE Run ITHIM.R
+**** TODO Schedule car to Phoenix
+**** DONE Clean Wunderlist
 ** Error bars to travel estimates [ ] x 3
 ** Make data package
-** Create Pomodoro List and Set up [ ]
 ** Misc [ ]
 *** TODO research laptops
 - System76 Lemur, $1,000 i7 dual, 16GB, ($7,500 for the cheap version)
@@ -69,6 +80,10 @@ Wed Jan  4 09:23:14 2017
 
 ** Create a six-month plan for work at GHI [ ]
 
+~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
+
 * Completed Pomodoro List
 ** Create ITHIM class [X] x 3?
 ** Figure for Jonathan [X] [X] [X]
@@ -87,6 +102,8 @@ Wed Jan  4 09:23:14 2017
 *** DONE Put ITHIM (GHI) meetings on calendar
 *** DONE Slack about scheduling ITHIM (All-Team) meeting
 ** Misc
+*** DONE Schedule flu shot
+*** DONE Schedule boiler inspection
 *** DONE White Elephant Party
 *** DONE Holiday Block Party
 *** DONE Poker Doodle
