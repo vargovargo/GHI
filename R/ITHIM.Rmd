@@ -10,7 +10,7 @@ results, questions, interpreations, notes, etc.-->
 
 ```{r libs, eval = TRUE, echo = FALSE, results = "hide", warning = FALSE, error = FALSE, message = FALSE}
 options(repos='http://cran.rstudio.com/')
-install.packages(c("ggplot2","dplyr","openssl","httr", "git2r", "devtools", "roxygen2"))
+#install.packages(c("ggplot2","dplyr","openssl","httr", "git2r", "devtools", "roxygen2"))
 library("ggplot2")
 library("devtools")
 library("reshape2")
@@ -355,7 +355,7 @@ p + stat_smooth( method = loess) + theme_bw() + scale_x_continuous(name="Mean No
 
 p + stat_smooth( method = loess) + theme_bw() + scale_x_continuous(name="Mean Non-Travel METs (MET-hrs./week) (Referent Group)") + scale_y_continuous(name="Change in National DALYs (Thousands)") + coord_cartesian(xlim = c(0, upper)) + geom_point()
 
-ITHIMList <- as("ITHIMList", ITHIMList)
+ITHIMList <- as(ITHIMList, "ITHIMList")
 saveRDS(ITHIMList, file = "./data/ITHIMList.by.state.rds")
 
 ```
