@@ -5,31 +5,40 @@
 ```{r figwidth, eval = TRUE,  warning = FALSE, message = FALSE, echo = FALSE}
 fig.width <- 6
 phi <- (1+sqrt(5))/2 # the golden ratio ;)
+options(repos='http://cran.rstudio.com/')
 ```
 
 First load the package from Github.  To do this you need the package
-devtools.
+_devtools_.
 
 ```{r, libs, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
-options(repos='http://cran.rstudio.com/')
 install.packages("devtools")
+library("devtools")
 ```
 
-Now load the package and install ITHIM.
+Now use _install\_github_ to install _ITHIM_ and be sure to load it with _library_.
 
 ```{r libs2, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
 library("devtools")
-#install_github(repo = "syounkin/ITHIM", ref = "devel")
-install("~/ITHIM/")
+install_github(repo = "syounkin/ITHIM", ref = "master")
 library("ITHIM")
 ```
 
 
+
 ### Create default ITHIM object
+=======
+Now that ITHIM is installed and loaded the first step is to create an
+ITHIM object that represents the baseline vision.
+
+To do so we may create the default ITHIM object using _createITHIM_.
+createITHIM as follows.
+
 
 ```{r create, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
 ITHIM.baseline <- createITHIM()
 ```
+
 
 ### ITHIM Methods
 
@@ -71,6 +80,33 @@ Each ITHIM object contains a ParameterSet object.
 ```{r pSet, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
 paramSet.baseline <- getParameterSet(ITHIM.baseline)
 paramSet.scenario <- getParameterSet(ITHIM.scenario)
+=======
+An ITHIM object is an R object that conatins, among other things, a
+set of parameters that define the model.  To view these parameters we
+may use _getParameterSet_.
+
+```{r class, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
+getParameterSet(ITHIM.baseline)
+```
+
+There are currently fourteen parameters, many of which are matrices,
+in the model.  (Recall that we are only using the physical activity
+component.)
+
+We have means and mean matrices for walk time, cycle time and
+non-travel-related activity and coefficients of variation for active
+transport time and non-travel-related activity.  nAgeClass has always
+been 8 and meanType is always "referent".  GBD is an array of disease
+burden estimates and quantiles is the vector of quantiles used for the
+approximation of the PAF integral.
+
+Now to create the scenario we need only change one parameter.
+Parameters may be changed with _update_.  First we change the mean
+walking time muwt to 120 minutes.
+
+```{r scenario, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
+ITHIM.scenario <- update(ITHIM.baseline, list(muwt =120))
+>>>>>>> a14bdd7f9847c86f744bf70f3ffe8d2643d2ffb5
 ```
 
 ```{r class, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}

@@ -5,6 +5,7 @@ week)
 * Schedule
 ** Set 1
 *** Pomodoro #1
+
 12:45
 *** Pomodoro #2
 1:05
@@ -21,14 +22,30 @@ week)
 2:40
 ** Long Break
 2:40-3:00
+=======
+10:02
+*** Pomodoro #2
+10:22
+*** Pomodoro #3
+10:42
+** Long Break
+11:05 - 11:20
+** Set 2
+*** Pomodoro #4
+11:20
+*** Pomodoro #5
+11:40
+*** Pomodoro #6
+12:00
+** Long Break
+12:10 - 12:40
+
 ** Set 3
 *** Pomodoro #7
 
 *** Pomodoro #8
 
 *** Pomodoro #9
-
-
 * Current Pomodoro List
 ** Create Pomodoro list and Misc [X]
 *** Misc
@@ -36,22 +53,25 @@ week)
 **** TODO Run ITHIM.R
 **** TODO Schedule car to Phoenix
 **** DONE Clean Wunderlist
+** Eric Main [X] [ ]
+*** TODO Update the tutorial
+** Vargo's new functions [X] [ ]
+** DiCaprio Proposal [ ] x 2
+*** TODO Read
+*** TODO Comment
+** Buy laptop [ ] x 2
+* Future Pomodoro List
 ** Action Items [ ] x 2
 *** TODO Read James's Analytica materials
 *** TODO Reach out to Faris, Ali, Yizheng and Liming
 *** TODO ICT Repository
-
-
-* Future Pomodoro List
 ** Error bars to travel estimates [ ] x 3
 ** Make data package
-** Create Pomodoro List and Set up [ ]
 ** Misc [ ]
 *** TODO research laptops
 - System76 Lemur, $1,000 i7 dual, 16GB, ($7,500 for the cheap version)
 - 8 GB, i5, 256 GB MacBook $1,599 (2.03 pounds)
 - MacBook Air $1,200, 8 GB, i5,
-
 ** Edit methods paper [ ] x 3
 *** TODO Update methods paper To-Do List
 *** TODO Materials & Methods
@@ -62,10 +82,10 @@ week)
 ** Wijk aan Zee Trip Details [ ]
 *** TODO Book hotel in Wijk aan Zee
 *** TODO Travel arrangements from Amsterdam <-> Wijk aan Zee
-
 ** Create a six-month plan for work at GHI [ ]
-
 * Completed Pomodoro List
+** Eric Main [ ]
+*** DONE Email about Slack message
 ** Create ITHIM class [X] x 3?
 ** Figure for Jonathan [X] [X] [X]
 *** DONE Send figures to Vargo
@@ -105,6 +125,8 @@ Re: Christmas and Madison Trip
 *** DONE Make files available for Maggie
 Introduction and Discussion
 ** Cambridge Trip Details
+*** DONE Reserve bed and breakfast
+*** DONE Email James itinerary
 *** DONE Book airfare from Amsterdam to London
 *** DONE Reserve tickets
 *** DONE Email Jonathan/Monet to confirm purchase of airfare
