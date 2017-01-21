@@ -19,55 +19,65 @@ Now load the package and install ITHIM.
 
 ```{r libs2, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
 library("devtools")
-install_github(repo = "syounkin/ITHIM", ref = "devel")
+#install_github(repo = "syounkin/ITHIM", ref = "devel")
+install("~/ITHIM/")
 library("ITHIM")
 ```
 
-### Step-by-step
 
-Now that ITHIM is installed and loaded the first step is to create the
-baseline model.  To do so, using defaults built into the package, use
-createITHIM as follows.
+### Create default ITHIM object
 
 ```{r create, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
 ITHIM.baseline <- createITHIM()
 ```
 
+### ITHIM Methods
+
+
+#### getMeans
+
+```{r methods3, eval = TRUE, dev=c('png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
+getMeans(ITHIM.baseline)
+```
+
+#### update
+
+```{r update, eval = TRUE, dev=c('png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
+ITHIM.scenario <- update(ITHIM.baseline, list(muwt = 2*getMeans(ITHIM.baseline)$walk))
+```
+
+#### compareModels
+
+```{r compareModels, eval = TRUE, dev=c('png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
+CRA.list <- compareModels(ITHIM.baseline,ITHIM.scenario)
+```
+
+#### Plot
+
+```{r methods2, eval = FALSE, dev=c('png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
+plot(ITHIM.baseline)
+```
+
+#### getMethodsITHIM
+
+```{r getMethods, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
+getMethodsITHIM()
+```
+
+### The _ParameterSet_ Object
+
+Each ITHIM object contains a ParameterSet object.
+
+```{r pSet, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
+paramSet.baseline <- getParameterSet(ITHIM.baseline)
+paramSet.scenario <- getParameterSet(ITHIM.scenario)
+```
+
 ```{r class, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
-
+paramSet.baseline
 ```
 
-
-
-
-
-There are currently fourteen parameters, many of which are matrices,
-in the model.  (Recall that we are only using the physical activity
-component.)
-
-```{r parameters, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
-names(ITHIM.baseline$parameters)
+```{r class2, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
+paramSet.scenario
 ```
 
-We have means and mean matrices for walk time, cycle time and
-non-travel-related activity and coefficients of variation for active
-transport time and non-travel-related activity.  nAgeClass has always
-been 8 and meanType is always "referent".  GBD is an array of disease
-burden estimates and quantiles is the vector of quantiles used for the
-approximation of the PAF integral.
-
-Now to create the scenario we need only change one parameter.
-Parameters may be changed with updateITHIM.  First we change the mean
-walking time muwt to 120 minutes.
-
-```{r scenario, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
-ITHIM.scenario <- updateITHIM(ITHIM.baseline, "muwt", 120)
-```
-Now to run the comparative risk assesment use compareModels.
-```{r CRA, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
-comparativeRisk <- compareModels(ITHIM.baseline, ITHIM.scenario)
-```
-
-```{r AF, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
-comparativeRisk$AF$ColonCancer
-```

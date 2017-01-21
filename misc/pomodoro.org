@@ -5,24 +5,22 @@ week)
 * Schedule
 ** Set 1
 *** Pomodoro #1
-Wed Jan  4 08:59:55 2017
+12:45
 *** Pomodoro #2
-Wed Jan  4 09:23:14 2017
+1:05
 *** Pomodoro #3
-9:43
+1:20
 ** Long Break
-10:00 - 10:30
-** Meeting
-10:30 - 11:30
+1:35-2:00
 ** Set 2
 *** Pomodoro #4
-11:30
+2:00
 *** Pomodoro #5
-11:50
+2:20
 *** Pomodoro #6
-12:10
+2:40
 ** Long Break
-12:15 - 1:00
+2:40-3:00
 ** Set 3
 *** Pomodoro #7
 
@@ -34,11 +32,9 @@ Wed Jan  4 09:23:14 2017
 * Current Pomodoro List
 ** Create Pomodoro list and Misc [X]
 *** Misc
-**** DONE make data
-**** DONE Run ITHIM.R
+**** TODO make data
+**** TODO Run ITHIM.R
 **** TODO Schedule car to Phoenix
-**** DONE Schedule boiler inspection
-**** TODO Schedule flu shot
 **** DONE Clean Wunderlist
 ** Action Items [ ] x 2
 *** TODO Read James's Analytica materials
@@ -87,6 +83,8 @@ Wed Jan  4 09:23:14 2017
 *** DONE Put ITHIM (GHI) meetings on calendar
 *** DONE Slack about scheduling ITHIM (All-Team) meeting
 ** Misc
+*** DONE Schedule flu shot
+*** DONE Schedule boiler inspection
 *** DONE White Elephant Party
 *** DONE Holiday Block Party
 *** DONE Poker Doodle
