@@ -19,22 +19,68 @@ library("devtools")
 Now use _install\_github_ to install _ITHIM_ and be sure to load it with _library_.
 
 ```{r libs2, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
-install_github(repo = "syounkin/ITHIM", ref = "devel")
+library("devtools")
+install_github(repo = "syounkin/ITHIM", ref = "master")
 library("ITHIM")
 ```
 
-### Step-by-step
 
+
+### Create default ITHIM object
+=======
 Now that ITHIM is installed and loaded the first step is to create an
 ITHIM object that represents the baseline vision.
 
 To do so we may create the default ITHIM object using _createITHIM_.
 createITHIM as follows.
 
+
 ```{r create, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
 ITHIM.baseline <- createITHIM()
 ```
 
+
+### ITHIM Methods
+
+
+#### getMeans
+
+```{r methods3, eval = TRUE, dev=c('png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
+getMeans(ITHIM.baseline)
+```
+
+#### update
+
+```{r update, eval = TRUE, dev=c('png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
+ITHIM.scenario <- update(ITHIM.baseline, list(muwt = 2*getMeans(ITHIM.baseline)$walk))
+```
+
+#### compareModels
+
+```{r compareModels, eval = TRUE, dev=c('png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
+CRA.list <- compareModels(ITHIM.baseline,ITHIM.scenario)
+```
+
+#### Plot
+
+```{r methods2, eval = FALSE, dev=c('png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
+plot(ITHIM.baseline)
+```
+
+#### getMethodsITHIM
+
+```{r getMethods, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
+getMethodsITHIM()
+```
+
+### The _ParameterSet_ Object
+
+Each ITHIM object contains a ParameterSet object.
+
+```{r pSet, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
+paramSet.baseline <- getParameterSet(ITHIM.baseline)
+paramSet.scenario <- getParameterSet(ITHIM.scenario)
+=======
 An ITHIM object is an R object that conatins, among other things, a
 set of parameters that define the model.  To view these parameters we
 may use _getParameterSet_.
@@ -60,12 +106,14 @@ walking time muwt to 120 minutes.
 
 ```{r scenario, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
 ITHIM.scenario <- update(ITHIM.baseline, list(muwt =120))
-```
-Now to run the comparative risk assesment use compareModels.
-```{r CRA, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
-comparativeRisk <- compareModels(ITHIM.baseline, ITHIM.scenario)
+>>>>>>> a14bdd7f9847c86f744bf70f3ffe8d2643d2ffb5
 ```
 
-```{r AF, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
-comparativeRisk$AF$ColonCancer
+```{r class, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
+paramSet.baseline
 ```
+
+```{r class2, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
+paramSet.scenario
+```
+
