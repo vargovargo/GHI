@@ -38,7 +38,7 @@ First we use NHTS to estimate mean walking and cycling times.
 ### NHTS
 
 ```{r compute, echo = FALSE, eval = TRUE}
-compute <- TRUE
+compute <- FALSE
 ```
 
 #### Create a handful of functions to help parse data
@@ -175,6 +175,14 @@ RwtList <- lapply( meanWalkList, zeroReferentCase)
 RctList <- lapply( meanCycleList, zeroReferentCase)
 muwtList <- lapply( meanWalkList, function(x) ifelse(x[3,2]==0,1e-3, x[3,2]))
 muctList <- lapply( meanCycleList, function(x) ifelse(x[3,2]==0,1e-3, x[3,2]))
+```
+
+```{r sampleSize, eval = TRUE, dev=c('pdf', 'png'), fig.width = 3*fig.width, fig.asp = 1/phi, echo = TRUE, warning = FALSE}
+foo <- lapply( countMatrix, function(x) c(x) )
+foo <- melt(foo)
+names(foo) <- c("sampleSize", "state")
+p <- ggplot(foo, aes( x = state, y = sampleSize))
+p + geom_bar(stat = "identity") + scale_y_log10() + labs(y = "Sample Size (Referent Group)", x = "State") + theme_bw()
 ```
 
 ## Non-Travel METs
