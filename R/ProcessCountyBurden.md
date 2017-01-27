@@ -2,7 +2,7 @@
 title: "CDC WONDER county estimates for ITHIM"
 output: html_document
 ---
-The script creates county-level estimates of disesae burden using the annual number of deaths and the Global Burden of Disease numbers.  This script reads in text files output by CDC's WONDER database for deatiled mortality [https://wonder.cdc.gov/ucd-icd10.html]. There are four required files to get the needed age-gender-cause estimates required for ITHIM. We use the following causes of death for ITHIM from the ICD-10 113 Cause List. 
+The script creates county-level estimates of disesae burden by estimating annual number of age-sex-cause-sppecific deaths and combining with the Global Burden of Disease numbers for the US.  This script reads in text files output by CDC's WONDER database for deatiled mortality [https://wonder.cdc.gov/ucd-icd10.html]. There are four required files to get the needed age-gender-cause estimates required for ITHIM. You can run the query at this website. We use the following causes of death for ITHIM from the ICD-10 113 Cause List. 
 
 _Malignant neoplasms of colon, rectum and anus (C18-C21), Malignant neoplasms of trachea, bronchus and  lung (C33-C34), Malignant neoplasm of breast (C50), #Diabetes mellitus (E10-E14), #Alzheimer's disease (G30), Ischemic heart   diseases (I20-I25), Acute and subacute endocarditis (I33), Diseases of pericardium and acute myocarditis (I30-I31,I40),	Essential hypertension and hypertensive renal disease (I10,I12,I15), #Influenza and pneumonia (J09-J18), Other acute lower	respiratory infections (J20-J22,U04), #Chronic lower respiratory diseases (J40-J47), Other diseases of respiratory system	(J00-J06,J30- J39,J67,J70-J98), Motor vehicle accidents	(V02-V04,V09.0,V09.2,V12-V14,V19.0-V19.2,V19.4-V19.6,V20-V79,V80.3-V80.5,V81.0-V81.1,V82.0-V82.1,V83-V86,V87.0-V87.8,V88.0-V88.8, V89.0,V89.2),	Other land transport accidents (V01,V05-V06,V09.1,V09.3-V09.9,V10-V11,V15-V18,V19.3,V19.8-V19.9,V80.0-V80.2,V80.6-V80.9,V81.2-V81.9,V82.2-V82.9,V87.9,V88.9,	V89.1,V89.3,V89.9)_
 
@@ -13,8 +13,26 @@ _Malignant neoplasms of colon, rectum and anus (C18-C21), Malignant neoplasms of
 
 The WONDER query must be divided into the 5yr and 10 year groupings because WONDER does not provide any population counts for age groups over 84 years unless they are all grouped into the '85+' group which is only available using WONDER's 10yr grouping. We use the 5 year groups so that we are able to reconstruct the same age groups used in previous versions of ITHIM. 
 
-This chunk reads in the data. Obtaining the full detailed mortality needed for ITHIM requires querying CDC WONDER no less than 4 times. The number of rows must be set for the 10 and 5 yr data files, so that meta-data stored at the end of the text file is not read in.  
-
+This function reads in the data. Obtaining the full detailed mortality needed for ITHIM requires querying CDC WONDER no less than 4 times. The number of rows must be set for the 10 and 5 yr data files, so that meta-data stored at the end of the text file is not read in.  
+```{r}
+#function to read in and clean up each WONDER file
+readWONDER <- function(file){
+  
+  foo<-readLines(file)
+  foo<-foo[-1]
+  
+  if(length(grep("---",foo))>0){
+    foo<-foo[-c(grep("---",foo):length(foo))]
+  }
+  n <- as.numeric(length(foo))
+    
+  wonder <- read.table(file, sep="\t", as.is = T, nrows = n, skip=1)
+  header <- read.table(file, sep="\t", as.is = T, nrows = 1)
+  colnames(wonder) <- unlist(header)
+    
+  return(wonder)
+}
+```
 ```{r}
 #read in data for ages 0-84 (AKA 5yr age groups)
 numberOfRows <- 33696
