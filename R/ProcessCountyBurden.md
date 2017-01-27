@@ -31,9 +31,15 @@ readWONDER <- function(file){
   wonder <- read.table(file, sep="\t", as.is = T, nrows = n, skip=1)
   header <- read.table(file, sep="\t", as.is = T, nrows = 1)
   colnames(wonder) <- unlist(header)
-    
+  
+  wonder$Deaths <- ifelse(wonder$Population== "Suppressed" | wonder$Population== "Missing" , 0, wonder$Deaths)
+  wonder$POPclean <- ifelse(wonder$Population== "Suppressed", sample(1:9), as.integer(as.character(wonder$Population))) 
+  wonder$POPclean <- ifelse(wonder$Population== "Missing", sample(1:9), as.integer(as.character(wonder$POPclean))) 
+  
   return(wonder)
+  
 }
+
 ```
 
 This function will be used at the end of the script to prepare the data for import into an ITHIM object later. It converts the dataframe to a list and aggeregates seveal of the disease outcomes into one 'CVD' category. It is very similar to the readGBD function in the ITHIM package, but accepts a DF as its input instead of an RDS file.
@@ -77,20 +83,15 @@ fiveYearOneYear <-  paste("./",state,"_counties_2015_5yr.txt", sep="")
 tenYearAllYears <-  paste("./",state,"_counties_99-15_10yr.txt", sep="")
 tenYearOneYear <-  paste("./",state,"_counties_2015_10yr.txt", sep="")
  
-
 #read in data for ages 0-84 (AKA 5yr age groups)
 wonder <- readWONDER(fiveYearAllYears)
 wonder2 <- readWONDER(fiveYearOneYear)
-wonder2$POPclean <- ifelse(wonder2$Population== "Suppressed", sample(1:9), as.integer(as.character(wonder2$Population))) 
-wonder2$POPclean <- ifelse(wonder2$Population== "Missing", 1, as.integer(as.character(wonder2$POPclean)))
 wonder2$POP2015 <- as.integer(as.character(wonder2$POPclean))
 wonder <- cbind(wonder, wonder2["POP2015"])
 
 #read in data for ages 85plus (AKA 10yr age groups)
 wonder10 <- readWONDER(tenYearAllYears)
 wonder210 <- readWONDER(tenYearOneYear)
-wonder210$POPclean <- ifelse(wonder210$Population== "Suppressed", sample(1:9), as.integer(as.character(wonder210$Population))) 
-wonder210$POPclean <- ifelse(wonder210$Population== "Missing", 1, as.integer(as.character(wonder210$POPclean)))
 wonder210$POP2015 <- as.integer(as.character(wonder210$POPclean))
 wonder10 <- cbind(wonder10, wonder210["POP2015"])
 names(wonder10) <- names(wonder)
@@ -104,14 +105,14 @@ The code binds the data from the 5yr and 10yr age groups to give you all years a
 Using the imputed death tallies and all year popualtions we calculate a crude rate for each county-age-gener-cause combo, and apply that rate to the single year population to estimate the single year death count. 
 
 ```{r}
+
 wonderall$EstImpDeaths <- as.integer(ifelse(wonderall$Deaths == "Suppressed", sample(0:9), as.integer(as.character(wonderall$Deaths))))
 wonderall$EstRate <- wonderall$EstImpDeaths/as.integer(as.character(wonderall$Population))
 ##### if pop is small set rate to zero or a default
 wonderall$EstDeaths <- wonderall$EstRate*wonderall$POP2015
 
-wonderall <- wonderall[,c(2,3,4,6,8,13:16)]
+wonderall <- wonderall[,c(2,3,4,6,8,14:17)]
 names(wonderall) <- c("county", "countyFIPS", "wonderAge", "wonderGender","wonderCause","POP2015","EstImpDeaths","EstRate","EstDeaths")   
-
 
 ```
 One cause in ITHIM is not included in the ICD-10, depression. Here a frame of county-age-gender-depression cells are created, mereged with the appropriate single year populations and merged with the data from WONDER before final application of the burden estimates. 
