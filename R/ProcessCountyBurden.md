@@ -63,6 +63,10 @@ readGBDcounties <- function(stateGBD){
 }
 ```
 ```{r}
+library(ggplot2)
+library(plyr)
+
+
 #Identify the state as 2-letter abbreviation (all caps) for which you are running the script here. 
 state <- "OR"
 
@@ -157,35 +161,51 @@ Finally, this table can be paired with the US GBD numbers to estimate a scaled c
 ```{r}
 
 ########## this 'wonderall' is a table you can crunch for anything ##################
-#summarize by county>Urbanization>Gender<age<cause
-wonderSummary <- ddply(wonder, .(county, gender, ITHIMage, ITHIMcause), summarise, 
-                       Deaths = sum(as.numeric(as.character(EstDeaths)), na.rm=T),
-                       POP = mean(POP2014, na.rm=T)
+#summarize by state>Urbanization>Gender<age<cause
+wonderSummary <- ddply(wonderall, .(county, wonderGender, ITHIMage, ITHIMcause, wonderCause ), summarise, 
+                       Deaths = sum(as.integer(as.character(EstDeaths)), na.rm=T),
+                       POP = sum(POP2015, na.rm=T)
 )
 
+wonderSummary <- ddply(wonderSummary, .(county, wonderGender, ITHIMage, ITHIMcause), summarise, 
+                       Deaths = sum(as.integer(as.character(Deaths)), na.rm=T),
+                       POP = mean(POP, na.rm=T)
+)
 
-USGBD <- read.csv("../USGBD.csv", header=T)
+names(wonderSummary) <- c("county","gender","ITHIMage","ITHIMcause","deaths","POP")
+
+USGBD <- read.csv(url("https://uwmadison.box.com/shared/static/3k579xkxoyjgdbn6odx15wkxmbskanq9.csv"), header=T)
 USGBD$ITHIMage <- as.character(USGBD$ITHIMage)
 USGBD$ITHIMcause <- as.character(USGBD$ITHIMcause)
 
 burden <- merge(wonderSummary, USGBD, all.x=T)
-burden$deaths <- burden$Deaths
-burden$ratio <- ifelse(burden$GBDdeaths == 0, 1, ((burden$deaths/burden$POP)/(burden$GBDdeaths/burden$GBDpop)))
+
+#magic number here for setting RRatio to 1
+burden$ratio <- ifelse(burden$GBDdeaths < 10, 1, ((burden$deaths/burden$POP)/(burden$GBDdeaths/burden$GBDpop)))
 burden$YLL <- burden$ratio * (burden$GBDyll/burden$GBDpop) * burden$POP
 burden$YLD <- burden$ratio * (burden$GBDyld/burden$GBDpop) * burden$POP
 burden$DALY <- burden$ratio * (burden$GBDdaly/burden$GBDpop) * burden$POP
 
-burden$sex <- factor(ifelse(burden$gender == "Male ","M","F"), levels=c("M","F"))
+burden$sex <- factor(ifelse(burden$gender == "Male" | burden$gender == "Male ","M","F"), levels=c("M","F"))
     
 burdenOut <- burden[,c("county","ITHIMcause","sex","ITHIMage","deaths","YLL","YLD","DALY")]
 names(burdenOut) <- c("county","disease","sex","ageClass","dproj","yll","yld","daly")
 
-burdenOut <- burdenOut[order(burdenOut$county, burdenOut$disease, burdenOut$sex, burdenOut$ageClass),] 
+burdenOut <- burdenOut[order(burdenOut$county, burdenOut$disease, burdenOut$sex, burdenOut$ageClass),]
 
-saveRDS(burdenOut, "./WICountiesBurdens2014.rds")
-write.csv(burdenOut, "./WICountiesBurdens2014.csv", row.names=F)
+
+#output <- readGBDcounties(burdenOut)
+
+write.csv(output, paste("./",state,"CountiesBurdens2015.csv", sep=""), row.names=F)
 
 ```
 
 We can check the distribution of burden by county-age-gender for particular cause (say, Breast Cancer) in all counties by plotting it. 
 
+```{r}
+
+gah <- subset(burdenOut, disease == "BreastCancer")
+
+ggplot(gah, aes(x=ageClass, y=yll, fill=factor(sex))) + geom_bar(stat="identity", position="dodge") + facet_wrap(~county)
+
+```
