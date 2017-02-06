@@ -44,52 +44,17 @@ RIburden <- computeRoadInjuryBurden(ITHIM.baseline, ITHIM.scenario)
 deltaDeaths <- sum(subset(RIburden, burden == "dproj")$delta)
 ```
 
-```{r roadInjuries4, message = FALSE, , dev=c('png'), eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
-
-deltaDeathsVec <- c()
-
-for( sin in sinVec <- seq(0,1,length.out = 25) ){
-    ITHIM.baseline <- update(ITHIM.baseline, list(safetyInNumbers = sin*matrix(1,nrow = 8, ncol = 2)))
-    ITHIM.scenario <- updateRoadInjuries(ITHIM.baseline, ITHIM.scenario)
-    RIburden <- computeRoadInjuryBurden(ITHIM.baseline, ITHIM.scenario)
-    deltaDeaths <- sum(subset(RIburden, burden == "dproj")$delta)
-    deltaDeathsVec <- c(deltaDeathsVec, deltaDeaths)
-}
-
-plot(sinVec, deltaDeathsVec, type = "p", pch = 20)
-
-```
-```{r roadInjuries5, message = FALSE, , dev=c('png'), eval = FALSE, warning = FALSE, error = TRUE, echo = FALSE}
-    ITHIM.baseline <- update(ITHIM.baseline, list(safetyInNumbers = 0.5*matrix(1,nrow = 8, ncol = 2)))
-deltaDeathsVec <- c()
-for( underReporting in underReportingVec <- runif(10,0,1) ){
-    cat(underReporting)
-    ITHIM.baseline <- update(ITHIM.baseline, list(roadInjuries = lapply(getRoadInjuries(ITHIM.baseline), function(x) x/underReporting)))
-    ITHIM.scenario <- updateRoadInjuries(ITHIM.baseline, ITHIM.scenario)
-    RIburden <- computeRoadInjuryBurden(ITHIM.baseline, ITHIM.scenario)
-    deltaDeaths <- sum(subset(RIburden, burden == "dproj")$delta)
-    deltaDeathsVec <- c(deltaDeathsVec, deltaDeaths)
-}
-plot(underReportingVec, deltaDeathsVec, type = "p", pch = 20)
-```
-
 ```{r roadInjuries6, message = FALSE, , dev=c('png'), eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
-
-for(i in 1:10){
-
-    simRI <- lapply(getRoadInjuries(ITHIM.baseline), function(x){
-      lambda <- c(as.matrix(x))
-      simCount <- matrix(mapply(function(y){rpois(1,y)},y=lambda), nrow = nrow(x), ncol = ncol(x))
-      dimnames(simCount) <- dimnames(x)
-      simCount
-    })
+simRI <- lapply(getRoadInjuries(ITHIM.baseline), function(x){
+  lambda <- c(as.matrix(x))
+  simCount <- matrix(mapply(function(y){rpois(1,y)},y=lambda), nrow = nrow(x), ncol = ncol(x))
+  dimnames(simCount) <- dimnames(x)
+  retrun(simCount)
+})
 
 ITHIM.baseline.sim <- update(ITHIM.baseline, list(roadInjuries = simRI))
     ITHIM.scenario.sim <- updateRoadInjuries(ITHIM.baseline.sim, ITHIM.scenario)
     RIburden <- computeRoadInjuryBurden(ITHIM.baseline.sim, ITHIM.scenario.sim)
     deltaDeaths <- sum(subset(RIburden, burden == "dproj")$delta)
 cat(c(deltaDeaths, "\n"))
-
-}
-
 ```
