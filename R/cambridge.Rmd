@@ -53,8 +53,8 @@ simRI <- lapply(getRoadInjuries(ITHIM.baseline), function(x){
 })
 
 ITHIM.baseline.sim <- update(ITHIM.baseline, list(roadInjuries = simRI))
-    ITHIM.scenario.sim <- updateRoadInjuries(ITHIM.baseline.sim, ITHIM.scenario)
-    RIburden <- computeRoadInjuryBurden(ITHIM.baseline.sim, ITHIM.scenario.sim)
-    deltaDeaths <- sum(subset(RIburden, burden == "dproj")$delta)
-cat(c(deltaDeaths, "\n"))
+ITHIM.scenario.sim <- updateRoadInjuries(ITHIM.baseline.sim, ITHIM.scenario)
+RIburden <- computeRoadInjuryBurden(ITHIM.baseline.sim, ITHIM.scenario.sim)
+deltaDeaths <- sum(subset(RIburden, burden == "dproj")$delta)
+
 ```
