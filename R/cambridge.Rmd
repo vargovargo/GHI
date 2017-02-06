@@ -49,7 +49,7 @@ simRI <- lapply(getRoadInjuries(ITHIM.baseline), function(x){
   lambda <- c(as.matrix(x))
   simCount <- matrix(mapply(function(y){rpois(1,y)},y=lambda), nrow = nrow(x), ncol = ncol(x))
   dimnames(simCount) <- dimnames(x)
-  retrun(simCount)
+  return(simCount)
 })
 
 ITHIM.baseline.sim <- update(ITHIM.baseline, list(roadInjuries = simRI))
