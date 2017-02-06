@@ -1,0 +1,26 @@
+* STATS19 Dataset
+** Police road traffic injuries data
+**
+
+
+
+* Tasks
+** Convert everything into R
+** reproducing Annas stata code in R
+** STATS19 -> baseline risk estimates w/ uncertainty
+** ICT -> integrated with sTATS19 data???
+***
+
+
+* Sam
+Help with Ali's packaging?
+*
+
+* ICT
+
+** individual level
+
+
+* UW struggles with scenario generation
+
+*
