@@ -11,10 +11,10 @@ results, questions, interpreations, notes, etc.-->
 ```{r libs, eval = TRUE, echo = TRUE, results = "hide", warning = FALSE, error = FALSE, message = FALSE}
 rm(list=ls())
 library("devtools")
-install_github("syounkin/ITHIM", ref="devel")
-#install("~/ITHIM/")
-#document("~/ITHIM/")
-#install("~/ITHIM/")
+#install_github("syounkin/ITHIM", ref="cambridge")
+install("~/ITHIM/")
+document("~/ITHIM/")
+install("~/ITHIM/")
 library("ITHIM")
 ```
 
