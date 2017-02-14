@@ -64,6 +64,9 @@ readGBDcounties <- function(stateGBD){
   
 }
 ```
+
+From here down the script requires files in a Box Sync directory.
+
 ```{r}
 library(ggplot2)
 library(plyr)
