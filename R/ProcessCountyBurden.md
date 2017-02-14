@@ -1,7 +1,3 @@
----
-title: "CDC WONDER county estimates for ITHIM"
-output: html_document
----
 The script creates county-level estimates of disesae burden, which can be used to update an ITHIM object.  It does so by estimating annual number of age-sex-cause-specific deaths and combining them with the Global Burden of Disease numbers for the US.  This script reads in text files output by CDC's WONDER database for deatiled mortality [https://wonder.cdc.gov/ucd-icd10.html]. We use the following causes of death for ITHIM from the ICD-10 113 Cause List. 
 
 _Malignant neoplasms of colon, rectum and anus (C18-C21), Malignant neoplasms of trachea, bronchus and  lung (C33-C34), Malignant neoplasm of breast (C50), #Diabetes mellitus (E10-E14), #Alzheimer's disease (G30), Ischemic heart   diseases (I20-I25), Acute and subacute endocarditis (I33), Diseases of pericardium and acute myocarditis (I30-I31,I40),	Essential hypertension and hypertensive renal disease (I10,I12,I15), #Influenza and pneumonia (J09-J18), Other acute lower	respiratory infections (J20-J22,U04), #Chronic lower respiratory diseases (J40-J47), Other diseases of respiratory system	(J00-J06,J30- J39,J67,J70-J98), Motor vehicle accidents	(V02-V04,V09.0,V09.2,V12-V14,V19.0-V19.2,V19.4-V19.6,V20-V79,V80.3-V80.5,V81.0-V81.1,V82.0-V82.1,V83-V86,V87.0-V87.8,V88.0-V88.8, V89.0,V89.2),	Other land transport accidents (V01,V05-V06,V09.1,V09.3-V09.9,V10-V11,V15-V18,V19.3,V19.8-V19.9,V80.0-V80.2,V80.6-V80.9,V81.2-V81.9,V82.2-V82.9,V87.9,V88.9,	V89.1,V89.3,V89.9)_

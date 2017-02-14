@@ -10,6 +10,9 @@ RoadFatalities: R/RoadFatalities.Rmd R/RoadFatalities.R
 tutorial: R/tutorial.Rmd R/tutorial.R
 	cd R; R --vanilla -e 'source("tutorial.R")'
 
+ProcessCountyBurden: R/ProcessCountyBurden.md R/ProcessCountyBurden.R
+	cd R; R --vanilla -e 'source("ProcessCountyBurden.R")'
+
 methods:
 	cd methodsPaper; make methodsPaper.pdf
 
