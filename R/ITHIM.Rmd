@@ -20,8 +20,8 @@ library("dplyr")
 
 ```{r loadITHIM, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = FALSE}
 document("~/ITHIM/")
-#install("~/ITHIM/")
-install_github("syounkin/ITHIM", ref="cambridge")
+install("~/ITHIM/")
+#install_github("syounkin/ITHIM", ref="cambridge")
 install_github("smbache/magrittr", ref="master")
 
 library("magrittr")
@@ -348,7 +348,7 @@ for( muNonTravel in seq(0, upper, by = wd)){
 
   ITHIM.national <- update(ITHIM.national, list(muNonTravel = muNonTravel))
 
-  DALYs <- lapply(ITHIMList, sumDALY, ITHIM.baseline = ITHIM.national)
+  DALYs <- lapply(ITHIMList, deltaBurden, ITHIM.baseline = ITHIM.national)
   DALYs <- data.frame(State = names(DALYs), muNonTravel = muNonTravel, DALY = unlist(DALYs))
   DALYsTotal <- rbind(DALYsTotal, DALYs)
 }
@@ -387,7 +387,7 @@ p + theme_bw() + scale_x_discrete(name="", labels = c("0-4","5-14","15-29","30-4
 
 ITHIMListScenario <- lapply(ITHIMList, function(ithim) update(ithim, list(muwt = ithim@parameters@muwt + 10*7)))
 
-deltaDALYList <- mapply(sumDALY, ITHIMList, ITHIMListScenario)
+deltaDALYList <- mapply(deltaBurden, ITHIMList, ITHIMListScenario)
 
 
 getDALY <- function( ITHIM ){
@@ -539,8 +539,8 @@ for(at in atVec ){  # minutes active transport/week
 
     ITHIM.national <- update(ITHIM.national, list(muNonTravel = muNonTravel))
 
-    DALYs <- sumDALY(ITHIM.national, ITHIM.scenario)
-    DALYs.quints <- sumDALY(ITHIM.national.quints, ITHIM.scenario.quints)
+    DALYs <- deltaBurden(ITHIM.national, ITHIM.scenario)
+    DALYs.quints <- deltaBurden(ITHIM.national.quints, ITHIM.scenario.quints)
 
     D <- data.frame(quants = c("percentiles","quintiles"), DALYs = c(DALYs,DALYs.quints),at = at, muNonTravel = muNonTravel)
 
