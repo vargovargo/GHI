@@ -157,5 +157,5 @@ DallasWONDERpop <- ddply(DallasCnty, .(state, county, tract, gender, WONDERage),
                                       
                          )
 
-write.csv(DallasWONDERpop, "./Box Sync/work/Louisville/Dallas/dallasWonderPop.csv", row.names=F)
+#write.csv(DallasWONDERpop, "./Box Sync/work/Louisville/Dallas/dallasWonderPop.csv", row.names=F)
 
