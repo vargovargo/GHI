@@ -38,6 +38,7 @@ First we use NHTS to estimate mean walking and cycling times.
 ### NHTS
 
 ```{r compute, echo = FALSE, eval = TRUE}
+date()
 compute <- FALSE
 ```
 
@@ -558,13 +559,12 @@ p + geom_line() + geom_point() + theme_bw() + scale_y_continuous(name="DALYs Ave
 
 ```
 
-## Figure 2
 
-```{r displayMeans, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = phi, warning = FALSE, message = FALSE, echo = FALSE}
+```{r displayMeans, eval = FALSE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = phi, warning = FALSE, message = FALSE, echo = FALSE}
 
 ITHIM.national <- update(ITHIM.national, list(muNonTravel = 10))
 
-D <- rbind(getWalkTime(ITHIM.national),getWalkSpeed(ITHIM.national),getCycleTime(ITHIM.national),getNonTravelMETs(ITHIM.national))
+D <- rbind(getWalkTime(ITHIM.national),getCycleTime(ITHIM.national),getNonTravelMETs(ITHIM.national))
 D <- within(D, sex <- factor(sex, levels = c("F","M")))
 
 p <- ggplot(D, aes(x = ageClass, y = mu, fill = sex)) + geom_bar(stat= "identity", position = "dodge")
@@ -637,3 +637,6 @@ p + theme_bw() + scale_y_continuous(name="DALYs Averted (thousands)") + facet_gr
 #+ theme(axis.text.x  = element_text(angle = 270, vjust = 0.5, size = 8)) + facet_grid( . ~ disease, scales = "free_y")
 ```
 
+```{r sessionInfo, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, echo = TRUE, warning = FALSE}
+sessionInfo()
+```

@@ -1,0 +1,117 @@
+
+
+Let's verify that our parameters have been set properly.
+
+```{r misc14, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+getWalkTime(ITHIM)
+getCycleTime(ITHIM)
+getRoadInjuries(ITHIM)
+head(getGBD(ITHIM))
+```
+
+
+## Archive
+
+
+
+The ITHIM class, which defines an ITHIM object, contains three slots.  Two of the slots are used for the physical activity component and the third is simply a container for all of the parameters in the model.  This container is the ParameterSet class.
+
+```{r roadInjuries11, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+getParameterSet(ITHIM)
+```
+
+## Road Injury Model
+We inspect the road injury counts that are used by default.
+```{r misc4, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+RI <- getRoadInjuries(ITHIM)
+class(RI)
+names(RI)
+RI$FatalLocal
+```
+
+We do not yet have default values for the distance by road type
+matrices.
+
+```{r misc3, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+getDistRoadType(ITHIM)
+```
+
+So, we have to update manually.
+
+```{r roadInjuries, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+scenario <- readRDS(file = "~/Downloads/distByRoadTypeScenario4.rds")
+base <- readRDS(file = "~/Downloads/distByRoadTypeBaseline.rds")
+ITHIM.baseline <- update(ITHIM, list(distRoadType = base))
+ITHIM.scenario <- update(ITHIM, list(distRoadType = scenario))
+getDistRoadType(ITHIM.baseline)
+getDistRoadType(ITHIM.scenario)
+```
+
+Now that we have the distances by road type we may compute the
+scenario injury multipliers and compute the scenario road injury
+estimates.
+
+```{r roadInjuries0, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+ITHIM.scenario <- updateRoadInjuries(ITHIM.baseline, ITHIM.scenario)
+```
+
+The final ingredient is the GBD set of parameters.  We have a file
+stored within the ITHIM package from which we may read in these
+values.  We update the ITHIM objects as follows.
+
+```{r roadInjuries9, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+#ITHIM.baseline <- update(ITHIM.baseline, list(GBD = readGBD(file = "~/GHI/misc/gbdEngland.csv")))
+#ITHIM.scenario <- update(ITHIM.scenario, list(GBD = readGBD(file = "~/GHI/misc/gbdEngland.csv")))
+```
+
+```{r roadInjuries10, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+getParameterSet(ITHIM.baseline)
+```
+
+```{r roadInjuries3, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+RIburden <- computeRoadInjuryBurden(ITHIM.baseline, ITHIM.scenario)
+(deltaDeaths <- sum(subset(RIburden, burden == "dproj")$delta))
+```
+
+## Safety in Numbers
+
+The point of all of this class and method business is to make the code for analyses tidy and human-readable.  Here is an example in which we vary the safety in numbers parameters.
+
+```{r roadInjuries4, message = FALSE, , dev=c('png'), eval = FALSE, warning = FALSE, error = TRUE, echo = FALSE}
+
+deltaDeathsVec <- c()
+
+for( sin in sinVec <- seq(0,1,length.out = 10) ){
+    ITHIM.baseline <- update(ITHIM.baseline, list(safetyInNumbers = sin*matrix(1,nrow = 8, ncol = 2)))
+    ITHIM.scenario <- updateRoadInjuries(ITHIM.baseline, ITHIM.scenario)
+    RIburden <- computeRoadInjuryBurden(ITHIM.baseline, ITHIM.scenario)
+    deltaDeaths <- sum(subset(RIburden, burden == "dproj")$delta) # Not human-readable enough, should improve
+    deltaDeathsVec <- c(deltaDeathsVec, deltaDeaths)
+}
+
+plot(sinVec, deltaDeathsVec, type = "b", pch = 20)
+
+```
+
+## Uncertainty in Road Injury Estimates
+
+```{r roadInjuries6, message = FALSE, , dev=c('png'), eval = FALSE, warning = FALSE, error = TRUE, echo = FALSE}
+
+deltaDeaths.vec <- c()
+for( i in 1:50 ){
+
+  simRI <- lapply(getRoadInjuries(ITHIM.baseline), function(x){
+    lambda <- c(as.matrix(x))
+    simCount <- matrix(mapply(function(y){rpois(1,y)},y=lambda), nrow = nrow(x), ncol = ncol(x))
+    dimnames(simCount) <- dimnames(x)
+    return(as.data.frame(simCount))
+  })
+  ITHIM.baseline.sim <- update(ITHIM.baseline, list(roadInjuries = simRI))
+  ITHIM.scenario.sim <- updateRoadInjuries(ITHIM.baseline.sim, ITHIM.scenario)
+
+  RIburden <- computeRoadInjuryBurden(ITHIM.baseline.sim, ITHIM.scenario.sim)
+  deltaDeaths <- sum(subset(RIburden, burden == "dproj")$delta)
+  deltaDeaths.vec <- c(deltaDeaths.vec, deltaDeaths)
+}
+hist(deltaDeaths.vec)
+```

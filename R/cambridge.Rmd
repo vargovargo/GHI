@@ -1,24 +1,18 @@
-﻿# Integrated Transport and Health Impacts Model
+﻿## ITHIM Package
 
-## ITHIM Package
-<!-- This document will eventually serve as a compendium to the R package
-_ITHIM_.  It will describe how to use the package to implement the
-ITHIM model, as well as a detailed description of the model itself.
-
-As a working document it will serve as a place for SGY to post
-results, questions, interpreations, notes, etc.-->
+### Install and Load ITHIM
 
 ```{r libs, eval = TRUE, echo = TRUE, results = "hide", warning = FALSE, error = FALSE, message = FALSE}
 rm(list=ls())
 library("devtools")
-#install_github("syounkin/ITHIM", ref="cambridge")
-install("~/ITHIM/")
-document("~/ITHIM/")
-install("~/ITHIM/")
+install_github("syounkin/ITHIM", ref="devel")
 library("ITHIM")
 ```
 
 ```{r misc, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = FALSE}
+#install("~/ITHIM/")
+#document("~/ITHIM/")
+#install("~/ITHIM/")
 fig.width <- 6 # inches
 phi <- (1+sqrt(5))/2 # the golden ratio ;)
 ```
@@ -32,141 +26,24 @@ scenarios are derived.  The necessary input parameters are contained
 in 3 files, listed below.
 
 ```{r misc2, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
-
 fileNamesList <- list(
-    activeTransportTimeFile = "~/GHI/misc/activeTransportTime.csv",
-#    roadInjuriesFile = "~/GHI/misc/stata19.csv",
-    roadInjuriesFile = "~/GHI/misc/roadInjuries.csv",
-#    GBDFile = "~/GHI/misc/gbdEngland_20170209.csv"
-    GBDFile = "~/GHI/misc/gbd.csv"
+    activeTransportTimeFile = "~/ITHIM/inst/activeTransportTime.csv",
+    roadInjuriesFile = "~/ITHIM/inst/roadInjuries.csv",
+    GBDFile = "~/ITHIM/inst/gbd.csv"
 )
 
 ITHIM <- createITHIM(fileNamesList)
-#ITHIM <- createITHIM()
 ```
 
-The file activeTtransportTime.csv contains means (absolute) for
-walking and cycling times (min/week), stratified by age and sex.
 Links to sample files can be found below.
 
-http://ithim.ghi.wisc.edu/activeTransportTime.csv
-http://ithim.ghi.wisc.edu/roadInjuries.csv
-http://ithim.ghi.wisc.edu/gbd.csv
+* [activeTransportTime.csv](http://ithim.ghi.wisc.edu/activeTransportTime.csv)
+* [roadInjuries.csv](http://ithim.ghi.wisc.edu/roadInjuries.csv)
+* [gbd.csv](http://ithim.ghi.wisc.edu/gbd.csv)
 
+These files can also be found in the devel branch of ITHIM repository.
 
+* [activeTransportTime.csv](https://github.com/syounkin/ITHIM/blob/devel/inst/activeTransportTime.csv)
+* [roadInjuries.csv](https://github.com/syounkin/ITHIM/blob/devel/inst/roadInjuries.csv)
+* [gbd.csv](https://github.com/syounkin/ITHIM/blob/devel/inst/gbd.csv)
 
-Let's verify that our parameters have been set properly.
-
-```{r misc14, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
-getWalkTime(ITHIM)
-getCycleTime(ITHIM)
-getRoadInjuries(ITHIM)
-head(getGBD(ITHIM))
-```
-
-
-## Archive
-
-
-
-The ITHIM class, which defines an ITHIM object, contains three slots.  Two of the slots are used for the physical activity component and the third is simply a container for all of the parameters in the model.  This container is the ParameterSet class.
-
-```{r roadInjuries11, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
-getParameterSet(ITHIM)
-```
-
-## Road Injury Model
-We inspect the road injury counts that are used by default.
-```{r misc4, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
-RI <- getRoadInjuries(ITHIM)
-class(RI)
-names(RI)
-RI$FatalLocal
-```
-
-We do not yet have default values for the distance by road type
-matrices.
-
-```{r misc3, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
-getDistRoadType(ITHIM)
-```
-
-So, we have to update manually.
-
-```{r roadInjuries, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
-scenario <- readRDS(file = "~/Downloads/distByRoadTypeScenario4.rds")
-base <- readRDS(file = "~/Downloads/distByRoadTypeBaseline.rds")
-ITHIM.baseline <- update(ITHIM, list(distRoadType = base))
-ITHIM.scenario <- update(ITHIM, list(distRoadType = scenario))
-getDistRoadType(ITHIM.baseline)
-getDistRoadType(ITHIM.scenario)
-```
-
-Now that we have the distances by road type we may compute the
-scenario injury multipliers and compute the scenario road injury
-estimates.
-
-```{r roadInjuries0, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
-ITHIM.scenario <- updateRoadInjuries(ITHIM.baseline, ITHIM.scenario)
-```
-
-The final ingredient is the GBD set of parameters.  We have a file
-stored within the ITHIM package from which we may read in these
-values.  We update the ITHIM objects as follows.
-
-```{r roadInjuries9, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
-#ITHIM.baseline <- update(ITHIM.baseline, list(GBD = readGBD(file = "~/GHI/misc/gbdEngland.csv")))
-#ITHIM.scenario <- update(ITHIM.scenario, list(GBD = readGBD(file = "~/GHI/misc/gbdEngland.csv")))
-```
-
-```{r roadInjuries10, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
-getParameterSet(ITHIM.baseline)
-```
-
-```{r roadInjuries3, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
-RIburden <- computeRoadInjuryBurden(ITHIM.baseline, ITHIM.scenario)
-(deltaDeaths <- sum(subset(RIburden, burden == "dproj")$delta))
-```
-
-## Safety in Numbers
-
-The point of all of this class and method business is to make the code for analyses tidy and human-readable.  Here is an example in which we vary the safety in numbers parameters.
-
-```{r roadInjuries4, message = FALSE, , dev=c('png'), eval = FALSE, warning = FALSE, error = TRUE, echo = FALSE}
-
-deltaDeathsVec <- c()
-
-for( sin in sinVec <- seq(0,1,length.out = 10) ){
-    ITHIM.baseline <- update(ITHIM.baseline, list(safetyInNumbers = sin*matrix(1,nrow = 8, ncol = 2)))
-    ITHIM.scenario <- updateRoadInjuries(ITHIM.baseline, ITHIM.scenario)
-    RIburden <- computeRoadInjuryBurden(ITHIM.baseline, ITHIM.scenario)
-    deltaDeaths <- sum(subset(RIburden, burden == "dproj")$delta) # Not human-readable enough, should improve
-    deltaDeathsVec <- c(deltaDeathsVec, deltaDeaths)
-}
-
-plot(sinVec, deltaDeathsVec, type = "b", pch = 20)
-
-```
-
-## Uncertainty in Road Injury Estimates
-
-```{r roadInjuries6, message = FALSE, , dev=c('png'), eval = FALSE, warning = FALSE, error = TRUE, echo = FALSE}
-
-deltaDeaths.vec <- c()
-for( i in 1:50 ){
-
-  simRI <- lapply(getRoadInjuries(ITHIM.baseline), function(x){
-    lambda <- c(as.matrix(x))
-    simCount <- matrix(mapply(function(y){rpois(1,y)},y=lambda), nrow = nrow(x), ncol = ncol(x))
-    dimnames(simCount) <- dimnames(x)
-    return(as.data.frame(simCount))
-  })
-  ITHIM.baseline.sim <- update(ITHIM.baseline, list(roadInjuries = simRI))
-  ITHIM.scenario.sim <- updateRoadInjuries(ITHIM.baseline.sim, ITHIM.scenario)
-
-  RIburden <- computeRoadInjuryBurden(ITHIM.baseline.sim, ITHIM.scenario.sim)
-  deltaDeaths <- sum(subset(RIburden, burden == "dproj")$delta)
-  deltaDeaths.vec <- c(deltaDeaths.vec, deltaDeaths)
-}
-hist(deltaDeaths.vec)
-```

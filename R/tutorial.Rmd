@@ -1,119 +1,72 @@
-## ITHIM Tutorial
+﻿## ITHIM Package Tutorial
 
-### Installing the package
+### Install and Load ITHIM
 
-```{r figwidth, eval = TRUE,  warning = FALSE, message = FALSE, echo = FALSE}
-fig.width <- 6
-phi <- (1+sqrt(5))/2 # the golden ratio ;)
-options(repos='http://cran.rstudio.com/')
-```
-
-First load the package from Github.  To do this you need the package
-_devtools_.
-
-```{r, libs, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
-install.packages("devtools")
+```{r libs, eval = TRUE, echo = TRUE, results = "hide", warning = FALSE, error = FALSE, message = FALSE}
 library("devtools")
-```
-
-Now use _install\_github_ to install _ITHIM_ and be sure to load it with _library_.
-
-```{r libs2, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
-library("devtools")
-install_github(repo = "syounkin/ITHIM", ref = "master")
+install_github("syounkin/ITHIM", ref="devel")
 library("ITHIM")
 ```
 
+### Create the ITHIM object
 
+#### Method 1: Using Input Files
 
-### Create default ITHIM object
-=======
-Now that ITHIM is installed and loaded the first step is to create an
-ITHIM object that represents the baseline vision.
+We begin by creating the ITHIM object from which both the baseline and
+scenario are derived.  Currently ITHIM reads three files for the
+necessary input parameters.  Sample files are listed below.
 
-To do so we may create the default ITHIM object using _createITHIM_.
-createITHIM as follows.
-
-
-```{r create, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
-ITHIM.baseline <- createITHIM()
+```{r misc2, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+fileNamesList <- list(
+    activeTransportTimeFile = "~/ITHIM/inst/activeTransportTime.csv",
+    roadInjuriesFile = "~/ITHIM/inst/roadInjuries.csv",
+    GBDFile = "~/ITHIM/inst/gbd.csv"
+)
 ```
 
+These files can be found in the devel branch of ITHIM repository.
 
-### ITHIM Methods
+* [activeTransportTime.csv](https://github.com/syounkin/ITHIM/blob/devel/inst/activeTransportTime.csv)
+* [roadInjuries.csv](https://github.com/syounkin/ITHIM/blob/devel/inst/roadInjuries.csv)
+* [gbd.csv](https://github.com/syounkin/ITHIM/blob/devel/inst/gbd.csv)
 
-
-#### getMeans
-
-```{r methods3, eval = TRUE, dev=c('png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
-getMeans(ITHIM.baseline)
+Now create the ITHIM object.
+```{r misc20, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+ITHIM <- createITHIM(fileNamesList)
 ```
 
-#### update
-
-```{r update, eval = TRUE, dev=c('png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
-ITHIM.scenario <- update(ITHIM.baseline, list(muwt = 2*getMeans(ITHIM.baseline)$walk))
+##### Active Transport File Format
 ```
-
-#### compareModels
-
-```{r compareModels, eval = TRUE, dev=c('png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
-CRA.list <- compareModels(ITHIM.baseline,ITHIM.scenario)
+ageClass,sex,mode,value
+ageClass1,M,walk,10
+ageClass2,M,walk,9
+...
+ageClass7,F,cycle,15
+ageClass8,F,cycle,13
 ```
-
-#### Plot
-
-```{r methods2, eval = FALSE, dev=c('png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
-plot(ITHIM.baseline)
+The rows must be ordered by ageClass.
+##### Road Injuries File Format
 ```
-
-#### getMethodsITHIM
-
-```{r getMethods, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
-getMethodsITHIM()
+severity,roadType,strikingMode,victimMode,value
+Fatal,Local,walk,walk,0
+Fatal,Local,cycle,walk,13
+...
+Serious,Highway,LGV,NOV,0
+Serious,Highway,mbike,NOV,0
 ```
-
-### The _ParameterSet_ Object
-
-Each ITHIM object contains a ParameterSet object.
-
-```{r pSet, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
-paramSet.baseline <- getParameterSet(ITHIM.baseline)
-paramSet.scenario <- getParameterSet(ITHIM.scenario)
-=======
-An ITHIM object is an R object that conatins, among other things, a
-set of parameters that define the model.  To view these parameters we
-may use _getParameterSet_.
-
-```{r class, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
-getParameterSet(ITHIM.baseline)
+ebikes are not included
+##### GBD File Format
+The GBD file format has not been normalized like the others yet.
 ```
-
-There are currently fourteen parameters, many of which are matrices,
-in the model.  (Recall that we are only using the physical activity
-component.)
-
-We have means and mean matrices for walk time, cycle time and
-non-travel-related activity and coefficients of variation for active
-transport time and non-travel-related activity.  nAgeClass has always
-been 8 and meanType is always "referent".  GBD is an array of disease
-burden estimates and quantiles is the vector of quantiles used for the
-approximation of the PAF integral.
-
-Now to create the scenario we need only change one parameter.
-Parameters may be changed with _update_.  First we change the mean
-walking time muwt to 120 minutes.
-
-```{r scenario, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
-ITHIM.scenario <- update(ITHIM.baseline, list(muwt =120))
->>>>>>> a14bdd7f9847c86f744bf70f3ffe8d2643d2ffb5
+disease,sex,ageClass,dproj,yll,yld,daly
+BreastCancer,M,ageClass1,0,0,0,0
+BreastCancer,M,ageClass2,0,0,0,0
+...
+RTIs,F,ageClass7,1486.647682,21930.32348,7921.96966,29852.3031
+RTIs,F,ageClass8,1957.865757,10720.47109,5222.446302,15942.95826
 ```
+RTIs stands for road traffic injuries.
 
-```{r class, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
-paramSet.baseline
+```{r misc22, message = FALSE, eval = FALSE, warning = FALSE, error = TRUE, echo = FALSE}
+purl("./tutorial.Rmd","./tutorialScript.R", documentation = 0)
 ```
-
-```{r class2, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = TRUE}
-paramSet.scenario
-```
-
