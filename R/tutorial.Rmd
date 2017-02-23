@@ -12,8 +12,6 @@ makes this is easy.
 library("devtools")
 install_github("syounkin/ITHIM", ref="master")
 library("ITHIM")
-date()
-packageVersion("ITHIM")
 ```
 
 ## Creating an ITHIM object
@@ -91,12 +89,15 @@ files by simply updating the baseline object with a few new
 parameters.
 
 First we need to know the name of the parameters we want to update.
-Currently the list of parameters resides in the help page for
-"createParameterList".  We will find a better place for it.
-Alternatively one can inspect the slots directly with slotNames.
+Currently the list of parameters resides in the help page for the
+ITHIM class.  Alternatively one can inspect the
+slots directly with `slotNames`.
 
-```{r misc24, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
-help(createParameterList)
+```{r misc24, message = FALSE, eval = FALSE, warning = FALSE, error = TRUE, echo = TRUE}
+help("ITHIM")
+```
+or
+```{r misc124, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
 slotNames(getParameterSet(ITHIM.baseline))
 ```
 
@@ -107,14 +108,23 @@ list of available methods use `getMethodsITHIM` with no arguments.
 ```{r misc23, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
 getMethodsITHIM()
 meanVec <- getMeans(ITHIM.baseline)
-meanWalkingTime <- meanVec$walk
-meanCyclingTime <- meanVec$cycle
+meanVec
+meanWalkingTime <- meanVec$walk; meanCyclingTime <- meanVec$cycle
 scenarioParameters <- list(muwt = 2*meanWalkingTime, muct = 2*meanCyclingTime)
 scenarioParameters
 ```
 
+Now we use the list of parameters and the baseline ITHIM object to
+create the scenario ITHIM object.
+
 ```{r misc250, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
 ITHIM.scenario <- update(ITHIM.baseline, scenarioParameters)
+```
+
+Let's inspect it to be sure.
+
+```{r misc351, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+getMeans(ITHIM.scenario)
 ```
 
 ## Physical Activity Component
@@ -123,5 +133,19 @@ Once the baseline and scenario ITHIM objects are defined, we may
 compute the change in burden due to physical activity as follows.
 
 ```{r misc25, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
-deltaBurden(ITHIM.baseline, ITHIM.scenario, dis = "total", bur = "daly.delta")
+deltaBurden(ITHIM.baseline, ITHIM.scenario, dis = "total", bur = "deaths")
+deltaBurden(ITHIM.baseline, ITHIM.scenario, dis = "BreastCancer", bur = "deaths")
+deltaBurden(ITHIM.baseline, ITHIM.scenario, dis = "Depression", bur = "deaths")
+deltaBurden(ITHIM.baseline, ITHIM.scenario, dis = "Depression", bur = "daly")
+```
+
+## Appendix
+
+```{r misc350, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+ITHIM.baseline
+ITHIM.scenario
+```
+### Session Info
+```{r sessionInfo, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = FALSE, message = FALSE}
+sessionInfo()
 ```
