@@ -349,7 +349,7 @@ for( muNonTravel in seq(0, upper, by = wd)){
 
   ITHIM.national <- update(ITHIM.national, list(muNonTravel = muNonTravel))
 
-  DALYs <- lapply(ITHIMList, deltaBurden, ITHIM.baseline = ITHIM.national)
+  DALYs <- lapply(ITHIMList, deltaBurden, baseline = ITHIM.national)
   DALYs <- data.frame(State = names(DALYs), muNonTravel = muNonTravel, DALY = unlist(DALYs))
   DALYsTotal <- rbind(DALYsTotal, DALYs)
 }
