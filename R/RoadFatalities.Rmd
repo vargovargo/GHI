@@ -8,21 +8,53 @@ library("devtools")
 library("reshape2")
 library("plyr")
 library("dplyr")
+library("tidyr")
+#install_github("smbache/magrittr", ref="master")
+#library("magrittr")
 ```
 
 ```{r loadITHIM, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = FALSE}
-#document("~/ITHIM/")
-#install("~/ITHIM/")
-install_github("syounkin/ITHIM", ref="devel")
-install_github("smbache/magrittr", ref="master")
-#library("magrittr")
+install("~/ITHIM/")
+#install_github("syounkin/ITHIM", ref="devel")
 library("ITHIM")
 fig.width <- 6 # inches
 phi <- (1+sqrt(5))/2 # the golden ratio ;)
 ```
 
+Note that I edited the file 'Countyavg_01-05.csv' by hand a little.
+The changes were simple, e.g., column names and capitilization.
 
-```{r roadFat, eval = TRUE, dev=c('png'), fig.width = fig.width, fig.asp = 1/phi, echo = TRUE, warning = FALSE}
+```{r foobar, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+RIbyCounty <- read.csv(file = "~/GHI/misc/Countyavg_01-05.csv", stringsAsFactors = TRUE)
+```
+
+We create a national road injuries estimate by adding up all of the
+county averages.  We do that using the R package `tidyr` and its
+piping mechanism `%>%`.  This is then written to the default file in
+`inst` and read in with `createITHIM` using no arguments (because its
+the default file).
+
+```{r foo, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+RINational <- RIbyCounty %>%
+  gather(strikingMode, count, -(1:5)) %>%
+  complete(severity, roadType, victimMode,strikingMode) %>%
+  group_by(severity,roadType,victimMode,strikingMode) %>%
+  summarise(value = sum(count, na.rm = TRUE)) %>%
+  filter(strikingMode != "nov")
+
+write.csv(RINational, file = "~/ITHIM/inst/roadInjuriesUS.csv", quote = FALSE, row.names = FALSE)
+```
+```{r foo2, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+install("~/ITHIM/")
+ITHIM <- createITHIM()
+
+getRoadInjuries(ITHIM)
+```
+Rows are stiking mode and columns are victim mode.
+
+
+
+```{r roadFat, eval = FALSE, dev=c('png'), fig.width = fig.width, fig.asp = 1/phi, echo = FALSE, warning = FALSE}
 pedDeath <- readRDS(file = "./data/BikePedDeathModelData.rds")
 pedDeath <- subset(pedDeath, urbSubRur == "Urban")
 pedDeath <- within(pedDeath, pedDeathLogical <- pedDeaths0913 > 0)
@@ -48,11 +80,11 @@ p #+ geom_freqpoly(binwidth = 10) #+ facet_grid( SEX ~ .)
 
 ggplot(D, aes(x = METs, ..density.., colour = AGECAT)) +
 
+#AT <- ifelse( ( pctWalkToWork + pctBikeToWork ) > 0  &  ( pctWalkToWork + pctBikeToWork ) <= 0.10 , "low" ,
+#ifelse( ( pctWalkToWork + pctBikeToWork ) > 0.10  &  ( pctWalkToWork + pctBikeToWork ) <= 0.50 , "medium" ,
+#ifelse( ( pctWalkToWork + pctBikeToWork ) > 0.50  &  ( pctWalkToWork + pctBikeToWork ) <= 1 , "high" , NA)))
 
 
 ```
 
 
-AT <- ifelse( ( pctWalkToWork + pctBikeToWork ) > 0  &  ( pctWalkToWork + pctBikeToWork ) <= 0.10 , "low" ,
-ifelse( ( pctWalkToWork + pctBikeToWork ) > 0.10  &  ( pctWalkToWork + pctBikeToWork ) <= 0.50 , "medium" ,
-ifelse( ( pctWalkToWork + pctBikeToWork ) > 0.50  &  ( pctWalkToWork + pctBikeToWork ) <= 1 , "high" , NA)))
