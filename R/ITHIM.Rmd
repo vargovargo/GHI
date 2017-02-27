@@ -21,7 +21,7 @@ library("dplyr")
 ```{r loadITHIM, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = FALSE}
 document("~/ITHIM/")
 install("~/ITHIM/")
-#install_github("syounkin/ITHIM", ref="cambridge")
+#install_github("syounkin/ITHIM", ref="devel")
 install_github("smbache/magrittr", ref="master")
 
 library("magrittr")
@@ -39,7 +39,7 @@ First we use NHTS to estimate mean walking and cycling times.
 
 ```{r compute, echo = FALSE, eval = TRUE}
 date()
-compute <- FALSE
+compute <- TRUE
 ```
 
 #### Create a handful of functions to help parse data
@@ -119,6 +119,10 @@ NHTS.trips <- subset(NHTS.trips, !is.na(TRVL_MIN))
 NHTS <- merge(NHTS.person, NHTS.trips, by = c("HOUSEID","PERSONID"), all.x = TRUE)
 NHTS <- within(NHTS, TRVL_MIN <- ifelse(is.na(TRVL_MIN), 0, TRVL_MIN))
 saveRDS(NHTS, file = "./data/NHTS.rds")
+
+
+# write.csv(with(NHTS,data.frame(HOUSEID, PERSONID, SEX, AGE, MODE = AT, TRVL_MIN, TRPMILES)), file = "./misc/NHTS.csv", quote = FALSE, row.names = FALSE)
+
 ```
 
 ```{r loadNHTS, eval = !compute}
