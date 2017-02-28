@@ -1,20 +1,28 @@
-﻿## ITHIM Package Tutorial
+﻿# ITHIM Package Tutorial
 
-### Install and Load ITHIM
+```{r rm, eval = TRUE, echo = FALSE, results = "hide", warning = FALSE, error = FALSE, message = FALSE}
+rm(list=ls())
+```
+To begin using ITHIM one first must install it.  The package devtools
+makes this is easy.
 
-```{r libs, eval = TRUE, echo = TRUE, results = "hide", warning = FALSE, error = FALSE, message = FALSE}
+## Install and Load ITHIM
+
+```{r libs, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = FALSE, message = FALSE}
 library("devtools")
-install_github("syounkin/ITHIM", ref="devel")
+install_github("syounkin/ITHIM", ref="master")
 library("ITHIM")
 ```
 
-### Create the ITHIM object
+## Creating an ITHIM object
 
-#### Method 1: Using Input Files
+The ITHIM package uses the ITHIM class to facilitate...
 
-We begin by creating the ITHIM object from which both the baseline and
-scenario are derived.  Currently ITHIM reads three files for the
-necessary input parameters.  Sample files are listed below.
+### Method 1: Using Input Files
+
+We begin by creating an ITHIM object to represent the baseline model.
+Currently ITHIM reads three files for the necessary input parameters.
+Sample files are listed below.
 
 ```{r misc2, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
 fileNamesList <- list(
@@ -24,18 +32,19 @@ fileNamesList <- list(
 )
 ```
 
-These files can be found in the devel branch of ITHIM repository.
+These files can be found in the master branch of ITHIM repository.
 
-* [activeTransportTime.csv](https://github.com/syounkin/ITHIM/blob/devel/inst/activeTransportTime.csv)
-* [roadInjuries.csv](https://github.com/syounkin/ITHIM/blob/devel/inst/roadInjuries.csv)
-* [gbd.csv](https://github.com/syounkin/ITHIM/blob/devel/inst/gbd.csv)
+* [activeTransportTime.csv](https://github.com/syounkin/ITHIM/blob/master/inst/activeTransportTime.csv)
+* [roadInjuries.csv](https://github.com/syounkin/ITHIM/blob/master/inst/roadInjuries.csv)
+* [gbd.csv](https://github.com/syounkin/ITHIM/blob/master/inst/gbd.csv)
 
-Now create the ITHIM object.
+Using the list of three file names we can create the ITHIM object using `createITHIM`.
+
 ```{r misc20, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
-ITHIM <- createITHIM(fileNamesList)
+ITHIM.baseline <- createITHIM(fileNamesList)
 ```
 
-##### Active Transport File Format
+#### Active Transport File Format
 ```
 ageClass,sex,mode,value
 ageClass1,M,walk,10
@@ -45,7 +54,7 @@ ageClass7,F,cycle,15
 ageClass8,F,cycle,13
 ```
 The rows must be ordered by ageClass.
-##### Road Injuries File Format
+#### Road Injuries File Format
 ```
 severity,roadType,strikingMode,victimMode,value
 Fatal,Local,walk,walk,0
@@ -55,7 +64,7 @@ Serious,Highway,LGV,NOV,0
 Serious,Highway,mbike,NOV,0
 ```
 ebikes are not included
-##### GBD File Format
+#### GBD File Format
 The GBD file format has not been normalized like the others yet.
 ```
 disease,sex,ageClass,dproj,yll,yld,daly
@@ -69,4 +78,74 @@ RTIs stands for road traffic injuries.
 
 ```{r misc22, message = FALSE, eval = FALSE, warning = FALSE, error = TRUE, echo = FALSE}
 purl("./tutorial.Rmd","./tutorialScript.R", documentation = 0)
+```
+
+### Method 2: Using the `update` Method
+
+Suppose we wanted to create a scenario in which the mean cycling time
+and mean walking time are doubled.  We need only to change two means
+in the model and nothing else.  To do so we could avoid creating input
+files by simply updating the baseline object with a few new
+parameters.
+
+First we need to know the name of the parameters we want to update.
+Currently the list of parameters resides in the help page for the
+ITHIM class.  Alternatively one can inspect the
+slots directly with `slotNames`.
+
+```{r misc24, message = FALSE, eval = FALSE, warning = FALSE, error = TRUE, echo = TRUE}
+help("ITHIM")
+```
+or
+```{r misc124, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+slotNames(getParameterSet(ITHIM.baseline))
+```
+
+Now we need to retrieve the walking and cycling means from the
+baseline model.  To do so we use the method `getMeans`.  To find a
+list of available methods use `getMethodsITHIM` with no arguments.
+
+```{r misc23, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+getMethodsITHIM()
+meanVec <- getMeans(ITHIM.baseline)
+meanVec
+meanWalkingTime <- meanVec$walk; meanCyclingTime <- meanVec$cycle
+scenarioParameters <- list(muwt = 2*meanWalkingTime, muct = 2*meanCyclingTime)
+scenarioParameters
+```
+
+Now we use the list of parameters and the baseline ITHIM object to
+create the scenario ITHIM object.
+
+```{r misc250, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+ITHIM.scenario <- update(ITHIM.baseline, scenarioParameters)
+```
+
+Let's inspect it to be sure.
+
+```{r misc351, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+getMeans(ITHIM.scenario)
+```
+
+## Physical Activity Component
+
+Once the baseline and scenario ITHIM objects are defined, we may
+compute the change in burden due to physical activity as follows.
+
+```{r misc25, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+deltaBurden(ITHIM.baseline, ITHIM.scenario, dis = "total", bur = "deaths")
+deltaBurden(ITHIM.baseline, ITHIM.scenario, dis = "BreastCancer", bur = "deaths")
+deltaBurden(ITHIM.baseline, ITHIM.scenario, dis = "Depression", bur = "deaths")
+deltaBurden(ITHIM.baseline, ITHIM.scenario, dis = "Depression", bur = "daly")
+```
+
+## Appendix
+
+```{r misc350, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+ITHIM.baseline
+ITHIM.scenario
+```
+### Session Info
+```{r sessionInfo, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = FALSE, message = FALSE}
+sessionInfo()
 ```
