@@ -4,7 +4,7 @@ library("ITHIM")
 packageVersion("ITHIM")
 rm(list=ls())
 
-######## read in ITHIM objects ####### 
+######## read in ITHIM objects #######
 #available at https://uwmadison.box.com/shared/static/06doqkc3aiaoqdb569r7si1vthlyvgu9.rds
 #states <- readRDS("~/Downloads/ITHIMList.by.state.rds")
 states <- readRDS("~/GHI/R/data/ITHIMList.by.state.rds")
@@ -13,6 +13,7 @@ states <- readRDS("~/GHI/R/data/ITHIMList.by.state.rds")
 
 allStatesResults <- data.frame()
 
+#for(i in 1:2){
 for(i in 1:length(states)){
 
     results <- data.frame()
@@ -39,15 +40,16 @@ for(i in 1:length(states)){
     ntVec <- c(2, 5, 10)
 
     for(muNT in ntVec){
-        for(wlk in 1:(n+1)){
-            for(cyc in 1:(n+1)){
-                scenario <- update(base, list(muwt = wVec[wlk], muct = cVec[cyc], muNonTravel = muNT))
-                activityLevel <- ifelse(muNT == 2, "Low", ifelse(muNT == 5, "Medium", "Low"))
+        base <- update(base, list(muNonTravel = muNT))
+        for(wlk in wVec){
+            for(cyc in cVec){
+                scenario <- update(base, list(muwt = wlk, muct = cyc, muNonTravel = muNT))
+                activityLevel <- ifelse(muNT == ntVec[1], "Low", ifelse(muNT == ntVec[2], "Medium", ifelse(muNT == ntVec[3], "High", NA)))
                 comparativeRisk <- data.frame(ST = state,
-                                              cycleTime = getMeans(scenario)$cycle, 
-                                              walkTime= getMeans(scenario)$walk, 
-                                              minIncreaseCycle = cyc-1, 
-                                              minIncreaseWalk = wlk-1, 
+                                              cycleTime = getMeans(scenario)$cycle,
+                                              walkTime= getMeans(scenario)$walk,
+                                              minIncreaseCycle = cyc-baseCycle,
+                                              minIncreaseWalk = wlk-baseWalk,
                                               nonTravelActivity = activityLevel)
 
                 deltaDALYs <- data.frame(deltaBurden(base, scenario, dis = "all"),
@@ -59,28 +61,40 @@ for(i in 1:length(states)){
                                          deltaBurden(base, scenario, dis = "Diabetes")
                                          )
 
-                names(deltaDALYs) <- c("deltaDALY.all","deltaDALY.BreastCancer","deltaDALY.ColonCancer","deltaDALY.CVD","deltaDALY.Dementia","deltaDALY.Depression","deltaDALY.Diabetes")
+                names(deltaDALYs) <- c("all","BreastCancer","ColonCancer","CVD","Dementia","Depression","Diabetes")
 
+                foo <- cbind(comparativeRisk, deltaDALYs)
 
-                comparativeRisk <-  cbind(comparativeRisk, deltaDALYs, totalDALYs)
+                foo <- foo %>% gather("disease","value",7:13)
+#                comparativeRisk <-  cbind(comparativeRisk, deltaDALYs, t(totalDALYs))
 
-                results <- rbind(comparativeRisk, results)     
-            }  
-        } 
+                results <- rbind(foo, results)
+            }
+        }
     }
 
     allStatesResults <- rbind(results, allStatesResults)
-    
+
 }
 
-allStatesResults <- within(allStatesResults,{ 
-                           pctTotalDALYS = deltaDALY.all/DALY.all
-                           pctBreastCancer = deltaDALY.BreastCancer/DALY.BreastCancer
-                           pctColonCancer = deltaDALY.ColonCancer/DALY.ColonCancer
-                           pctCVD = deltaDALY.CVD/DALY.CVD
-                           pctDementia = deltaDALY.Dementia/DALY.Dementia
-                           pctDepression = deltaDALY.Depression/DALY.Depression
-                           pctDiabetes = deltaDALY.Diabetes/DALY.Diabetes
-})
+allStatesResults <- data.frame(allStatesResults, total = t(totalDALYs))
+
+
+
+allStatesResults <- allStatesResults %>% dplyr::mutate( burdenScenario = total + value, pctReduction = -100*value/total)
+
+allStatesResults <- melt(allStatesResults[,!names(allStatesResults) %in% c("value","total")], id =c("ST","cycleTime","walkTime","minIncreaseCycle","minIncreaseWalk","nonTravelActivity","disease"))
+
+
+
+## allStatesResults <- within(allStatesResults,{
+##                            pctTotalDALYS = deltaDALY.all/DALY.all
+##                            pctBreastCancer = deltaDALY.BreastCancer/DALY.BreastCancer
+##                            pctColonCancer = deltaDALY.ColonCancer/DALY.ColonCancer
+##                            pctCVD = deltaDALY.CVD/DALY.CVD
+##                            pctDementia = deltaDALY.Dementia/DALY.Dementia
+##                            pctDepression = deltaDALY.Depression/DALY.Depression
+##                            pctDiabetes = deltaDALY.Diabetes/DALY.Diabetes
+## })
 
 write.csv(allStatesResults, file = "~/GHI/data/stateResults.csv", quote = FALSE, row.names = FALSE)
