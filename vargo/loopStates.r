@@ -2,6 +2,7 @@ library(devtools)
 install_github("syounkin/ITHIM", ref="devel", force=TRUE)
 library("ITHIM")
 packageVersion("ITHIM")
+rm(list=ls())
 
 ######## read in ITHIM objects ####### 
 #available at https://uwmadison.box.com/shared/static/06doqkc3aiaoqdb569r7si1vthlyvgu9.rds
@@ -12,55 +13,74 @@ states <- readRDS("~/GHI/R/data/ITHIMList.by.state.rds")
 
 allStatesResults <- data.frame()
 
-#i=48
-for(i in 1:3){ 
-  results <- data.frame()
-  state <- names(states[i])
-  base <- states[[state]]
+for(i in 1:length(states)){
 
-  baseWalk <- getMeans(base)$walk
-  baseCycle <-  getMeans(base)$cycle
-  # choose this number which controls the number of runs n=3 > 9 runs of  the CRA
-  n <- 3
-  
-  # mean walking and cyling times are varied from half of the baseline to double the baseline
-  wVec <- seq(baseWalk,baseWalk+n,length.out = n+1)
-  cVec <- seq(baseCycle,baseCycle+n,length.out = n+1)
-  ntVec <- c(2, 5, 10)
-  
+    results <- data.frame()
+    state <- names(states[i])
+    base <- states[[state]]
 
-  for(muNT in ntVec){
-    for(wlk in 1:(n+1)){
-      for(cyc in 1:(n+1)){
-        scenario <- update(base, list(muwt = wVec[wlk], muct = cVec[cyc], muNonTravel = muNT))
-        activityLevel <- ifelse(muNT == 2, "Low", ifelse(muNT == 5, "Medium", "Low"))
-        comparativeRisk <- data.frame(ST = state,
-                                      cycleTime = getMeans(scenario)$cycle, 
-                                      walkTime= getMeans(scenario)$walk, 
-                                      minIncreaseCycle = cyc-1, 
-                                      minIncreaseWalk = wlk-1, 
-                                      nonTravelActivity = activityLevel,
-                                      pctTotalDALYS = deltaBurden(base, scenario)/getBurden(base),
-                                      pctBreastCancer= deltaBurden(base, scenario, dis = "BreastCancer")/getBurden(base, dis = "BreastCancer"),
-                                      pctColonCancer= deltaBurden(base, scenario, dis = "ColonCancer")/getBurden(base, dis = "ColonCancer"),
-                                      pctCVD = deltaBurden(base, scenario, dis = "CVD")/getBurden(base, dis = "CVD"),
-                                      pctDementia = deltaBurden(base, scenario, dis = "Dementia")/getBurden(base, dis = "Dementia"),
-                                      pctDiabetes = deltaBurden(base, scenario, dis = "Diabetes")/getBurden(base, dis = "Diabetes"),
-                                      pctDepression = deltaBurden(base, scenario, dis = "Depression")/getBurden(base, dis = "Depression")
-                                      ## totalDALYS = deltaBurden(base, scenario),               
-                                      ## BreastCancer= sumBreastCancer(base, scenario), 
-                                      ## ColonCancer= sumColonCancer(base, scenario), 
-                                      ## CVD = sumCVD(base, scenario), 
-                                      ## Dementia = sumDementia(base, scenario), 
-                                      ## Depression = sumDepression(base, scenario),
-                                      ## Diabetes = sumDiabetes(base, scenario)
-                                      )
+    totalDALYs <- data.frame(getBurden(base, dis = "all"),
+                    getBurden(base, dis = "BreastCancer"),
+                    getBurden(base, dis = "ColonCancer"),
+                    getBurden(base, dis = "CVD"),
+                    getBurden(base, dis = "Dementia"),
+                    getBurden(base, dis = "Depression"),
+                    getBurden(base, dis = "Diabetes")
+                    )
 
-        results <- rbind(comparativeRisk, results)     
-      }  
-    } 
-  }
+    names(totalDALYs) <- c("DALY.all","DALY.BreastCancer","DALY.ColonCancer","DALY.CVD","DALY.Dementia","DALY.Depression","DALY.Diabetes")
 
-  allStatesResults <- rbind(results, allStatesResults)
- 
+    baseWalk <- getMeans(base)$walk
+    baseCycle <-  getMeans(base)$cycle
+
+    n <- 4
+    wVec <- seq(baseWalk,baseWalk+n,length.out = n+1)
+    cVec <- seq(baseCycle,baseCycle+n,length.out = n+1)
+    ntVec <- c(2, 5, 10)
+
+    for(muNT in ntVec){
+        for(wlk in 1:(n+1)){
+            for(cyc in 1:(n+1)){
+                scenario <- update(base, list(muwt = wVec[wlk], muct = cVec[cyc], muNonTravel = muNT))
+                activityLevel <- ifelse(muNT == 2, "Low", ifelse(muNT == 5, "Medium", "Low"))
+                comparativeRisk <- data.frame(ST = state,
+                                              cycleTime = getMeans(scenario)$cycle, 
+                                              walkTime= getMeans(scenario)$walk, 
+                                              minIncreaseCycle = cyc-1, 
+                                              minIncreaseWalk = wlk-1, 
+                                              nonTravelActivity = activityLevel)
+
+                deltaDALYs <- data.frame(deltaBurden(base, scenario, dis = "all"),
+                                         deltaBurden(base, scenario, dis = "BreastCancer"),
+                                         deltaBurden(base, scenario, dis = "ColonCancer"),
+                                         deltaBurden(base, scenario, dis = "CVD"),
+                                         deltaBurden(base, scenario, dis = "Dementia"),
+                                         deltaBurden(base, scenario, dis = "Depression"),
+                                         deltaBurden(base, scenario, dis = "Diabetes")
+                                         )
+
+                names(deltaDALYs) <- c("deltaDALY.all","deltaDALY.BreastCancer","deltaDALY.ColonCancer","deltaDALY.CVD","deltaDALY.Dementia","deltaDALY.Depression","deltaDALY.Diabetes")
+
+
+                comparativeRisk <-  cbind(comparativeRisk, deltaDALYs, totalDALYs)
+
+                results <- rbind(comparativeRisk, results)     
+            }  
+        } 
+    }
+
+    allStatesResults <- rbind(results, allStatesResults)
+    
 }
+
+allStatesResults <- within(allStatesResults,{ 
+                           pctTotalDALYS = deltaDALY.all/DALY.all
+                           pctBreastCancer = deltaDALY.BreastCancer/DALY.BreastCancer
+                           pctColonCancer = deltaDALY.ColonCancer/DALY.ColonCancer
+                           pctCVD = deltaDALY.CVD/DALY.CVD
+                           pctDementia = deltaDALY.Dementia/DALY.Dementia
+                           pctDepression = deltaDALY.Depression/DALY.Depression
+                           pctDiabetes = deltaDALY.Diabetes/DALY.Diabetes
+})
+
+write.csv(allStatesResults, file = "~/GHI/data/stateResults.csv", quote = FALSE, row.names = FALSE)
