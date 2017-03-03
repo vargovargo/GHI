@@ -10,7 +10,8 @@ makes this is easy.
 
 ```{r libs, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = FALSE, message = FALSE}
 library("devtools")
-install_github("syounkin/ITHIM", ref="master")
+#install_github("syounkin/ITHIM", ref="master")
+install_github("syounkin/ITHIM", ref="devel")
 library("ITHIM")
 ```
 
@@ -133,7 +134,7 @@ Once the baseline and scenario ITHIM objects are defined, we may
 compute the change in burden due to physical activity as follows.
 
 ```{r misc25, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
-deltaBurden(ITHIM.baseline, ITHIM.scenario, dis = "total", bur = "deaths")
+deltaBurden(ITHIM.baseline, ITHIM.scenario, dis = "all", bur = "deaths")
 deltaBurden(ITHIM.baseline, ITHIM.scenario, dis = "BreastCancer", bur = "deaths")
 deltaBurden(ITHIM.baseline, ITHIM.scenario, dis = "Depression", bur = "deaths")
 deltaBurden(ITHIM.baseline, ITHIM.scenario, dis = "Depression", bur = "daly")
