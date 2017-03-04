@@ -1,6 +1,7 @@
 library(devtools)
 install_github("syounkin/ITHIM", ref="devel", force=TRUE)
 library("ITHIM")
+library("tidyr")
 packageVersion("ITHIM")
 rm(list=ls())
 
