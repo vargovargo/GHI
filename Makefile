@@ -10,6 +10,9 @@ RoadFatalities: R/RoadFatalities.Rmd R/RoadFatalities.R
 tutorial: R/tutorial.Rmd R/tutorial.R
 	cd R; R --vanilla -e 'source("tutorial.R")'
 
+states: vargo/loopStates.Rmd vargo/loopStates.R
+	cd vargo; R --vanilla -e 'source("loopStates.R")'
+
 ProcessCountyBurden: R/ProcessCountyBurden.md R/ProcessCountyBurden.R
 	cd R; R --vanilla -e 'source("ProcessCountyBurden.R")'
 
