@@ -14,6 +14,8 @@ states <- readRDS("~/GHI/R/data/ITHIMList.by.state.rds")
 
 allStatesResults <- data.frame()
 
+n <- 5
+
 #for(i in 1:2){
 for(i in 1:length(states)){
 
@@ -35,9 +37,8 @@ for(i in 1:length(states)){
     baseWalk <- getMeans(base)$walk
     baseCycle <-  getMeans(base)$cycle
 
-    n <- 4
-    wVec <- seq(baseWalk,baseWalk+n,length.out = n+1)
-    cVec <- seq(baseCycle,baseCycle+n,length.out = n+1)
+    wVec <- baseWalk + seq(0, 20, length.out = n)
+    cVec <- baseCycle + seq(0, 20, length.out = n)
     ntVec <- c(2, 5, 10)
 
     for(muNT in ntVec){
@@ -62,12 +63,15 @@ for(i in 1:length(states)){
                                          deltaBurden(base, scenario, dis = "Diabetes")
                                          )
 
+                deltaDALYs <- data.frame(ifelse(t(unlist(deltaDALYs)) > 0, 0, deltaDALYs))
+
+
                 names(deltaDALYs) <- c("all","BreastCancer","ColonCancer","CVD","Dementia","Depression","Diabetes")
+
 
                 foo <- cbind(comparativeRisk, deltaDALYs)
 
                 foo <- foo %>% gather("disease","value",7:13)
-#                comparativeRisk <-  cbind(comparativeRisk, deltaDALYs, t(totalDALYs))
 
                 results <- rbind(foo, results)
             }
@@ -82,7 +86,7 @@ allStatesResults <- data.frame(allStatesResults, total = t(totalDALYs))
 
 
 
-allStatesResults <- allStatesResults %>% dplyr::mutate( burdenScenario = total + value, pctReduction = -100*value/total)
+allStatesResults <- allStatesResults %>% dplyr::mutate( deltaBurden = -value, pctReduction = -100*value/total)
 
 allStatesResults <- melt(allStatesResults[,!names(allStatesResults) %in% c("value","total")], id =c("ST","cycleTime","walkTime","minIncreaseCycle","minIncreaseWalk","nonTravelActivity","disease"))
 
