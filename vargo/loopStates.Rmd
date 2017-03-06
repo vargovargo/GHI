@@ -1,5 +1,6 @@
 Foo.
-```{r libs, eval = TRUE, echo = TRUE, results = "show", warning = TRUE, error = TRUE, message = TRUE}
+```{r states, eval = TRUE, echo = TRUE, results = "show", warning = TRUE, error = TRUE, message = TRUE}
+
 library(devtools)
 install_github("syounkin/ITHIM", ref="devel", force=TRUE)
 library("ITHIM")
@@ -7,14 +8,11 @@ library("tidyr")
 packageVersion("ITHIM")
 rm(list=ls())
 
-######## read in ITHIM objects #######
-#available at https://uwmadison.box.com/shared/static/06doqkc3aiaoqdb569r7si1vthlyvgu9.rds
-#states <- readRDS("~/Downloads/ITHIMList.by.state.rds")
 states <- readRDS("~/GHI/R/data/ITHIMList.by.state.rds")
 
 allStatesResults <- data.frame()
 
-n <- 5
+n <- 5 # length of walk and cycle vectors
 ntVec <- c(2, 5, 10) # must be ordered and have length 3
 
 for(state in names(states)){
@@ -22,7 +20,7 @@ for(state in names(states)){
     results <- data.frame()
 
     base <- states[[state]]
-    base <- update(base, list(quantiles = seq(0.1,0.9,by=0.1)))
+    base <- update(base, list(quantiles = seq(0.1, 0.9, by = 0.1)))
 
     totalDALYs <- data.frame(getBurden(base, dis = "all"),
                     getBurden(base, dis = "BreastCancer"),
@@ -38,8 +36,8 @@ for(state in names(states)){
     baseWalk <- getMeans(base)$walk
     baseCycle <-  getMeans(base)$cycle
 
-    wVec <- baseWalk + seq(0, 20, length.out = n)
-    cVec <- baseCycle + seq(0, 20, length.out = n)
+    wVec <- baseWalk + seq(0, 60, length.out = n)
+    cVec <- baseCycle + seq(0, 60, length.out = n)
 
     for(muNT in ntVec){
         base <- update(base, list(muNonTravel = muNT))
@@ -84,23 +82,9 @@ for(state in names(states)){
 
 allStatesResults <- data.frame(allStatesResults, total = t(totalDALYs))
 
-
-
 allStatesResults <- allStatesResults %>% dplyr::mutate( deltaBurden = -value, pctReduction = -100*value/total)
 
 allStatesResults <- melt(allStatesResults[,!names(allStatesResults) %in% c("value","total")], id =c("ST","cycleTime","walkTime","minIncreaseCycle","minIncreaseWalk","nonTravelActivity","disease"))
-
-
-
-## allStatesResults <- within(allStatesResults,{
-##                            pctTotalDALYS = deltaDALY.all/DALY.all
-##                            pctBreastCancer = deltaDALY.BreastCancer/DALY.BreastCancer
-##                            pctColonCancer = deltaDALY.ColonCancer/DALY.ColonCancer
-##                            pctCVD = deltaDALY.CVD/DALY.CVD
-##                            pctDementia = deltaDALY.Dementia/DALY.Dementia
-##                            pctDepression = deltaDALY.Depression/DALY.Depression
-##                            pctDiabetes = deltaDALY.Diabetes/DALY.Diabetes
-## })
 
 write.csv(allStatesResults, file = "~/GHI/data/stateResults.csv", quote = FALSE, row.names = FALSE)
 ```
