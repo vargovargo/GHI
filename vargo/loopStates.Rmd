@@ -1,3 +1,5 @@
+Foo.
+```{r libs, eval = TRUE, echo = TRUE, results = "show", warning = TRUE, error = TRUE, message = TRUE}
 library(devtools)
 install_github("syounkin/ITHIM", ref="devel", force=TRUE)
 library("ITHIM")
@@ -101,3 +103,4 @@ allStatesResults <- melt(allStatesResults[,!names(allStatesResults) %in% c("valu
 ## })
 
 write.csv(allStatesResults, file = "~/GHI/data/stateResults.csv", quote = FALSE, row.names = FALSE)
+```
