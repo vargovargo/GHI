@@ -15,7 +15,9 @@ allStatesResults <- data.frame()
 n <- 5 # length of walk and cycle vectors
 ntVec <- c(2, 5, 10) # must be ordered and have length 3
 
-for(state in names(states)){
+stateVec <- names(states)
+
+for(state in stateVec){
 
     results <- data.frame()
 
@@ -50,7 +52,7 @@ for(state in names(states)){
                                               walkTime= getMeans(scenario)$walk,
                                               minIncreaseCycle = cyc-baseCycle,
                                               minIncreaseWalk = wlk-baseWalk,
-                                              nonTravelActivity = activityLevel)
+                                              nonTravelActivity = activityLevel, stringsAsFactors = FALSE)
 
                 deltaDALYs <- data.frame(deltaBurden(base, scenario, dis = "all"),
                                          deltaBurden(base, scenario, dis = "BreastCancer"),
@@ -71,6 +73,8 @@ for(state in names(states)){
 
                 foo <- foo %>% gather("disease","value",7:13)
 
+                foo <- data.frame(foo, total = t(totalDALYs))
+
                 results <- rbind(foo, results)
             }
         }
@@ -80,11 +84,15 @@ for(state in names(states)){
 
 }
 
-allStatesResults <- data.frame(allStatesResults, total = t(totalDALYs))
+summary(allStatesResults)
 
 allStatesResults <- allStatesResults %>% dplyr::mutate( deltaBurden = -value, pctReduction = -100*value/total)
 
+summary(allStatesResults)
+
 allStatesResults <- melt(allStatesResults[,!names(allStatesResults) %in% c("value","total")], id =c("ST","cycleTime","walkTime","minIncreaseCycle","minIncreaseWalk","nonTravelActivity","disease"))
+
+summary(allStatesResults)
 
 write.csv(allStatesResults, file = "~/GHI/data/stateResults.csv", quote = FALSE, row.names = FALSE)
 ```
