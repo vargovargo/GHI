@@ -10,17 +10,15 @@ rm(list=ls())
 #states <- readRDS("~/Downloads/ITHIMList.by.state.rds")
 states <- readRDS("~/GHI/R/data/ITHIMList.by.state.rds")
 
-####### Compare States ##################
-
 allStatesResults <- data.frame()
 
 n <- 5
 
 #for(i in 1:2){
-for(i in 1:length(states)){
+for(state in names(states)){
 
     results <- data.frame()
-    state <- names(states[i])
+
     base <- states[[state]]
 
     totalDALYs <- data.frame(getBurden(base, dis = "all"),
@@ -39,7 +37,7 @@ for(i in 1:length(states)){
 
     wVec <- baseWalk + seq(0, 20, length.out = n)
     cVec <- baseCycle + seq(0, 20, length.out = n)
-    ntVec <- c(2, 5, 10)
+    ntVec <- c(2, 5, 10) # must be ordered and have length 3
 
     for(muNT in ntVec){
         base <- update(base, list(muNonTravel = muNT))
