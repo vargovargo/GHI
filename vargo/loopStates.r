@@ -13,13 +13,14 @@ states <- readRDS("~/GHI/R/data/ITHIMList.by.state.rds")
 allStatesResults <- data.frame()
 
 n <- 5
+ntVec <- c(2, 5, 10) # must be ordered and have length 3
 
-#for(i in 1:2){
 for(state in names(states)){
 
     results <- data.frame()
 
     base <- states[[state]]
+    base <- update(base, list(quantiles = seq(0.1,0.9,by=0.1)))
 
     totalDALYs <- data.frame(getBurden(base, dis = "all"),
                     getBurden(base, dis = "BreastCancer"),
@@ -37,7 +38,6 @@ for(state in names(states)){
 
     wVec <- baseWalk + seq(0, 20, length.out = n)
     cVec <- baseCycle + seq(0, 20, length.out = n)
-    ntVec <- c(2, 5, 10) # must be ordered and have length 3
 
     for(muNT in ntVec){
         base <- update(base, list(muNonTravel = muNT))
