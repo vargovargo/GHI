@@ -328,7 +328,7 @@ DALYsTotal <- data.frame()
 ITHIMList <- list()
 ITHIM.default <- createITHIM()
 
-ITHIM.default <- update(ITHIM.default, list( cvNonTravel = 3, cv = 1.65, muNonTravel = 4, muNonTravelMatrix = METmatrix, quantiles = (1:99)/100 ) )
+ITHIM.default <- update(ITHIM.default, list( cvNonTravel = 3, cv = 1.65, muNonTravel = 4, muNonTravelMatrix = METmatrix, quantiles = (1:9)/10 ) )
 
 ITHIM.national <- update(ITHIM.default, list(muwt = muwtNational, muct = muctNational, Rwt = RwtNational, Rct = RctNational))
 
