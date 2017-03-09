@@ -15,34 +15,26 @@ install_github("syounkin/ITHIM", ref="devel")
 library("ITHIM")
 ```
 
-## Creating an ITHIM object
-
-The ITHIM package uses the ITHIM class to facilitate...
-
-### Method 1: Using Input Files
+## Creating a Baseline ITHIM object
 
 We begin by creating an ITHIM object to represent the baseline model.
 Currently ITHIM reads three files for the necessary input parameters.
 Sample files are listed below.
 
 ```{r misc2, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
-fileNamesList <- list(
-    activeTransportTimeFile = "~/ITHIM/inst/activeTransportTime.csv",
-    roadInjuriesFile = "~/ITHIM/inst/roadInjuries.csv",
-    GBDFile = "~/ITHIM/inst/gbd.csv"
-)
+activeTransportFile <- "~/ITHIM/inst/activeTransportTime.csv"
+GBDFile <- "~/ITHIM/inst/gbd.csv"
 ```
 
 These files can be found in the master branch of ITHIM repository.
 
 * [activeTransportTime.csv](https://github.com/syounkin/ITHIM/blob/master/inst/activeTransportTime.csv)
-* [roadInjuries.csv](https://github.com/syounkin/ITHIM/blob/master/inst/roadInjuries.csv)
 * [gbd.csv](https://github.com/syounkin/ITHIM/blob/master/inst/gbd.csv)
 
 Using the list of three file names we can create the ITHIM object using `createITHIM`.
 
 ```{r misc20, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
-ITHIM.baseline <- createITHIM(fileNamesList)
+ITHIM.baseline <- createITHIM(activeTransportFile = activeTransportFile, GBDFile = GBDFile)
 ```
 
 #### Active Transport File Format
@@ -55,16 +47,6 @@ ageClass7,F,cycle,15
 ageClass8,F,cycle,13
 ```
 The rows must be ordered by ageClass.
-#### Road Injuries File Format
-```
-severity,roadType,strikingMode,victimMode,value
-Fatal,Local,walk,walk,0
-Fatal,Local,cycle,walk,13
-...
-Serious,Highway,LGV,NOV,0
-Serious,Highway,mbike,NOV,0
-```
-ebikes are not included
 #### GBD File Format
 The GBD file format has not been normalized like the others yet.
 ```
@@ -81,7 +63,34 @@ RTIs stands for road traffic injuries.
 purl("./tutorial.Rmd","./tutorialScript.R", documentation = 0)
 ```
 
-### Method 2: Using the `update` Method
+### Road Injury Data
+
+If road injury data is present it can be included in the same manner.
+
+```{r misc123, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+roadInjuriesFile <- "~/ITHIM/inst/roadInjuries.csv"
+```
+
+```{r misc220, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+ITHIM.baseline <- createITHIM(activeTransportFile = activeTransportFile, GBDFile = GBDFile, roadInjuriesFile = roadInjuriesFile)
+```
+
+#### Road Injury File Format
+* [roadInjuries.csv](https://github.com/syounkin/ITHIM/blob/master/inst/roadInjuries.csv)
+
+#### Road Injuries File Format
+```
+severity,roadType,strikingMode,victimMode,value
+Fatal,Local,walk,walk,0
+Fatal,Local,cycle,walk,13
+...
+Serious,Highway,LGV,NOV,0
+Serious,Highway,mbike,NOV,0
+```
+ebikes are not included
+
+
+## Creating Scenarios Using the `update` Method
 
 Suppose we wanted to create a scenario in which the mean cycling time
 and mean walking time are doubled.  We need only to change two means
@@ -91,15 +100,11 @@ parameters.
 
 First we need to know the name of the parameters we want to update.
 Currently the list of parameters resides in the help page for the
-ITHIM class.  Alternatively one can inspect the
-slots directly with `slotNames`.
+ITHIM class (`help("ITHIM")`).  Alternatively one can use
+`getParameterNames`.
 
-```{r misc24, message = FALSE, eval = FALSE, warning = FALSE, error = TRUE, echo = TRUE}
-help("ITHIM")
-```
-or
 ```{r misc124, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
-slotNames(getParameterSet(ITHIM.baseline))
+getParameterNames(ITHIM.baseline)
 ```
 
 Now we need to retrieve the walking and cycling means from the
@@ -142,11 +147,9 @@ deltaBurden(ITHIM.baseline, ITHIM.scenario, dis = "Depression", bur = "daly")
 
 ## Appendix
 
-```{r misc350, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
-ITHIM.baseline
-ITHIM.scenario
-```
-### Session Info
+### Session Info & Package Test
 ```{r sessionInfo, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = FALSE, message = FALSE}
+library("testthat")
+test_package("ITHIM")
 sessionInfo()
 ```
