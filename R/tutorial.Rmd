@@ -3,67 +3,93 @@
 ```{r rm, eval = TRUE, echo = FALSE, results = "hide", warning = FALSE, error = FALSE, message = FALSE}
 rm(list=ls())
 ```
-To begin using ITHIM one first must install it.  The package devtools
-makes this is easy.
+To begin using ITHIM one first must install it.  The package
+_devtools_ makes this is easy.  Install _devtools_ using
+`install.packages("devtools")` or some other way in _RStudio_.
 
 ## Install and Load ITHIM
 
+We use the function `install_github` to install the _master_ branch of
+the _ITHIM_ package repository.
+
 ```{r libs, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = FALSE, message = FALSE}
 library("devtools")
-#install_github("syounkin/ITHIM", ref="master")
-install_github("syounkin/ITHIM", ref="devel")
+install_github("syounkin/ITHIM", ref="master")
 library("ITHIM")
 ```
 
 ## Creating a Baseline ITHIM object
 
 We begin by creating an ITHIM object to represent the baseline model.
-Currently ITHIM reads three files for the necessary input parameters.
-Sample files are listed below.
+Currently _ITHIM_ can read up to three files containing input
+parameters, but it is not necessary to provide all three.  Two sample
+files are listed below that contain model parameters for the active
+transport component of _ITHIM_.
 
 ```{r misc2, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
 activeTransportFile <- "~/ITHIM/inst/activeTransportTime.csv"
 GBDFile <- "~/ITHIM/inst/gbd.csv"
 ```
 
-These files can be found in the master branch of ITHIM repository.
+For a description of the file format see the help page for
+`createITHIM` using `help("createITHIM")`.
+
+```{r misc20, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+ITHIM.baseline <- createITHIM(activeTransportFile = activeTransportFile,
+                              GBDFile = GBDFile)
+```
 
 * [activeTransportTime.csv](https://github.com/syounkin/ITHIM/blob/master/inst/activeTransportTime.csv)
 * [gbd.csv](https://github.com/syounkin/ITHIM/blob/master/inst/gbd.csv)
 
-Using the list of three file names we can create the ITHIM object using `createITHIM`.
-
-```{r misc20, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
-ITHIM.baseline <- createITHIM(activeTransportFile = activeTransportFile, GBDFile = GBDFile)
-```
-
+### File Formats
 #### Active Transport File Format
+
+The active transport file contains mean walking and cycling times
+stratified by sex and _ITHIM_ age class.  The default file is located
+in _inst/_.
+
 ```
 ageClass,sex,mode,value
-ageClass1,M,walk,10
-ageClass2,M,walk,9
+ageClass1,M,walk,21.47
+ageClass2,M,walk,53.11
+ageClass3,M,walk,50.13
 ...
-ageClass7,F,cycle,15
-ageClass8,F,cycle,13
+ageClass6,F,cycle,1.53
+ageClass7,F,cycle,0.53
+ageClass8,F,cycle,0.23
 ```
-The rows must be ordered by ageClass.
-#### GBD File Format
-The GBD file format has not been normalized like the others yet.
+
+Notes about file format:
+* The rows must be ordered by ageClass.
+* The mean values are in minutes per week
+
+#### Disease Burden File Format
+
+The disease burden file contains estimates for disease burden
+stratified by _ITHIM_ age class and sex.
+
 ```
-disease,sex,ageClass,dproj,yll,yld,daly
-BreastCancer,M,ageClass1,0,0,0,0
-BreastCancer,M,ageClass2,0,0,0,0
+disease,sex,ageClass,burdenType,value
+BreastCancer,M,ageClass1,dproj,0
+BreastCancer,M,ageClass2,dproj,0
+BreastCancer,M,ageClass3,dproj,0
 ...
-RTIs,F,ageClass7,1486.647682,21930.32348,7921.96966,29852.3031
-RTIs,F,ageClass8,1957.865757,10720.47109,5222.446302,15942.95826
+RTIs,F,ageClass6,daly,49108.81151
+RTIs,F,ageClass7,daly,29852.3031
+RTIs,F,ageClass8,daly,15942.95826
 ```
-RTIs stands for road traffic injuries.
+
+Notes about file format:
+* RTIs stands for road traffic injuries
+* Only _ITHIM_ diseases can be included, namely "BreastCancer",
+  "ColonCancer", "CVD", "Dementia", "Diabetes", "Depression" and "RTIs"
 
 ```{r misc22, message = FALSE, eval = FALSE, warning = FALSE, error = TRUE, echo = FALSE}
 purl("./tutorial.Rmd","./tutorialScript.R", documentation = 0)
 ```
 
-### Road Injury Data
+#### Road Injuries File Format
 
 If road injury data is present it can be included in the same manner.
 
@@ -72,22 +98,26 @@ roadInjuriesFile <- "~/ITHIM/inst/roadInjuries.csv"
 ```
 
 ```{r misc220, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
-ITHIM.baseline <- createITHIM(activeTransportFile = activeTransportFile, GBDFile = GBDFile, roadInjuriesFile = roadInjuriesFile)
+ITHIM.baseline <- createITHIM(activeTransportFile = activeTransportFile,
+                              GBDFile = GBDFile,
+                              roadInjuriesFile = roadInjuriesFile)
 ```
 
-#### Road Injury File Format
 * [roadInjuries.csv](https://github.com/syounkin/ITHIM/blob/master/inst/roadInjuries.csv)
 
-#### Road Injuries File Format
 ```
 severity,roadType,strikingMode,victimMode,value
 Fatal,Local,walk,walk,0
 Fatal,Local,cycle,walk,13
+Fatal,Local,bus,walk,213
 ...
+Serious,Highway,HGV,NOV,0
 Serious,Highway,LGV,NOV,0
 Serious,Highway,mbike,NOV,0
 ```
-ebikes are not included
+
+Notes about file format:
+* ebikes are not included
 
 
 ## Creating Scenarios Using the `update` Method
@@ -143,6 +173,14 @@ deltaBurden(ITHIM.baseline, ITHIM.scenario, dis = "all", bur = "deaths")
 deltaBurden(ITHIM.baseline, ITHIM.scenario, dis = "BreastCancer", bur = "deaths")
 deltaBurden(ITHIM.baseline, ITHIM.scenario, dis = "Depression", bur = "deaths")
 deltaBurden(ITHIM.baseline, ITHIM.scenario, dis = "Depression", bur = "daly")
+```
+
+## Built-In Example
+
+An example is contained within the _ITHIM_ package.
+
+```{r misc225, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+example("ITHIM")
 ```
 
 ## Appendix
