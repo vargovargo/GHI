@@ -305,6 +305,8 @@ gbdRDS <-  readRDS(file = "~/GHI/R/data/stateMetroBurdens2014.rds")
 gbdRDS <- within(gbdRDS, state <- stateNameToAbbrev(state))
 
 
+gbdRDS %>% melt() %>% filter(disease %in% c("IHD", "HHD", "InflammatoryHD")) %>% group_by(state, sex, ageClass, variable) %>% summarise(sum = sum(value)) %>% mutate(disease = "CVD") %>% head
+
 gbdByState <- split(gbdRDS,gbdRDS$state)
 gbdByState <- lapply(gbdByState, function(x) x[,!names(x)=="state"])
 gbdList <- lapply(gbdByState, gbdParse)
