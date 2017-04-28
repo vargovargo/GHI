@@ -35,10 +35,10 @@ data:
 	mkdir -p ./data/ATUS/
 	unzip  atussum_2015.zip -d ./data/ATUS/
 	mv -v atussum_2015.zip ./data/ATUS
-	wget https://ithim.ghi.wisc.edu/data/BikePedDeathModelData.rds
-	mv -v BikePedDeathModelData.rds ./R/data/
-	wget https://ithim.ghi.wisc.edu/data/stateMetroBurdens2014.rds
-	mv -v stateMetroBurdens2014.rds ./R/data/
+#	wget https://ithim.ghi.wisc.edu/data/BikePedDeathModelData.rds
+#	mv -v BikePedDeathModelData.rds ./R/data/
+#	wget https://ithim.ghi.wisc.edu/data/stateMetroBurdens2014.rds
+#	mv -v stateMetroBurdens2014.rds ./R/data/
 	# wget https://www.ithim.ghi.wisc.edu/data/ITHIMList.by.state.rds
 	# mv -v ITHIMList.by.state.rds ./R/data/
 

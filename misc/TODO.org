@@ -1,23 +1,32 @@
+* TODO Review Tomek's work
+* TODO Review Chris Jackson's work
+* TODO Introduce myself to Rob Johnson
+* TODO Get up to speed on Woodcock's visit
 
-* TODO Reply to James abut visit (0.5)
+* Methods Paper
+** TODO Read
+** 
 * TODO Comment on ITHIM survey (0.5)
 * TODO Update Methods Pomodoro List (0.5)
 See [[https://cobenefitsithim.slack.com/files/syounkin/F2WEBBFBN/Methods_Paper_To-Do_List][Methods Paper To-Do List]].
+* TODO Get in touch with Yizheng & Liming (0.5)
+* TODO Six month plan
+* DONE Reply to James abut visit (0.5)
+
+
+
+
+
+
 * DONE Employment Status Change (0.5)
 Read up on the change that is happening 12/1.
-* TODO Email Karen Aune
+* DONE Email Karen Aune
 * DONE Email Jonathan about FLSA Change (0.5)
-* TODO Clean UW inbox (0.5)
-* TODO Get in touch with Yizheng & Liming (0.5)
-* TODO Cambridge Trip Deliverables (1)
-* TODO Email Jonthan previous appointment letter
-* TODO Cambridge visit arrangements (2)
-* TODO MI and WI vs. CA and NY analysis
-* TODO Six month plan
+* DONE Clean UW inbox (0.5)
 
-
-
-
+* DONE Email Jonthan previous appointment letter
+* DONE Cambridge visit arrangements (2)
+* DONE MI and WI vs. CA and NY analysis
 
 
 
@@ -50,7 +59,6 @@ Read up on the change that is happening 12/1.
  regions (HHS) across the U.S.
 **** ITHIM object
  When a parameter is missing we use the national average defined by Jeff at CDC
-
 
 * Tw, Tc (Sam)
 ** Average time walking or cycling as transport

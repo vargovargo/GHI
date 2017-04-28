@@ -33,7 +33,7 @@ First we use NHTS to estimate mean walking and cycling times.
 
 ```{r compute, echo = FALSE, eval = TRUE}
 date()
-compute <- TRUE
+compute <- FALSE
 ```
 
 #### Create a handful of functions to help parse data
@@ -92,7 +92,7 @@ NHTS.person <- with(PERV2PUB,{
                     data.frame(HOUSEID = HOUSEID,
                                PERSONID = PERSONID,
                                SEX = as.factor(ifelse(R_SEX=="1", "M", ifelse(R_SEX=="2", "F", NA))),
-                               AGE = as.factor(convertToAgeClass(R_AGE)),
+                               AGE = as.factor(ITHIM:::convertToAgeClass(R_AGE)),
                                MSA = ifelse(MSASIZE %in% 1:5, TRUE, FALSE),
                                HHSTATE = as.character(HHSTATE),
                                HHS = as.character(convertToHHS(as.character(HHSTATE))), stringsAsFactors = FALSE
@@ -120,7 +120,7 @@ saveRDS(NHTS, file = "./data/NHTS.rds")
 ```
 
 ```{r loadNHTS, eval = !compute}
-NHTS <- readRDS(file = "./data/NHTS.rds")
+NHTS <- readRDS(file = "~/GHI/R/data/NHTS.rds")
 ```
 
 #### Compute National Metro Average
@@ -187,9 +187,9 @@ p + geom_bar(stat = "identity") + scale_y_log10() + labs(y = "Sample Size (Refer
 ## Non-Travel METs
 
 ```{r newMETs, echo = TRUE, eval = TRUE, echo = FALSE}
-newMETsFile <- "ATUS_to_METS_key.csv"
+newMETsFile <- "~/GHI/data/ATUS_to_METS_key.csv"
 
-newMETsFile <- system.file(newMETsFile, package="ITHIM")
+#newMETsFile <- system.file(newMETsFile, package="ITHIM")
 
 newMETs <- read.csv(file = newMETsFile, stringsAsFactors = FALSE, colClasses = c("character","character","character","character","numeric","character","character","character"))
 dataColumns <- c(1,5)
@@ -301,9 +301,11 @@ gbdParse <- function(gbd){
   return(gbdListTemp2)
 }
 
-gbdRDS <-  readRDS(file = "./data/stateMetroBurdens2014.rds")
+gbdRDS <-  readRDS(file = "~/GHI/R/data/stateMetroBurdens2014.rds")
 gbdRDS <- within(gbdRDS, state <- stateNameToAbbrev(state))
 
+
+gbdRDS %>% melt() %>% filter(disease %in% c("IHD", "HHD", "InflammatoryHD")) %>% group_by(state, sex, ageClass, variable) %>% summarise(sum = sum(value)) %>% mutate(disease = "CVD") %>% head
 
 gbdByState <- split(gbdRDS,gbdRDS$state)
 gbdByState <- lapply(gbdByState, function(x) x[,!names(x)=="state"])
@@ -388,7 +390,6 @@ ITHIMListScenario <- lapply(ITHIMList, function(ithim) update(ithim, list(muwt =
 
 deltaDALYList <- mapply(deltaBurden, ITHIMList, ITHIMListScenario)
 
-
 getDALY <- function( ITHIM ){
 foo <- data.frame(lapply(ITHIM@parameters@GBD, function(x) x$M$daly + x$F$daly))
 sum(foo[,names(foo) %in% c("BreastCancer","ColonCancer","Dementia","Depression","Diabetes", "CVD")])
@@ -409,7 +410,7 @@ D <- melt(foo)
 cbPalette <- c("#0072B2", "#56B4E9", "#999999", "#E69F00", "#009E73", "#F0E442", "#D55E00", "#CC79A7")
 
 p <- ggplot(D, aes(state, value/1e3, fill = variable))
-p + geom_bar(stat= "identity") + scale_x_discrete(name="") + scale_y_continuous(name="Thousands of DALYs") + guides(fill=FALSE) + scale_fill_manual(values=cbPalette) + theme(axis.text.y  = element_text(size = 16)) + theme(axis.text.x  = element_text(size = 16), axis.title.x  = element_text(size = 16)) + coord_flip() # + coord_cartesian(ylim = c(175, 600))
+p + geom_bar(stat= "identity") + scale_x_discrete(name="") + scale_y_continuous(name="Thousands of DALYs") + guides(fill=FALSE) + scale_fill_manual(values=cbPalette) + theme(axis.text.y  = element_text(size = 16)) + theme(axis.text.x  = element_text(size = 16), axis.title.x  = element_text(size = 16)) + coord_flip()
 ```
 
 
@@ -417,8 +418,9 @@ p + geom_bar(stat= "identity") + scale_x_discrete(name="") + scale_y_continuous(
 
 D <- rbind(data.frame(getWalkTime(ITHIMList[["MI"]]),state = "MI"), data.frame(getWalkTime(ITHIMList[["WI"]]),state = "WI"), data.frame(getWalkTime(ITHIMList[["OH"]]),state = "OH"))
 
-p <- ggplot(subset(D, ageClass != "ageClass1"), aes(x = ageClass, y = mu, fill = state)) + geom_bar(stat= "identity", position = "dodge")
+p <- ggplot(subset(D, ageClass != "ageClass1"), aes(x = ageClass, y = mean, fill = state)) + geom_bar(stat= "identity", position = "dodge")
 p + theme_bw() + facet_grid( . ~ sex) + scale_x_discrete(name="", labels = c("5-14","15-29","30-44","45-59","60-69","70-79","80+")) + scale_y_continuous(name="Time Walking per Week (minutes)") + theme(axis.text.x  = element_text(angle = 90, vjust = 0.5, size = 8)) + scale_fill_manual(values=cbPalette[-3])
+
 ```
 
 ### Visualization of trip time matrices
@@ -460,7 +462,7 @@ ITHIM.national <- update(ITHIM.national, list(muNonTravel = 10))
 
 ITHIM.CA <- ITHIMList[["CA"]]
 ITHIM.CA <- update(ITHIM.CA, list(muNonTravel = 10))
-foo1 <- compareModels(ITHIM.national,ITHIM.CA)
+foo1 <- ITHIM:::compareModels(ITHIM.national,ITHIM.CA)
 foobar1 <- data.frame(cbind(melt(foo1$daly.delta),paste0("ageClass",1:8)),State = "CA")
 
 foobar <- foobar1
@@ -470,7 +472,7 @@ names(foobar) <- c("delta.DALY","Sex","Disease","ageClass","State")
 
 ITHIM.NY <- ITHIMList[["NY"]]
 ITHIM.NY <- update(ITHIM.NY, list(muNonTravel = 10))
-foo2 <- compareModels(ITHIM.national,ITHIM.NY)
+foo2 <- ITHIM:::compareModels(ITHIM.national,ITHIM.NY)
 foobar2 <- data.frame(cbind(melt(foo2$daly.delta),paste0("ageClass",1:8)),State = "NY")
 foobar <- rbind(foobar1,foobar2)
 names(foobar) <- c("delta.DALY","Sex","Disease","ageClass","State")
@@ -621,7 +623,7 @@ foobar <- data.frame()
 
 for( state1 in state1Vec ){
     for( state2 in state2Vec ){
-        foo <- data.frame(lapply(compareModels(ITHIMList[[state1]],ITHIMList[[state2]])$daly.delta, function(x) sum(x$M + x$F)*prop), baseline = state1, scenario = state2)
+        foo <- data.frame(lapply(ITHIM:::compareModels(ITHIMList[[state1]],ITHIMList[[state2]])$daly.delta, function(x) sum(x$M + x$F)*prop), baseline = state1, scenario = state2)
         foobar <- rbind(foobar,foo)
     }
 }
