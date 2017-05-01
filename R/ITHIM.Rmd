@@ -295,7 +295,6 @@ stateNameToAbbrev <- function( stateName ){
 
 gbdParse <- function(gbd){
   gbdListTemp <- split(gbd,gbd$disease)
-  gbdListTemp[["CVD"]] <- data.frame(disease = "CVD", gbdListTemp$IHD[,c("sex",  "ageClass")], gbdListTemp$IHD[,c("dproj","yll","yld","daly")] + gbdListTemp$InflammatoryHD[,c("dproj","yll","yld","daly")] + gbdListTemp$HHD[,c("dproj","yll","yld","daly")])
   gbdListTemp2 <- lapply(gbdListTemp,function(x) split(x,as.factor(x$sex)))
   gbdListTemp2 <- lapply(gbdListTemp2, function(x) list(M=x$M,F=x$F))
   return(gbdListTemp2)
@@ -304,10 +303,24 @@ gbdParse <- function(gbd){
 gbdRDS <-  readRDS(file = "~/GHI/R/data/stateMetroBurdens2014.rds")
 gbdRDS <- within(gbdRDS, state <- stateNameToAbbrev(state))
 
+GBD <- bind_rows(
+  gbdRDS %>%
+  melt() %>%
+  filter(disease %in% c("IHD", "HHD", "InflammatoryHD")) %>%
+  group_by(state, sex, ageClass, variable) %>% summarise(value = sum(value)) %>%
+  mutate(disease = "CVD"),
+  gbdRDS %>%
+  melt() %>%
+  filter(disease %in% c("BreastCancer","ColonCancer","Dementia", "Diabetes", "Depression", "RTIs"))
+)
 
-gbdRDS %>% melt() %>% filter(disease %in% c("IHD", "HHD", "InflammatoryHD")) %>% group_by(state, sex, ageClass, variable) %>% summarise(sum = sum(value)) %>% mutate(disease = "CVD") %>% head
+GBD <- within(GBD, {
+  variable <- ifelse(variable == "dproj","deaths", as.character(variable))
+})
 
-gbdByState <- split(gbdRDS,gbdRDS$state)
+GBD <- with(GBD, data.frame(state, disease, sex, ageClass, variable, value, stringsAsFactors = FALSE)) %>% arrange(state,disease,sex,ageClass,variable)
+
+gbdByState <- split(GBD,GBD$state)
 gbdByState <- lapply(gbdByState, function(x) x[,!names(x)=="state"])
 gbdList <- lapply(gbdByState, gbdParse)
 
@@ -330,7 +343,7 @@ DALYsTotal <- data.frame()
 ITHIMList <- list()
 ITHIM.default <- createITHIM()
 
-ITHIM.default <- update(ITHIM.default, list( cvNonTravel = 3, cv = 1.65, muNonTravel = 4, muNonTravelMatrix = METmatrix, quantiles = (1:9)/10 ) )
+ITHIM.default <- update(ITHIM.default, list( cvNonTravel = 3, cv = 1.65, muNonTravel = 4, muNonTravelMatrix = METmatrix, quantiles = (1:99)/100 ) )
 
 ITHIM.national <- update(ITHIM.default, list(muwt = muwtNational, muct = muctNational, Rwt = RwtNational, Rct = RctNational))
 
@@ -386,31 +399,33 @@ p + theme_bw() + scale_x_discrete(name="", labels = c("0-4","5-14","15-29","30-4
 
 ```{r rustBelt, eval = TRUE, dev=c('pdf', 'png'), fig.width = 2*fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
 
+ITHIMList <- ITHIMList[names(ITHIMList) != "Natl."] # The national ITHIM obnject needs to have GBD updated.
+
 ITHIMListScenario <- lapply(ITHIMList, function(ithim) update(ithim, list(muwt = ithim@parameters@muwt + 10*7)))
 
 deltaDALYList <- mapply(deltaBurden, ITHIMList, ITHIMListScenario)
 
-getDALY <- function( ITHIM ){
-foo <- data.frame(lapply(ITHIM@parameters@GBD, function(x) x$M$daly + x$F$daly))
-sum(foo[,names(foo) %in% c("BreastCancer","ColonCancer","Dementia","Depression","Diabetes", "CVD")])
-}
+## getDALY <- function( ITHIM ){
+## foo <- data.frame(lapply(ITHIM@parameters@GBD, function(x) x$M$daly + x$F$daly))
+## sum(foo[,names(foo) %in% c("BreastCancer","ColonCancer","Dementia","Depression","Diabetes", "CVD")])
+## }
 
-burdenList <- lapply(ITHIMList, getDALY)
-foo <- data.frame(daly = unlist(burdenList), delta = deltaDALYList)
-foo <- within(foo, {
-  daly <- daly + delta
-  delta <- -delta
-  state <- names(burdenList)
-})
+## burdenList <- lapply(ITHIMList, getDALY)
+## foo <- data.frame(daly = unlist(burdenList), delta = deltaDALYList)
+## foo <- within(foo, {
+##   daly <- daly + delta
+##   delta <- -delta
+##   state <- names(burdenList)
+## })
 
-foo <- subset(foo, state %in% c("MI","OH"))
+## foo <- subset(foo, state %in% c("MI","OH"))
 
-D <- melt(foo)
+## D <- melt(foo)
 
 cbPalette <- c("#0072B2", "#56B4E9", "#999999", "#E69F00", "#009E73", "#F0E442", "#D55E00", "#CC79A7")
 
-p <- ggplot(D, aes(state, value/1e3, fill = variable))
-p + geom_bar(stat= "identity") + scale_x_discrete(name="") + scale_y_continuous(name="Thousands of DALYs") + guides(fill=FALSE) + scale_fill_manual(values=cbPalette) + theme(axis.text.y  = element_text(size = 16)) + theme(axis.text.x  = element_text(size = 16), axis.title.x  = element_text(size = 16)) + coord_flip()
+## p <- ggplot(D, aes(state, value/1e3, fill = variable))
+## p + geom_bar(stat= "identity") + scale_x_discrete(name="") + scale_y_continuous(name="Thousands of DALYs") + guides(fill=FALSE) + scale_fill_manual(values=cbPalette) + theme(axis.text.y  = element_text(size = 16)) + theme(axis.text.x  = element_text(size = 16), axis.title.x  = element_text(size = 16)) + coord_flip()
 ```
 
 
