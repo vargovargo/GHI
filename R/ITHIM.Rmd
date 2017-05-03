@@ -318,7 +318,7 @@ GBD <- within(GBD, {
   variable <- ifelse(variable == "dproj","deaths", as.character(variable))
 })
 
-GBD <- with(GBD, data.frame(state, disease, sex, ageClass, variable, value, stringsAsFactors = FALSE)) %>% arrange(state,disease,sex,ageClass,variable)
+GBD <- with(GBD, data.frame(state, disease, sex, ageClass, burdenType = variable, value, stringsAsFactors = FALSE)) %>% arrange(state,disease,sex,ageClass,burdenType)
 
 gbdByState <- split(GBD,GBD$state)
 gbdByState <- lapply(gbdByState, function(x) x[,!names(x)=="state"])
@@ -382,8 +382,11 @@ saveRDS(ITHIMList, file = "./data/ITHIMList.by.state.rds")
 
 ```
 
-```{r statewiseGBD, eval = TRUE, dev=c('pdf', 'png'), fig.width = 2*fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
+```{r statewiseGBD, eval = FALSE, dev=c('pdf', 'png'), fig.width = 2*fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
 D <- melt(lapply(ITHIMList, function(ITHIM) return(ITHIM@parameters@GBD)))
+
+D <- do.call(rbind,lapply(ITHIMList, getGBD))
+
 names(D) <- c("disease","sex","ageClass","type", "burden", "sex2", "disease2", "state")
 
 D <- within(D, sex <- factor(sex, levels = c("F","M")))
@@ -575,7 +578,7 @@ p + geom_line() + geom_point() + theme_bw() + scale_y_continuous(name="DALYs Ave
 ```
 
 
-```{r displayMeans, eval = FALSE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = phi, warning = FALSE, message = FALSE, echo = FALSE}
+```{r displayMeans, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = phi, warning = FALSE, message = FALSE, echo = FALSE}
 
 ITHIM.national <- update(ITHIM.national, list(muNonTravel = 10))
 
