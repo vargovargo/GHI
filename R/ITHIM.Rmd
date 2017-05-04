@@ -382,12 +382,9 @@ saveRDS(ITHIMList, file = "./data/ITHIMList.by.state.rds")
 
 ```
 
-```{r statewiseGBD, eval = FALSE, dev=c('pdf', 'png'), fig.width = 2*fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
-D <- melt(lapply(ITHIMList, function(ITHIM) return(ITHIM@parameters@GBD)))
-
-D <- do.call(rbind,lapply(ITHIMList, getGBD))
-
-names(D) <- c("disease","sex","ageClass","type", "burden", "sex2", "disease2", "state")
+```{r statewiseGBD, eval = TRUE, dev=c('pdf', 'png'), fig.width = 2*fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
+D <- do.call(rbind, mapply(function(df,state) data.frame(df, state = state), lapply(ITHIMList, getGBD), names(ITHIMList), SIMPLIFY = FALSE))
+names(D) <- c("disease","sex","ageClass","type", "burden", "state")
 
 D <- within(D, sex <- factor(sex, levels = c("F","M")))
 D <- within(D, state <- factor(state, levels = c("WI","MI","OH","NY","CA")))
@@ -407,32 +404,11 @@ ITHIMList <- ITHIMList[names(ITHIMList) != "Natl."] # The national ITHIM obnject
 ITHIMListScenario <- lapply(ITHIMList, function(ithim) update(ithim, list(muwt = ithim@parameters@muwt + 10*7)))
 
 deltaDALYList <- mapply(deltaBurden, ITHIMList, ITHIMListScenario)
-
-## getDALY <- function( ITHIM ){
-## foo <- data.frame(lapply(ITHIM@parameters@GBD, function(x) x$M$daly + x$F$daly))
-## sum(foo[,names(foo) %in% c("BreastCancer","ColonCancer","Dementia","Depression","Diabetes", "CVD")])
-## }
-
-## burdenList <- lapply(ITHIMList, getDALY)
-## foo <- data.frame(daly = unlist(burdenList), delta = deltaDALYList)
-## foo <- within(foo, {
-##   daly <- daly + delta
-##   delta <- -delta
-##   state <- names(burdenList)
-## })
-
-## foo <- subset(foo, state %in% c("MI","OH"))
-
-## D <- melt(foo)
-
-cbPalette <- c("#0072B2", "#56B4E9", "#999999", "#E69F00", "#009E73", "#F0E442", "#D55E00", "#CC79A7")
-
-## p <- ggplot(D, aes(state, value/1e3, fill = variable))
-## p + geom_bar(stat= "identity") + scale_x_discrete(name="") + scale_y_continuous(name="Thousands of DALYs") + guides(fill=FALSE) + scale_fill_manual(values=cbPalette) + theme(axis.text.y  = element_text(size = 16)) + theme(axis.text.x  = element_text(size = 16), axis.title.x  = element_text(size = 16)) + coord_flip()
 ```
 
-
 ```{r rustBelt2, eval = TRUE, dev=c('pdf', 'png'), fig.width = 2*fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
+
+cbPalette <- c("#0072B2", "#56B4E9", "#999999", "#E69F00", "#009E73", "#F0E442", "#D55E00", "#CC79A7")
 
 D <- rbind(data.frame(getWalkTime(ITHIMList[["MI"]]),state = "MI"), data.frame(getWalkTime(ITHIMList[["WI"]]),state = "WI"), data.frame(getWalkTime(ITHIMList[["OH"]]),state = "OH"))
 
@@ -666,4 +642,28 @@ p + theme_bw() + scale_y_continuous(name="DALYs Averted (thousands)") + facet_gr
 
 ```{r sessionInfo, eval = TRUE, dev=c('pdf', 'png'), fig.width = fig.width, fig.asp = 1/phi, echo = TRUE, warning = FALSE}
 sessionInfo()
+```
+
+```{r rustBeltOld, eval = FALSE, dev=c('pdf', 'png'), fig.width = 2*fig.width, fig.asp = 1/phi, warning = FALSE, message = FALSE, echo = FALSE}
+## getDALY <- function( ITHIM ){
+## foo <- data.frame(lapply(ITHIM@parameters@GBD, function(x) x$M$daly + x$F$daly))
+## sum(foo[,names(foo) %in% c("BreastCancer","ColonCancer","Dementia","Depression","Diabetes", "CVD")])
+## }
+
+## burdenList <- lapply(ITHIMList, getDALY)
+## foo <- data.frame(daly = unlist(burdenList), delta = deltaDALYList)
+## foo <- within(foo, {
+##   daly <- daly + delta
+##   delta <- -delta
+##   state <- names(burdenList)
+## })
+
+## foo <- subset(foo, state %in% c("MI","OH"))
+
+## D <- melt(foo)
+
+## cbPalette <- c("#0072B2", "#56B4E9", "#999999", "#E69F00", "#009E73", "#F0E442", "#D55E00", "#CC79A7")
+
+## p <- ggplot(D, aes(state, value/1e3, fill = variable))
+## p + geom_bar(stat= "identity") + scale_x_discrete(name="") + scale_y_continuous(name="Thousands of DALYs") + guides(fill=FALSE) + scale_fill_manual(values=cbPalette) + theme(axis.text.y  = element_text(size = 16)) + theme(axis.text.x  = element_text(size = 16), axis.title.x  = element_text(size = 16)) + coord_flip()
 ```
