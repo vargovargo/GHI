@@ -4,6 +4,9 @@ tex : methods second ITHIM-discussion
 report: R/ITHIM.Rmd R/ITHIM.R
 	cd R; R --vanilla -e 'source("ITHIM.R")'
 
+NHTS: R/NHTS.Rmd R/NHTS.R
+	cd R; R --vanilla -e 'source("NHTS.R")'
+
 RoadFatalities: R/RoadFatalities.Rmd R/RoadFatalities.R
 	cd R; R --vanilla -e 'source("RoadFatalities.R")'
 
