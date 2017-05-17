@@ -10,6 +10,7 @@ library("devtools")
 library("reshape2")
 library("plyr")
 library("dplyr")
+library("TravelSurvey")
 ```
 
 ```{r loadITHIM, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = FALSE}
@@ -110,6 +111,9 @@ We now correct for zero trip times in NHTS.
 NHTS.person <- subset( NHTS.person, MSA == TRUE )
 NHTS.trips <- subset(NHTS.trips, !is.na(TRVL_MIN))
 
+#saveRDS(NHTS.person, file = "./data/NHTS.person.rds")
+#saveRDS(NHTS.trips, file = "./data/NHTS.trips.rds")
+
 NHTS <- merge(NHTS.person, NHTS.trips, by = c("HOUSEID","PERSONID"), all.x = TRUE)
 NHTS <- within(NHTS, TRVL_MIN <- ifelse(is.na(TRVL_MIN), 0, TRVL_MIN))
 saveRDS(NHTS, file = "./data/NHTS.rds")
@@ -121,4 +125,29 @@ msaMatrix <- matrix(c(5602,4472,1922,7320,3120,6200,3362,7362,5720,4992,8872,
 5120,1692,7040,7160,6442,4120,4520,6280,2082,1642,3760,
 3280,1840,5880,3000,5560,
 "NY/NJ Metro","Los Angeles-Riverside-Orange County","Dallas-Fort Worth","San Diego","Greensboro-Winston Salem", "Phoenix/Mesa","Houston-Galveston-Brazoria", "San Francisco-Oakland-San Jose", "Norfolk-Virginia Beach", "Miami-Ft. Lauderdale", "Washington-Baltimore", rep("no label yet", 38)), ncol = 2)
+```
+
+```{r TravelSurvey, eval = compute, fig.width = 10, echo = FALSE}
+
+person.df <- with(NHTS.person,{
+    data.frame(houseID=HOUSEID, subjectID=PERSONID, sex = SEX, age = AGE, location = HHS)
+    })
+
+
+trip.df <- with(NHTS.trips,{
+    data.frame(houseID=HOUSEID, subjectID=PERSONID, duration = TRVL_MIN, mode = AT)
+})
+
+
+person.df <- subset(person.df,apply(person.df,MARGIN=1,FUN=function(x)all(!is.na(x))))
+trip.df <- subset(trip.df,apply(trip.df,MARGIN=1,FUN=function(x)all(!is.na(x))))
+
+NHTS.TravelSurvey <- new("TravelSurvey", person = person.df, trip = trip.df)
+saveRDS(NHTS.TravelSurvey, file = "~/GHI/R/data/NHTS.TravelSurvey.rds")
+
+NHTS.df <- dplyr::left_join(NHTS.TravelSurvey@person, NHTS.TravelSurvey@trip, by = c("houseID","subjectID"))
+
+NHTS.df <- within(NHTS.df, duration <- ifelse(is.na(duration), 0, duration))
+
+
 ```
