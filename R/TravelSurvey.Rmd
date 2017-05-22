@@ -1,0 +1,59 @@
+# Travel Survey Exploratory Analysis
+
+```{r libs, eval = TRUE, echo = FALSE, results = "hide", warning = FALSE, error = FALSE, message = FALSE}
+options(repos='http://cran.rstudio.com/')
+library("tidyverse")
+library("ITHIM")
+library("TravelSurvey")
+```
+
+```{r loadITHIM, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = FALSE}
+document("~/ITHIM/")
+install("~/ITHIM/")
+#install_github("syounkin/ITHIM", ref="devel")
+install_github("smbache/magrittr", ref="master")
+
+library("magrittr")
+library("ITHIM")
+
+fig.width <- 6 # inches
+phi <- (1+sqrt(5))/2 # the golden ratio ;)
+```
+
+```{r TravelSurvey, eval = compute, fig.width = 10, echo = FALSE}
+NHTS.ts <- readRDS(file = "~/GHI/R/data/NHTS.TravelSurvey.rds")
+NHTS.df <- dplyr::left_join(NHTS.TravelSurvey@person, NHTS.TravelSurvey@trip, by = c("houseID","subjectID"))
+NHTS.df <- within(NHTS.df, {
+    duration <- ifelse(is.na(duration), 0, duration)
+    mode <- factor(mode, levels = c("walk","cycle","other"))
+}
+)
+
+```
+
+## Mode share of walk/bike by MSA
+
+```{r plot1, eval = TRUE, fig.width = 20, echo = FALSE}
+total <- NHTS.df %>% group_by(location) %>% summarise(total = sum(duration) )
+byMode <- NHTS.df %>% group_by(location, mode) %>% summarise(byMode = sum(duration) )
+NHTS.table1 <- dplyr::full_join(byMode, total, by = "location") %>% mutate(propMode = byMode/total) %>% dplyr::filter(mode %in% c("walk","cycle"))
+
+p <- ggplot(data = NHTS.table1, aes(x = location, y = propMode, fill = mode))
+p + geom_bar(stat="identity") + theme_bw()
+```
+
+## Distribution of Trip Duration by MSA
+
+```{r plot2, eval = TRUE, fig.width = 20, echo = FALSE}
+p <- ggplot(subset(NHTS.df,!is.na(mode)), aes(x = location, y = duration, fill = location))
+p + geom_boxplot(outlier.shape = NA) + ylim(0,60)
+p + geom_violin(scale = "width" ) + ylim(0,60)
+```
+
+### Distribution of Trip Duration for NY MSA (5602)
+
+```{r plot3, eval = TRUE, fig.width = 10, echo = FALSE}
+p <- ggplot(subset(NHTS.df,!is.na(mode) & location == "5602"), aes(x = mode, y = duration, fill = mode))
+p + geom_boxplot(outlier.shape = NA)
+p + geom_violin(scale = "width", adjust = 4 )
+```
