@@ -8,21 +8,13 @@ library("TravelSurvey")
 ```
 
 ```{r loadITHIM, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = FALSE}
-document("~/ITHIM/")
-install("~/ITHIM/")
-#install_github("syounkin/ITHIM", ref="devel")
-install_github("smbache/magrittr", ref="master")
-
-library("magrittr")
-library("ITHIM")
-
 fig.width <- 6 # inches
 phi <- (1+sqrt(5))/2 # the golden ratio ;)
 ```
 
 ```{r TravelSurvey, eval = compute, fig.width = 10, echo = FALSE}
 NHTS.ts <- readRDS(file = "~/GHI/R/data/NHTS.TravelSurvey.rds")
-NHTS.df <- dplyr::left_join(NHTS.TravelSurvey@person, NHTS.TravelSurvey@trip, by = c("houseID","subjectID"))
+NHTS.df <- dplyr::left_join(NHTS.ts@person, NHTS.ts@trip, by = c("houseID","subjectID"))
 NHTS.df <- within(NHTS.df, {
     duration <- ifelse(is.na(duration), 0, duration)
     mode <- factor(mode, levels = c("walk","cycle","other"))
@@ -52,7 +44,7 @@ p + geom_violin(scale = "width" ) + ylim(0,60)
 
 ### Distribution of Trip Duration for NY MSA (5602)
 
-```{r plot3, eval = TRUE, fig.width = 10, echo = FALSE}
+```{r plot3, eval = TRUE, echo = FALSE, fig.width = 20, fig.asp = 1/phi}
 p <- ggplot(subset(NHTS.df,!is.na(mode) & location == "5602"), aes(x = mode, y = duration, fill = mode))
 p + geom_boxplot(outlier.shape = NA)
 p + geom_violin(scale = "width", adjust = 4 )
