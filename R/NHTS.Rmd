@@ -1,70 +1,28 @@
-# Integrated Transport and Health Impacts Model
-
-## R Package _ITHIM_
+# U.S. National Household Travel Surevy
 
 ```{r libs, eval = TRUE, echo = FALSE, results = "hide", warning = FALSE, error = FALSE, message = FALSE}
 options(repos='http://cran.rstudio.com/')
 #install.packages(c("ggplot2","dplyr","openssl","httr", "git2r", "devtools", "roxygen2"))
-library("ggplot2")
+library("tidyverse")
 library("devtools")
-library("reshape2")
-library("plyr")
-library("dplyr")
+#library("reshape2")
+#library("plyr")
+#library("dplyr")
 library("TravelSurvey")
-```
-
-```{r loadITHIM, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = FALSE}
-document("~/ITHIM/")
-install("~/ITHIM/")
-#install_github("syounkin/ITHIM", ref="devel")
-install_github("smbache/magrittr", ref="master")
-
-library("magrittr")
 library("ITHIM")
-
 fig.width <- 6 # inches
 phi <- (1+sqrt(5))/2 # the golden ratio ;)
 ```
-
-## HHS Metro Region Parameter Sets
-
-First we use NHTS to estimate mean walking and cycling times.
-
-### NHTS
 
 ```{r compute, echo = FALSE, eval = TRUE}
 date()
 compute <- TRUE
 ```
 
-```{r parsely, eval = TRUE, echo = FALSE}
-convertToHHS <- function(states){
-  HHSRegions <- matrix(c("CT","ME","MA","NH","RI","VT","NJ","NY","DE","DC","MD","PA","VA","WV","AL","FL","GA","KY","MS","NC","SC","TN","IL","IN","MI","MN","OH","WI","AR","LA","NM","OK","TX","IA","KS","MO","NE","CO","MT","ND","SD","UT","WY","AZ","CA","HI","NV","AK","ID","OR","WA",1,1,1,1,1,1,2,2,3,3,3,3,3,3,4,4,4,4,4,4,4,4,5,5,5,5,5,5,6,6,6,6,6,7,7,7,7,8,8,8,8,8,8,9,9,9,9,10,10,10,10,"HHS01","HHS01","HHS01","HHS01","HHS01","HHS01","HHS02","HHS02","HHS03","HHS03","HHS03","HHS03","HHS03","HHS03","HHS04","HHS04","HHS04","HHS04","HHS04","HHS04","HHS04","HHS04","HHS05","HHS05","HHS05","HHS05","HHS05","HHS05","HHS06","HHS06","HHS06","HHS06","HHS06","HHS07","HHS07","HHS07","HHS07","HHS08","HHS08","HHS08","HHS08","HHS08","HHS08","HHS09","HHS09","HHS09","HHS09","HHS10","HHS10","HHS10","HHS10"), nrow = 51, ncol = 3)
-  StateToHHS <- HHSRegions[,3]
-  names(StateToHHS) <- HHSRegions[,1]
-  return(StateToHHS[states])
-}
 
-countPeople <- function(data){
- nrow(data %>% group_by(HOUSEID, PERSONID) %>% dplyr::summarize(n()))
-}
+### Read Two of the Four NHTS Data Tables
 
-tripTime <- function(data, mode = "walk"){
- return(sum(subset(data, AT == mode)$TRVL_MIN, na.rm = TRUE))
-}
-
-reformatData <- function(data){
-foo <- matrix(unlist(data), nrow = 7, ncol = 2)
-foo <- rbind( c(0, 0), foo)
-dimnames(foo) <- list(paste0("ageClass",1:8), c("F","M"))
-return(foo[,c("M","F")])
-}
-
-```
-
-#### Read Two of the Four NHTS Data Tables
-
-```{r NHTS, eval = compute, echo = FALSE}
+```{r NHTS, eval = compute, echo = TRUE}
 DAYV2PUB <- read.csv(file = "~/GHI/data/NHTS/Ascii/DAYV2PUB.CSV", na.strings = c("-9","-8", "-7", "-1"))
 names(DAYV2PUB) <- c("HOUSEID","PERSONID","FRSTHM","OUTOFTWN","ONTD_P1","ONTD_P2","ONTD_P3","ONTD_P4","ONTD_P5","ONTD_P6","ONTD_P7","ONTD_P8","ONTD_P9","ONTD_P10","ONTD_P11","ONTD_P12","ONTD_P13","ONTD_P14","ONTD_P15","TDCASEID","HH_HISP","HH_RACE","DRIVER","R_SEX","WORKER","DRVRCNT","HHFAMINC","HHSIZE","HHVEHCNT","NUMADLT","FLAG100","LIF_CYC","TRIPPURP","AWAYHOME","CDIVMSAR","CENSUS_D","CENSUS_R","DROP_PRK","DRVR_FLG","EDUC","ENDTIME","HH_ONTD","HHMEMDRV","HHRESP","HHSTATE","HHSTFIPS","INTSTATE","MSACAT","MSASIZE","NONHHCNT","NUMONTRP","PAYTOLL","PRMACT","PROXY","PSGR_FLG","R_AGE","RAIL","STRTTIME","TRACC1","TRACC2","TRACC3","TRACC4","TRACC5","TRACCTM","TRAVDAY","TREGR1","TREGR2","TREGR3","TREGR4","TREGR5","TREGRTM","TRPACCMP","TRPHHACC","TRPHHVEH","TRPTRANS","TRVL_MIN","TRVLCMIN","TRWAITTM","URBAN","URBANSIZE","URBRUR","USEINTST","USEPUBTR","VEHID","WHODROVE","WHYFROM","WHYTO","WHYTRP1S","WRKCOUNT","DWELTIME","WHYTRP90","TDTRPNUM","TDWKND","TDAYDATE","TRPMILES","WTTRDFIN","VMT_MILE","PUBTRANS","HOMEOWN","HOMETYPE","HBHUR","HTRESDN","HTHTNRNT","HTPPOPDN","HTEEMPDN","HBRESDN","HBHTNRNT","HBPPOPDN","GASPRICE","VEHTYPE","HH_CBSA","HHC_MSA")
 
@@ -93,17 +51,17 @@ NHTS.person <- with(PERV2PUB,{
                                AGE = as.factor(ITHIM:::convertToAgeClass(R_AGE)),
                                MSA = ifelse(MSASIZE %in% 1:5, TRUE, FALSE),
                                HHSTATE = as.character(HHSTATE),
-                               HHS = as.character(convertToHHS(as.character(HHSTATE))),
+                               # HHS = as.character(convertToHHS(as.character(HHSTATE))),
                                MSA_ID = HHC_MSA, stringsAsFactors = FALSE)
 })
 
 ```
 
-#### Create TravelSurvey Object
+### Create TravelSurvey Object
 
 
 
-```{r TravelSurvey, eval = compute, fig.width = 10, echo = FALSE}
+```{r TravelSurvey, eval = compute, fig.width = 10, echo = TRUE}
 
 person.df <- with(NHTS.person,{
     data.frame(houseID=HOUSEID, subjectID=PERSONID, sex = SEX, age = AGE, location = MSA_ID)
@@ -119,40 +77,4 @@ trip.df <- subset(trip.df,apply(trip.df,MARGIN=1,FUN=function(x)all(!is.na(x))))
 NHTS.TravelSurvey <- new("TravelSurvey", person = person.df, trip = trip.df)
 
 saveRDS(NHTS.TravelSurvey, file = "~/GHI/R/data/NHTS.TravelSurvey.rds")
-```
-
-```{r TravelSurvey2, eval = compute, fig.width = 10, echo = FALSE}
-NHTS.TravelSurvey <- readRDS(file = "~/GHI/R/data/NHTS.TravelSurvey.rds")
-
-NHTS.df <- dplyr::left_join(NHTS.TravelSurvey@person, NHTS.TravelSurvey@trip, by = c("houseID","subjectID"))
-
-NHTS.df <- within(NHTS.df, duration <- ifelse(is.na(duration), 0, duration))
-
-
-```
-
-
-
-
-
-
-```{r msaMatrix, eval = FALSE, fig.width = 10, echo = FALSE}
-msaMatrix <- matrix(c(5602,4472,1922,7320,3120,6200,3362,7362,5720,4992,8872,
-8280,7240,0640,6922,5960,3600,0520,8960,3480,1602,6840,
-1280,1520,5360,6640,1122,5082,6162,2162,4920,7602,6480,
-5120,1692,7040,7160,6442,4120,4520,6280,2082,1642,3760,
-3280,1840,5880,3000,5560,
-"NY/NJ Metro","Los Angeles-Riverside-Orange County","Dallas-Fort Worth","San Diego","Greensboro-Winston Salem", "Phoenix/Mesa","Houston-Galveston-Brazoria", "San Francisco-Oakland-San Jose", "Norfolk-Virginia Beach", "Miami-Ft. Lauderdale", "Washington-Baltimore", rep("no label yet", 38)), ncol = 2)
-```
-
-```{r foob, eval = FALSE, echo = FALSE}
-#NHTS.person <- subset( NHTS.person, MSA == TRUE )
-#NHTS.trips <- subset(NHTS.trips, !is.na(TRVL_MIN))
-
-#saveRDS(NHTS.person, file = "./data/NHTS.person.rds")
-#saveRDS(NHTS.trips, file = "./data/NHTS.trips.rds")
-
-#NHTS <- merge(NHTS.person, NHTS.trips, by = c("HOUSEID","PERSONID"), all.x = TRUE)
-#NHTS <- within(NHTS, TRVL_MIN <- ifelse(is.na(TRVL_MIN), 0, TRVL_MIN))
-#saveRDS(NHTS, file = "./data/NHTS.rds")
 ```

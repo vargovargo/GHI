@@ -1,14 +1,15 @@
 all : clean data report methods tex
 tex : methods second ITHIM-discussion
 
-report: R/ITHIM.Rmd R/ITHIM.R
-	cd R; R --vanilla -e 'source("ITHIM.R")'
-
 NHTS: R/NHTS.Rmd R/NHTS.R
 	cd R; R --vanilla -e 'source("NHTS.R")'
 
 TravelSurvey: R/TravelSurvey.Rmd R/TravelSurvey.R
 	cd R; R --vanilla -e 'source("TravelSurvey.R")'
+
+report: R/ITHIM.Rmd R/ITHIM.R
+	cd R; R --vanilla -e 'source("ITHIM.R")'
+
 
 RoadFatalities: R/RoadFatalities.Rmd R/RoadFatalities.R
 	cd R; R --vanilla -e 'source("RoadFatalities.R")'

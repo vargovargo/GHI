@@ -1,4 +1,51 @@
 ### Appendix
+### Appendix
+
+```{r msaMatrix, eval = FALSE, fig.width = 10, echo = FALSE}
+msaMatrix <- matrix(c(5602,4472,1922,7320,3120,6200,3362,7362,5720,4992,8872,
+8280,7240,0640,6922,5960,3600,0520,8960,3480,1602,6840,
+1280,1520,5360,6640,1122,5082,6162,2162,4920,7602,6480,
+5120,1692,7040,7160,6442,4120,4520,6280,2082,1642,3760,
+3280,1840,5880,3000,5560,
+"NY/NJ Metro","Los Angeles-Riverside-Orange County","Dallas-Fort Worth","San Diego","Greensboro-Winston Salem", "Phoenix/Mesa","Houston-Galveston-Brazoria", "San Francisco-Oakland-San Jose", "Norfolk-Virginia Beach", "Miami-Ft. Lauderdale", "Washington-Baltimore", rep("no label yet", 38)), ncol = 2)
+```
+
+```{r foob, eval = FALSE, echo = FALSE}
+#NHTS.person <- subset( NHTS.person, MSA == TRUE )
+#NHTS.trips <- subset(NHTS.trips, !is.na(TRVL_MIN))
+
+#saveRDS(NHTS.person, file = "./data/NHTS.person.rds")
+#saveRDS(NHTS.trips, file = "./data/NHTS.trips.rds")
+
+#NHTS <- merge(NHTS.person, NHTS.trips, by = c("HOUSEID","PERSONID"), all.x = TRUE)
+#NHTS <- within(NHTS, TRVL_MIN <- ifelse(is.na(TRVL_MIN), 0, TRVL_MIN))
+#saveRDS(NHTS, file = "./data/NHTS.rds")
+```
+
+```{r parsely, eval = FALSE, echo = FALSE}
+convertToHHS <- function(states){
+  HHSRegions <- matrix(c("CT","ME","MA","NH","RI","VT","NJ","NY","DE","DC","MD","PA","VA","WV","AL","FL","GA","KY","MS","NC","SC","TN","IL","IN","MI","MN","OH","WI","AR","LA","NM","OK","TX","IA","KS","MO","NE","CO","MT","ND","SD","UT","WY","AZ","CA","HI","NV","AK","ID","OR","WA",1,1,1,1,1,1,2,2,3,3,3,3,3,3,4,4,4,4,4,4,4,4,5,5,5,5,5,5,6,6,6,6,6,7,7,7,7,8,8,8,8,8,8,9,9,9,9,10,10,10,10,"HHS01","HHS01","HHS01","HHS01","HHS01","HHS01","HHS02","HHS02","HHS03","HHS03","HHS03","HHS03","HHS03","HHS03","HHS04","HHS04","HHS04","HHS04","HHS04","HHS04","HHS04","HHS04","HHS05","HHS05","HHS05","HHS05","HHS05","HHS05","HHS06","HHS06","HHS06","HHS06","HHS06","HHS07","HHS07","HHS07","HHS07","HHS08","HHS08","HHS08","HHS08","HHS08","HHS08","HHS09","HHS09","HHS09","HHS09","HHS10","HHS10","HHS10","HHS10"), nrow = 51, ncol = 3)
+  StateToHHS <- HHSRegions[,3]
+  names(StateToHHS) <- HHSRegions[,1]
+  return(StateToHHS[states])
+}
+
+countPeople <- function(data){
+ nrow(data %>% group_by(HOUSEID, PERSONID) %>% dplyr::summarize(n()))
+}
+
+tripTime <- function(data, mode = "walk"){
+ return(sum(subset(data, AT == mode)$TRVL_MIN, na.rm = TRUE))
+}
+
+reformatData <- function(data){
+foo <- matrix(unlist(data), nrow = 7, ncol = 2)
+foo <- rbind( c(0, 0), foo)
+dimnames(foo) <- list(paste0("ageClass",1:8), c("F","M"))
+return(foo[,c("M","F")])
+}
+
+```
 
 Do it again, but with quintiles
 
