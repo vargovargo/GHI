@@ -56,3 +56,10 @@ p <- ggplot(subset(NHTS.df,!is.na(mode) & location == "5602"), aes(x = mode, y =
 p + geom_boxplot(outlier.shape = NA) + ylim(0,60)
 p + geom_violin(scale = "width", adjust = 4 ) + ylim(0,60)
 ```
+
+```{r means, eval = TRUE, echo = FALSE, fig.width = fig.width, fig.asp = 1/phi}
+meanDuration <- NHTS.df %>% group_by(location,sex,age,mode) %>% summarise(meanDuration = mean(duration))
+
+%>% complete(nesting(location,sex,age,mode))
+
+```
