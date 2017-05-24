@@ -11,7 +11,7 @@ fig.width <- 6 # inches
 phi <- (1+sqrt(5))/2 # the golden ratio ;)
 ```
 
-```{r TravelSurvey, eval = compute, fig.width = 10, echo = FALSE}
+```{r TravelSurvey, eval = compute, fig.width = fig.width, echo = FALSE}
 NHTS.ts <- readRDS(file = "~/GHI/R/data/NHTS.TravelSurvey.rds")
 NHTS.df <- dplyr::left_join(NHTS.ts@person, NHTS.ts@trip, by = c("houseID","subjectID"))
 NHTS.df <- within(NHTS.df, {
@@ -22,7 +22,7 @@ NHTS.df <- within(NHTS.df, {
 
 ## Mode share of walk/bike by MSA
 
-```{r plot1, eval = TRUE, fig.width = 20, echo = FALSE}
+```{r plot1, eval = TRUE, fig.width = fig.width, echo = FALSE, fig.asp = 1/phi}
 total <- NHTS.df %>% group_by(location) %>% summarise(mean = mean(duration), total = sum(duration), sdTotal = sd(duration), nTotal = n())
 
 byMode <- NHTS.df %>% group_by(location, mode) %>% summarise(byMode = mean(duration), sdMode = sd(duration), nMode=n() )
@@ -37,13 +37,13 @@ NHTS.table2 <- within(NHTS.table2, {
     })
 
 p <- ggplot(NHTS.table2, aes(x = location, y = value, colour = mode))
-p + geom_line(aes(group = ciMode))# + facet_grid(mode ~ . )
+p + geom_line(aes(group = ciMode)) + facet_grid(mode ~ . )
 
 ```
 
 ## Distribution of Trip Duration by MSA
 
-```{r plot2, eval = TRUE, fig.width = 20, echo = FALSE}
+```{r plot2, eval = TRUE, fig.width = fig.width, echo = FALSE, fig.asp = 1/phi}
 p <- ggplot(subset(NHTS.df,!is.na(mode)), aes(x = location, y = duration, fill = location))
 p + geom_boxplot(outlier.shape = NA) + ylim(0,60)
 p + geom_violin(scale = "width" ) + ylim(0,60)
@@ -51,8 +51,8 @@ p + geom_violin(scale = "width" ) + ylim(0,60)
 
 ### Distribution of Trip Duration for NY MSA (5602)
 
-```{r plot3, eval = TRUE, echo = FALSE, fig.width = 20, fig.asp = 1/phi}
+```{r plot3, eval = TRUE, echo = FALSE, fig.width = fig.width, fig.asp = 1/phi}
 p <- ggplot(subset(NHTS.df,!is.na(mode) & location == "5602"), aes(x = mode, y = duration, fill = mode))
-p + geom_boxplot(outlier.shape = NA)
-p + geom_violin(scale = "width", adjust = 4 )
+p + geom_boxplot(outlier.shape = NA) + ylim(0,60)
+p + geom_violin(scale = "width", adjust = 4 ) + ylim(0,60)
 ```
