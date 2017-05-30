@@ -64,7 +64,7 @@ NHTS.person <- with(PERV2PUB,{
 ```{r TravelSurvey, eval = compute, fig.width = 10, echo = TRUE}
 
 person.df <- with(NHTS.person,{
-    data.frame(houseID=HOUSEID, subjectID=PERSONID, sex = SEX, age = AGE, location = MSA_ID)
+    data.frame(houseID=HOUSEID, subjectID=PERSONID, sex = SEX, age = AGE, location = as.character(MSA_ID))
     })
 
 trip.df <- with(NHTS.trips,{
