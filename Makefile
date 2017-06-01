@@ -17,6 +17,9 @@ RoadFatalities: R/RoadFatalities.Rmd R/RoadFatalities.R
 tutorial: R/tutorial.Rmd R/tutorial.R
 	cd R; R --vanilla -e 'source("tutorial.R")'
 
+oregon: R/oregon.Rmd R/oregon.R
+	cd R; R --vanilla -e 'source("oregon.R")'
+
 states: vargo/loopStates.Rmd vargo/loopStates.R
 	cd vargo; R --vanilla -e 'source("loopStates.R")'
 

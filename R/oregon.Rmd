@@ -1,0 +1,243 @@
+﻿# ITHIMr Demonstration for Portland, Oregon
+
+```{r rm, eval = TRUE, echo = FALSE, results = "hide", warning = FALSE, error = FALSE, message = FALSE}
+rm(list=ls())
+```
+
+## Install and Load ITHIM
+
+The package _devtools_ makes installation of the _ITHIM_ package easy.
+Install _devtools_ using `install.packages("devtools")` or some other
+way in _RStudio_.  We use the function `install_github` from
+_devtools_ to install the _devel_ branch of the _ITHIM_ package
+repository.
+
+```{r libs, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = FALSE, message = FALSE}
+library("devtools")
+install_github("ITHIM/ITHIM", ref="devel")
+```
+
+```{r libs2, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = FALSE, message = FALSE}
+library("ITHIM")
+library("tidyverse")
+```
+
+```{r figwidth, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = FALSE}
+fig.width <- 24 # inches
+phi <- (1+sqrt(5))/2 # the golden ratio ;)
+```
+
+## Create a Baseline ITHIM object
+
+We begin by creating an ITHIM object to represent the baseline model.
+Currently _ITHIM_ can read up to three files containing input
+parameters, but it is not necessary to provide all three.  Two sample
+files are listed below that contain model parameters for the active
+transport component of _ITHIM_.
+
+```{r misc2, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+activeTransportFile <- "~/ITHIM/inst/activeTransportTime.csv"
+GBDFile <- "~/ITHIM/inst/gbd.csv"
+```
+
+The file_activeTransprtTime.csv_ contains weekly mean travel times in
+minutes, stratified by age, sex and mode (walk,cycle). Currently eight
+age classes are used for the _ITHIM_ model.  For a more detailed
+description of the file format see the help page for `createITHIM`
+using `help("createITHIM")`.
+
+```{r misc20, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+ITHIM.baseline <- createITHIM(activeTransportFile = activeTransportFile,
+                              GBDFile = GBDFile)
+```
+
+Sample Files
+* [activeTransportTime.csv](https://github.com/syounkin/ITHIM/blob/master/inst/activeTransportTime.csv)
+* [gbd.csv](https://github.com/syounkin/ITHIM/blob/master/inst/gbd.csv)
+
+
+
+## Creating Scenarios Using the `update` Method
+
+Suppose we wanted to create a scenario in which the mean cycling time
+and mean walking time are doubled.  We need only to change two means
+in the model and nothing else.  To do so we could avoid creating input
+files by simply updating the baseline object with a few new
+parameters.
+
+First we need to know the name of the parameters we want to update.
+Currently the list of parameters resides in the help page for the
+ITHIM class (`help("ITHIM")`).  Alternatively one can use
+`getParameterNames`.
+
+```{r misc124, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+getParameterNames(ITHIM.baseline)
+```
+
+Now we need to retrieve the walking and cycling means from the
+baseline model.  To do so we use the method `getMeans`.  To find a
+list of available methods use `getMethodsITHIM` with no arguments.
+
+```{r misc23, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+getMethodsITHIM()
+meanVec <- getMeans(ITHIM.baseline)
+meanVec
+meanWalkingTime <- meanVec$walk; meanCyclingTime <- meanVec$cycle
+scenarioParameters <- list(muwt = 2*meanWalkingTime, muct = 2*meanCyclingTime)
+scenarioParameters
+```
+
+Now we use the list of parameters and the baseline ITHIM object to
+create the scenario ITHIM object.
+
+```{r misc250, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+ITHIM.scenario <- update(ITHIM.baseline, scenarioParameters)
+```
+
+Let's inspect it to be sure.
+
+```{r misc351, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+getMeans(ITHIM.scenario)
+```
+
+## Physical Activity Component
+
+Once the baseline and scenario ITHIM objects are defined, we may
+compute the change in burden due to physical activity as follows.
+
+```{r misc25, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+deltaBurden(ITHIM.baseline, ITHIM.scenario, dis = "all", bur = "deaths")
+deltaBurden(ITHIM.baseline, ITHIM.scenario, dis = "BreastCancer", bur = "deaths")
+deltaBurden(ITHIM.baseline, ITHIM.scenario, dis = "Depression", bur = "deaths")
+deltaBurden(ITHIM.baseline, ITHIM.scenario, dis = "Depression", bur = "daly")
+```
+
+## Active Travel Estimates for Portland (MSA 6442)
+
+We use the NAtional Household Transportation Survey data stored as a _TravelSurvey_ R object to estimate mean walk and cycle times.
+
+```{r oregon23, eval = TRUE, echo = FALSE, message = FALSE, warnings = FALSE, results = "hide", fig.width = fig.width, fig.asp = 1/phi}
+install_github("syounkin/TravelSurvey", ref="master")
+library("TravelSurvey")
+NHTS.ts <- readRDS(file = "~/GHI/R/data/NHTS.TravelSurvey.rds")
+NHTS.df <- dplyr::left_join(NHTS.ts@person, NHTS.ts@trip, by = c("houseID","subjectID"))
+```
+
+```{r oregon333, eval = TRUE, echo = FALSE, fig.width = fig.width, fig.asp = 1/phi}
+NHTS.df <- within(NHTS.df, {
+    id <- paste0(houseID,"-",subjectID)
+    duration <- ifelse(is.na(duration), 0, duration)
+    mode <- factor(mode, levels = c("walk","cycle","other"))
+    age <- factor(age, levels = c("00-04","05-14","15-29","30-44","45-59","60-69","70-79","80+"))
+    sex <- factor(sex, levels = c("M","F"))
+})
+```
+
+```{r oregon2, eval = TRUE, echo = TRUE, fig.width = fig.width, fig.asp = 1/phi}
+sampleSize <- NHTS.df %>% filter(location == "6442") %>% group_by(sex,age) %>% summarise(n=n_distinct(id))
+
+tripDuration <- NHTS.df %>% filter(location == "6442") %>% group_by(mode,sex,age) %>% summarise(total=sum(duration))
+
+activeTravelOregon <- right_join(sampleSize,tripDuration, by = c("sex","age")) %>% ungroup() %>% mutate(mean = total/n*7) %>% select(mode,sex,age,mean) %>% complete(mode,sex,age) %>% filter(mode %in% c("walk","cycle")) %>% as.data.frame()
+
+activeTravelOregon
+```
+
+
+
+## Appendix
+
+### Built-In Example
+
+An example is contained within the _ITHIM_ package.
+
+```{r misc225, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+example("ITHIM")
+```
+
+### File Formats
+#### Active Transport File Format
+
+The active transport file contains mean walking and cycling times
+stratified by sex and _ITHIM_ age class.  The default file is located
+in _inst/_.
+
+```
+ageClass,sex,mode,value
+ageClass1,M,walk,21.47
+ageClass2,M,walk,53.11
+ageClass3,M,walk,50.13
+...
+ageClass6,F,cycle,1.53
+ageClass7,F,cycle,0.53
+ageClass8,F,cycle,0.23
+```
+
+Notes about file format:
+* The rows must be ordered by ageClass.
+* The mean values are in minutes per week
+
+
+
+
+#### Disease Burden File Format
+
+The disease burden file contains estimates for disease burden
+stratified by _ITHIM_ age class and sex.
+
+```
+disease,sex,ageClass,burdenType,value
+BreastCancer,M,ageClass1,dproj,0
+BreastCancer,M,ageClass2,dproj,0
+BreastCancer,M,ageClass3,dproj,0
+...
+RTIs,F,ageClass6,daly,49108.81151
+RTIs,F,ageClass7,daly,29852.3031
+RTIs,F,ageClass8,daly,15942.95826
+```
+
+Notes about file format:
+* RTIs stands for road traffic injuries
+* Only _ITHIM_ diseases can be included, namely "BreastCancer",
+  "ColonCancer", "CVD", "Dementia", "Diabetes", "Depression" and "RTIs"
+
+
+
+### Road Injuries
+#### Road Injuries File Format
+
+If road injury data is present it can be included in the same manner.
+
+```{r misc123, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+roadInjuriesFile <- "~/ITHIM/inst/roadInjuries.csv"
+```
+
+```{r misc220, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+ITHIM.baseline <- createITHIM(activeTransportFile = activeTransportFile,
+                              GBDFile = GBDFile,
+                              roadInjuriesFile = roadInjuriesFile)
+```
+
+* [roadInjuries.csv](https://github.com/syounkin/ITHIM/blob/master/inst/roadInjuries.csv)
+
+```
+severity,roadType,strikingMode,victimMode,value
+Fatal,Local,walk,walk,0
+Fatal,Local,cycle,walk,13
+Fatal,Local,bus,walk,213
+...
+Serious,Highway,HGV,NOV,0
+Serious,Highway,LGV,NOV,0
+Serious,Highway,mbike,NOV,0
+```
+
+Notes about file format:
+* ebikes are not included
+
+
+### Session Info & Package Test
+```{r sessionInfo, eval = FALSE, echo = TRUE, results = "show", warning = FALSE, error = FALSE, message = FALSE}
+library("testthat")
+test_package("ITHIM")
+sessionInfo()
+```

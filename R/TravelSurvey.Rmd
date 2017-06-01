@@ -12,8 +12,10 @@ phi <- (1+sqrt(5))/2 # the golden ratio ;)
 ```
 
 ```{r msa, eval = TRUE, fig.width = fig.width, echo = FALSE}
-foo <- read.csv(file ="./../data/cbsatocountycrosswalk.csv", colClasses = "character")
-foo <- unique(foo[,c("msa","msaname")])
+#foo <- read.csv(file ="./../data/cbsatocountycrosswalk.csv", colClasses = "character")
+foo <- read.csv(file = "~/GHI/data/MSA.csv", colClasses = c("character","character"))
+names(foo) <- c("msa","msaname")
+#foo <- unique(foo[,c("msa","msaname")])
 msa <- foo$msa
 msaname <- foo$msaname
 names(msaname) <- msa
@@ -24,6 +26,7 @@ names(msaname) <- msa
 NHTS.ts <- readRDS(file = "~/GHI/R/data/NHTS.TravelSurvey.rds")
 NHTS.df <- dplyr::left_join(NHTS.ts@person, NHTS.ts@trip, by = c("houseID","subjectID"))
 NHTS.df <- within(NHTS.df, {
+    id <- paste0(houseID,"-",subjectID)
     duration <- ifelse(is.na(duration), 0, duration)
     mode <- factor(mode, levels = c("walk","cycle","other"))
     location <- msaname[location]
@@ -73,3 +76,4 @@ meanDuration <- NHTS.df %>% group_by(location,sex,age,mode) %>% summarise(meanDu
 %>% complete(nesting(location,sex,age,mode))
 
 ```
+

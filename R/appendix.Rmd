@@ -1,6 +1,13 @@
 ### Appendix
 ### Appendix
 
+#msaMatrix <- read.csv(file = "~/GHI/data/MSA.csv", colClasses = c("character","character"))
+#names(msaMatrix) <- c("msa","msaname")
+#msa <- msaMatrix$msa
+#msaname <- msaMatrix$msaname
+#names(msaname) <- msa
+
+
 ```{r msaMatrix, eval = FALSE, fig.width = 10, echo = FALSE}
 msaMatrix <- matrix(c(5602,4472,1922,7320,3120,6200,3362,7362,5720,4992,8872,
 8280,7240,0640,6922,5960,3600,0520,8960,3480,1602,6840,
