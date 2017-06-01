@@ -216,18 +216,6 @@ Notes about file format:
 
 #### Road Injuries File Format
 
-If road injury data is present it can be included in the same manner.
-
-```{r misc123, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
-roadInjuriesFile <- "~/ITHIM/inst/roadInjuries.csv"
-```
-
-```{r misc220, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
-ITHIM.baseline <- createITHIM(activeTransportFile = activeTransportFile,
-                              GBDFile = GBDFile,
-                              roadInjuriesFile = roadInjuriesFile)
-```
-
 * [roadInjuries.csv](https://ithim.wiscweb.wisc.edu/wp-content/uploads/sites/110/2017/06/roadInjuries.csv)
 
 ```
@@ -246,7 +234,7 @@ Notes about file format:
 
 
 ### Session Info & Package Test
-```{r sessionInfo, eval = FALSE, echo = TRUE, results = "show", warning = FALSE, error = FALSE, message = FALSE}
+```{r sessionInfo, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = FALSE, message = FALSE}
 library("testthat")
 test_package("ITHIM")
 sessionInfo()
