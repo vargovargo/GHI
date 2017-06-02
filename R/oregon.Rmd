@@ -45,35 +45,32 @@ age classes are used for the _ITHIM_ model.  For a more detailed
 description of the file format see the help page for `createITHIM`
 using `help("createITHIM")`.
 
-Please update the path and names in the code below to match the csv files you wish to use. 
+Please update the path and names in the code below to match the csv files you wish to use.
 
-```{r misc20, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+```{r misc320, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
 ITHIM.baseline <- createITHIM(activeTransportFile = "~/Downloads/activeTransportTime.csv",
                               GBDFile = "~/Downloads/gbd.csv")
 ```
 
-## Creating Scenarios Using the `update` Method
+The contents of the _ITHIM_ object are displayed in summary when the
+object is printed.  See below.
 
-Suppose we wanted to create a scenario in which the mean cycling time
-and mean walking time are doubled.  We need only to change two means
-in the model and nothing else.  To do so we could avoid creating input
-files by simply updating the baseline object with a few new
-parameters.  (note: this is the overall mean for the whole
-population. From this, _ITHIM_ will create means for each age & gender
-strata)
+```{r show, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+ITHIM.baseline
+```
 
-First we need to know the name of the parameters we want to update.
-Currently the list of parameters resides in the help page for the
+Currently the list of internal model parameters resides in the help page for the
 ITHIM class (`help("ITHIM")`).  Alternatively one can use the method
-`getParameterNames`.
+`getParameterNames` to display the names.
+
 
 ```{r misc124, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
 getParameterNames(ITHIM.baseline)
 ```
 
-Now we need to retrieve the walking and cycling means from the
-baseline model.  To do so we use the method `getMeans`, which returns a vector of means.  To find a
-list of available methods use `getMethodsITHIM` with no arguments.
+If we wanted to examine the overal means in the model we could use the
+method `getMeans`, which returns a vector of means.  To find a list of
+available methods use `getMethodsITHIM` with no arguments.
 
 ```{r misc23, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
 getMethodsITHIM()
@@ -86,32 +83,29 @@ meanVec <- getMeans(ITHIM.baseline)
 meanVec
 ```
 
-We can also pull out the mode-specific means from that vector and assign them to their own variables.
+## Creating a Scenario ITHIM object
 
-```{r misc3322, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
-meanWalkingTime <- meanVec$walk
-meanCyclingTime <- meanVec$cycle
+Suppose we wanted to create a scenario in which the mean cycling time
+and mean walking time are doubled.  We simply need to replace the
+active transport file with one that has the desired values.
+
+Sample Files
+* [activeTransportTime_scenario.csv](https://ithim.wiscweb.wisc.edu/wp-content/uploads/sites/110/2017/06/activeTransportTime_scenario.csv)
+
+
+Please update the path and names in the code below to match the csv
+files you wish to use.
+
+```{r misc20, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+ITHIM.scenario <- createITHIM(activeTransportFile = "~/Downloads/activeTransportTime_scenario.csv",
+                              GBDFile = "~/Downloads/gbd.csv")
 ```
 
-Next we'll create a list of the parameters we wish to change in our
-scenario. Recall,
-we're interested in a scenario that has double the mean walking time and double the mean cycling time of the baseline scenario.
+```{r misc7620, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = FALSE}
+modelMeans <- rbind(cbind(rbind(getWalkTime(ITHIM.baseline), getCycleTime(ITHIM.baseline), getNonTravelMETs(ITHIM.baseline)),vision = "baseline"), cbind(rbind(getWalkTime(ITHIM.scenario), getCycleTime(ITHIM.scenario), getNonTravelMETs(ITHIM.scenario)),vision = "scenario"))
 
-```{r misc3242, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
-scenarioParameters <- list(muwt = 2*meanWalkingTime, muct = 2*meanCyclingTime)
-scenarioParameters
-```
-
-_ITHIM_'s comparative risk assessment framework uses two models to describe the potential health impacts for small differences between them. In our case the two models differ in the active travel times of the population.  Above we created the baseline model, and now we use the list of changed parameters to `update` the baseline ITHIM object. This method creates a copy of the baseline ITHIM object with the changes we'd like to see in the new ITHIM object. We call this new object the scenario. 
-
-```{r misc250, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
-ITHIM.scenario <- update(ITHIM.baseline, scenarioParameters)
-```
-
-Let's inspect the scenario ITHIM object to be sure it includes the changes we expect.
-
-```{r misc351, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
-getMeans(ITHIM.scenario)
+p <- ggplot(modelMeans, aes(x = ageClass, y = mean, fill = vision))
+p + geom_bar(stat = "identity", position = "dodge") + facet_grid(type ~ sex, scales = "free_y")  + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 ## Physical Activity Component
@@ -128,8 +122,48 @@ deltaBurden(ITHIM.baseline, ITHIM.scenario, dis = "Depression", bur = "deaths")
 deltaBurden(ITHIM.baseline, ITHIM.scenario, dis = "Depression", bur = "daly")
 ```
 
-## Active Travel Estimates for Portland (MSA 6442)
+## Creating Scenarios Using the `update` Method
 
+In the above example we needed only to change two means in the model
+and nothing else.  To do so we could avoid creating input files by
+simply updating the baseline object with a few new parameters.  (note:
+this is the overall mean for the whole population. From this, _ITHIM_
+will create means for each age & gender strata)
+
+
+We can use the mode-specific means from the _meanVec_ vector and
+assign them to their own variables.
+
+```{r misc3322, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+meanWalkingTime <- meanVec$walk
+meanCyclingTime <- meanVec$cycle
+```
+
+Next we'll create a list of the parameters we wish to change in our
+scenario. Recall, we're interested in a scenario that has double the
+mean walking time and double the mean cycling time of the baseline
+scenario.
+
+```{r misc3242, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+scenarioParameters <- list(muwt = 2*meanWalkingTime, muct = 2*meanCyclingTime)
+scenarioParameters
+```
+
+_ITHIM_'s comparative risk assessment framework uses two models to describe the potential health impacts for small differences between them. In our case the two models differ in the active travel times of the population.  Above we created the baseline model, and now we use the list of changed parameters to `update` the baseline ITHIM object. This method creates a copy of the baseline ITHIM object with the changes we'd like to see in the new ITHIM object. We call this new object the scenario.
+
+```{r misc250, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+ITHIM.scenario <- update(ITHIM.baseline, scenarioParameters)
+```
+
+Let's inspect the scenario ITHIM object to be sure it includes the changes we expect.
+
+```{r misc351, message = FALSE, eval = TRUE, warning = FALSE, error = TRUE, echo = TRUE}
+getMeans(ITHIM.scenario)
+```
+
+## Creating an ITHIM object for Portland (MSA 6442)
+
+### Active Transport Means
 We use the National Household Transportation Survey (NHTS) data stored
 as a _TravelSurvey_ R object to estimate mean walk and cycle times.
 
@@ -158,6 +192,11 @@ tripDuration <- NHTS.df %>% filter(location == "6442") %>% group_by(mode,sex,age
 activeTravelOregon <- right_join(sampleSize,tripDuration, by = c("sex","age")) %>% ungroup() %>% mutate(mean = total/n*7) %>% select(mode,sex,age,mean) %>% complete(mode,sex,age) %>% filter(mode %in% c("walk","cycle")) %>% as.data.frame()
 
 activeTravelOregon
+```
+
+### Disease Burden
+
+```{r gbd, eval = TRUE, echo = TRUE, fig.width = fig.width, fig.asp = 1/phi}
 ```
 
 ## Appendix
