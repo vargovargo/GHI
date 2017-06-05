@@ -1,49 +1,34 @@
 rm(list=ls())
 
-library("ITHIM") # Make sure you're on the devel branch
-
-# SafetyInNumbers and DistByRoadType Baseline data already included via default input files
+library("ITHIM")
 
 ITHIM.baseline <- createITHIM()
 
-# Scenario DistByRoadType
+source("~/ITHIM/tests/testthat/helper-RI-usage.R")
 
-ITHIM.scenario <- update(ITHIM.baseline, list(distRoadType = ITHIM:::readDistByRoadType(system.file("distByRoadTypeScenario.csv", package = "ITHIM"))))
+ITHIM.baseline <- update(ITHIM.baseline, list(distRoadType = ITHIM:::helperCreateArray(excelDistByRoadTypeBaselineWithoutNOV)$createdArray))
 
-# RoadInjuries for baseline
+ITHIM.baseline <- update(ITHIM.baseline, list(safetyInNumbers = ITHIM:::helperCreateArray(excelSafetyInNumbersWithoutNOV)$createdArray))
 
-ITHIM.baseline <- update(ITHIM.baseline, list(roadInjuries = ITHIM:::readRoadInjuries(system.file("roadInjuries.csv", package = "ITHIM"))))
 
-# RoadInjuries for scenario using scenario multiplier and baseline RoadInjuries
+ITHIM.scenario <- update(ITHIM.baseline, list(distRoadType = ITHIM:::helperCreateArray(excelDistByRoadTypeScenarioWithoutNOV)$createdArray))
+
+
+ITHIM.baseline <- update(ITHIM.baseline, list(roadInjuries = ITHIM:::helperCreateArray(excelRoadInjuriesBaselineWithoutNOV)$createdArray))
+
 
 ITHIM.scenario <- ITHIM:::updateRoadInjuries(ITHIM.baseline, ITHIM.scenario)
 
-## rm(list=ls())
-## library("ITHIM") # Make sure you're on the devel branch
 
-## ITHIM <- createITHIM()
 
-## # DistByRoadType
+# Make sure you're on the devel branch
 
-## ITHIM.baseline <- readDistByRoadType(ITHIM, system.file("distByRoadTypeBaseline.csv", package = "ITHIM"))
-## ITHIM.scenario <- readDistByRoadType(ITHIM, system.file("distByRoadTypeScenario.csv", package = "ITHIM"))
+  # init ITHIM baseline and scenario using data for helper
 
-## # SafetyInNumbers
+  # this part can be prone to errors since createITHIM() by default loads SafetyInNumbers and DistByRoadType Baseline from /inst .
+  # In case of lack of these files, test won't work
+    # get SafetyInNumbers and DistByRoadType Baseline data from helper, not file (this is why read* methods are not used)
 
-## ITHIM.baseline <- readSafetyInNumbers(ITHIM.baseline, system.file("SiN.csv", package = "ITHIM"))
-## ITHIM.scenario <- readSafetyInNumbers(ITHIM.scenario, system.file("SiN.csv", package = "ITHIM"))
 
-## # RoadInjuries for baseline
+excelDistByRoadTypeBaselineWithoutNOV
 
-## ITHIM.baseline <- readRoadInjuries(ITHIM.baseline, system.file("roadInjuriesBaseline.csv", package = "ITHIM"))
-
-## # RoadInjuries for scenario using scenario multiplier and baseline RoadInjuries
-
-## ITHIM.scenario <- updateRoadInjuries(ITHIM.baseline, ITHIM.scenario)
-
-## ##################################################################
-## # refactored functions - individual call
-
-## testComputeMultiplier <- computeMultiplier(baseline = ITHIM.baseline, scenario = ITHIM.scenario, safetyInNumbers = getSiN(ITHIM.baseline))
-
-## testMultiplyInjuries <- multiplyInjuries(ITHIM.baseline = ITHIM.baseline, ITHIM.scenario = ITHIM.scenario)
