@@ -1,0 +1,11 @@
+foo <- read.csv(file="~/GHI/data/join2.csv", stringsAsFactors = FALSE)
+
+msaTest <- 6442
+
+msaMatrix <- foo %>% filter(msaNHTS == msaTest) %>%
+select(stateFIPS,countyFIPS)
+
+
+getPopulation(state=msaMatrix$stateFIPS, county =
+msaMatrix$countyFIPS)
+

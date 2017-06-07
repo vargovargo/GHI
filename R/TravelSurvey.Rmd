@@ -29,7 +29,7 @@ NHTS.df <- within(NHTS.df, {
     id <- paste0(houseID,"-",subjectID)
     duration <- ifelse(is.na(duration), 0, duration)
     mode <- factor(mode, levels = c("walk","cycle","other"))
-    location <- msaname[location]
+    location <- location #msaname[location]
 })
 ```
 
@@ -62,10 +62,10 @@ p + geom_boxplot(outlier.shape = NA) + ylim(0,60) + theme(axis.text.x = element_
 p + geom_violin(scale = "width" ) + ylim(0,60) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-### Distribution of Trip Duration for NY MSA (5602)
+### Distribution of Trip Duration for Portland, OR MSA (6442)
 
 ```{r plot3, eval = TRUE, echo = FALSE, fig.width = fig.width, fig.asp = 1/phi}
-p <- ggplot(subset(NHTS.df,!is.na(mode) & location == "5602"), aes(x = mode, y = duration, fill = mode))
+p <- ggplot(subset(NHTS.df,!is.na(mode) & location == "6442"), aes(x = mode, y = duration, fill = mode))
 p + geom_boxplot(outlier.shape = NA) + ylim(0,60) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 p + geom_violin(scale = "width", adjust = 4 ) + ylim(0,60) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
