@@ -4,6 +4,9 @@ tex : methods second ITHIM-discussion
 NHTS: R/NHTS.Rmd R/NHTS.R
 	cd R; R --vanilla -e 'source("NHTS.R")'
 
+msa: R/msa.Rmd R/msa.R
+	cd R; R --vanilla -e 'source("msa.R")'
+
 TravelSurvey: R/TravelSurvey.Rmd R/TravelSurvey.R
 	cd R; R --vanilla -e 'source("TravelSurvey.R")'
 

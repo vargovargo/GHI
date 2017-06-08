@@ -1,11 +1,32 @@
-foo <- read.csv(file="~/GHI/data/join2.csv", stringsAsFactors = FALSE)
+# MSA Population Size (F)
 
-msaTest <- 6442
+```{r libs, eval = TRUE, echo = TRUE, results = "hide", warning = FALSE, error = FALSE, message = FALSE}
+library("devtools")
+install_github("ITHIM/ITHIM", ref="devel")
+library("ITHIM")
+```
+## List of Population Size Matrices
 
-msaMatrix <- foo %>% filter(msaNHTS == msaTest) %>%
-select(stateFIPS,countyFIPS)
+```{r msa, eval = TRUE, echo = TRUE, warning = FALSE, error = FALSE, message = FALSE}
+msaIDFile <- read.csv(system.file("join2.csv", package = "ITHIM"), stringsAsFactors = FALSE)
+msaIDs <- msaIDFile$msaNHTS %>% unique
+msaIDs <- msaIDs[!is.na(msaIDs)] %>% as.list
+names(msaIDs) <- paste0("MSA-NHTS-", msaIDs)
+populationList <- getPopulation(msaIDs)
 
+length(populationList)
+names(populationList)
+head(populationList, 3)
+```
 
-getPopulation(state=msaMatrix$stateFIPS, county =
-msaMatrix$countyFIPS)
+## Top Three MSAa
 
+Let's inspect the top three MSAs by population size.
+
+```{r msa2, eval = TRUE, echo = TRUE, warning = FALSE, error = FALSE, message = FALSE}
+totalPop <- unlist(lapply(populationList,sum))
+head(totalPop[order(totalPop, decreasing = TRUE)],3)
+msaIDFile %>% filter(msaNHTS %in% c(4472,5602,1602)) %>% select(msaName,msaNHTS) %>% unique
+```
+
+Notice the non-uniqueness of `msaNHTS` in the data.
