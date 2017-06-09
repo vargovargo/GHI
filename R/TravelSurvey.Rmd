@@ -29,8 +29,9 @@ NHTS.df <- within(NHTS.df, {
     id <- paste0(houseID,"-",subjectID)
     duration <- ifelse(is.na(duration), 0, duration)
     mode <- factor(mode, levels = c("walk","cycle","other"))
-    location <- location #msaname[location]
+    location <- as.integer(as.character(location)) #msaname[location]
 })
+saveRDS(NHTS.df, file = "~/GHI/R/data/NHTS.df.rds")
 ```
 
 ## Mode share of walk/bike by MSA

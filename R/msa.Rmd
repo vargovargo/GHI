@@ -1,13 +1,13 @@
 # MSA Population Size (F)
 
-```{r libs, eval = TRUE, echo = TRUE, results = "hide", warning = FALSE, error = FALSE, message = FALSE}
+```{r msalibs, eval = TRUE, echo = TRUE, results = "hide", warning = FALSE, error = FALSE, message = FALSE}
 library("devtools")
 install_github("ITHIM/ITHIM", ref="devel")
 library("ITHIM")
 ```
 ## List of Population Size Matrices
 
-```{r msa, eval = TRUE, echo = TRUE, warning = FALSE, error = FALSE, message = FALSE}
+```{r msamsa, eval = TRUE, echo = TRUE, warning = FALSE, error = FALSE, message = FALSE}
 msaIDFile <- read.csv(system.file("join2.csv", package = "ITHIM"), stringsAsFactors = FALSE)
 msaIDs <- msaIDFile$msaNHTS %>% unique
 msaIDs <- msaIDs[!is.na(msaIDs)] %>% as.list
@@ -17,16 +17,35 @@ populationList <- getPopulation(msaIDs)
 length(populationList)
 names(populationList)
 head(populationList, 3)
+
+saveRDS(populationList, file = "~/GHI/R/data/populationList.rds")
 ```
 
-## Top Three MSAa
+## Top Three MSAs
 
 Let's inspect the top three MSAs by population size.
 
 ```{r msa2, eval = TRUE, echo = TRUE, warning = FALSE, error = FALSE, message = FALSE}
-totalPop <- unlist(lapply(populationList,sum))
-head(totalPop[order(totalPop, decreasing = TRUE)],3)
+totalPop <- lapply(populationList,sum) %>% unlist
+totalPop[totalPop %>% order(., decreasing = TRUE)] %>% head(., 3)
 msaIDFile %>% filter(msaNHTS %in% c(4472,5602,1602)) %>% select(msaName,msaNHTS) %>% unique
 ```
 
+It's L.A. New York and Chicago.  Seems right.
+
 Notice the non-uniqueness of `msaNHTS` in the data.
+
+## MSA ID check
+
+```{r msa3, eval = TRUE, echo = TRUE, warning = FALSE, error = FALSE, message = FALSE}
+msaIDs <- msaIDFile$msaNHTS %>% unique
+msaFromFile <- data.frame(msa = unlist(msaIDs)) %>% filter(!is.na(msa) & !(msa == -1)) %>% unlist
+
+NHTS.df <- readRDS(file = "~/GHI/R/data/NHTS.df.rds")
+msaIDs <- NHTS.df$location %>% unique
+msaFromNHTS <- data.frame(msa = unlist(msaIDs)) %>% filter(!is.na(msa) & !(msa == -1)) %>% unlist
+
+data.frame(msaFromFile[order(msaFromFile)],msaFromNHTS[order(msaFromNHTS)])
+```
+
+Sweet.
