@@ -1,8 +1,10 @@
 # MSA Population Size (F)
 
 ```{r msalibs, eval = TRUE, echo = TRUE, results = "hide", warning = FALSE, error = FALSE, message = FALSE}
+rm(list=ls())
 library("devtools")
-install_github("ITHIM/ITHIM", ref="devel")
+#install_github("ITHIM/ITHIM", ref="devel")
+install("~/ITHIM/")
 library("ITHIM")
 ```
 ## List of Population Size Matrices
@@ -11,7 +13,7 @@ library("ITHIM")
 msaIDFile <- read.csv(system.file("join2.csv", package = "ITHIM"), stringsAsFactors = FALSE)
 msaIDs <- msaIDFile$msaNHTS %>% unique
 msaIDs <- msaIDs[!is.na(msaIDs)] %>% as.list
-names(msaIDs) <- paste0("MSA-NHTS-", msaIDs)
+names(msaIDs) <- msaIDs
 populationList <- getPopulation(msaIDs)
 
 length(populationList)
@@ -35,17 +37,3 @@ It's L.A. New York and Chicago.  Seems right.
 
 Notice the non-uniqueness of `msaNHTS` in the data.
 
-## MSA ID check
-
-```{r msa3, eval = TRUE, echo = TRUE, warning = FALSE, error = FALSE, message = FALSE}
-msaIDs <- msaIDFile$msaNHTS %>% unique
-msaFromFile <- data.frame(msa = unlist(msaIDs)) %>% filter(!is.na(msa) & !(msa == -1)) %>% unlist
-
-NHTS.df <- readRDS(file = "~/GHI/R/data/NHTS.df.rds")
-msaIDs <- NHTS.df$location %>% unique
-msaFromNHTS <- data.frame(msa = unlist(msaIDs)) %>% filter(!is.na(msa) & !(msa == -1)) %>% unlist
-
-data.frame(msaFromFile[order(msaFromFile)],msaFromNHTS[order(msaFromNHTS)])
-```
-
-Sweet.

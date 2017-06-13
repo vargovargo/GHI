@@ -1,6 +1,7 @@
 # Travel Survey Exploratory Analysis
 
 ```{r libs, eval = TRUE, echo = FALSE, results = "hide", warning = FALSE, error = FALSE, message = FALSE}
+rm(list=ls())
 library("tidyverse")
 library("ITHIM")
 library("TravelSurvey")
@@ -29,7 +30,7 @@ NHTS.df <- within(NHTS.df, {
     id <- paste0(houseID,"-",subjectID)
     duration <- ifelse(is.na(duration), 0, duration)
     mode <- factor(mode, levels = c("walk","cycle","other"))
-    location <- as.integer(as.character(location)) #msaname[location]
+    location <- location
 })
 saveRDS(NHTS.df, file = "~/GHI/R/data/NHTS.df.rds")
 ```

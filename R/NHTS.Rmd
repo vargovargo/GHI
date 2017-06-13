@@ -2,6 +2,7 @@
 
 ```{r libs, eval = TRUE, echo = FALSE, results = "hide", warning = FALSE, error = FALSE, message = FALSE}
 options(repos='http://cran.rstudio.com/')
+rm(list=ls())
 #install.packages(c("ggplot2","dplyr","openssl","httr", "git2r", "devtools", "roxygen2"))
 library("tidyverse")
 library("devtools")
@@ -41,7 +42,7 @@ NHTS.trips <- with(DAYV2PUB,{
                    TRPMILES = as.numeric(TRPMILES)
 )})
 
-PERV2PUB <- read.csv(file = "~/GHI/data/NHTS/Ascii/PERV2PUB.CSV", na.strings = "-9")
+PERV2PUB <- read.csv(file = "~/GHI/data/NHTS/Ascii/PERV2PUB.CSV", na.strings = "-9", stringsAsFactors = FALSE)
 names(PERV2PUB) <- c("HOUSEID","PERSONID","VARSTRAT","WTPERFIN","SFWGT","HH_HISP","HH_RACE","DRVRCNT","HHFAMINC","HHSIZE","HHVEHCNT","NUMADLT","WRKCOUNT","FLAG100","LIF_CYC","CNTTDTR","BORNINUS","CARRODE","CDIVMSAR","CENSUS_D","CENSUS_R","CONDNIGH","CONDPUB","CONDRIDE","CONDRIVE","CONDSPEC","CONDTAX","CONDTRAV","DELIVER","DIARY","DISTTOSC","DRIVER","DTACDT","DTCONJ","DTCOST","DTRAGE","DTRAN","DTWALK","EDUC","EVERDROV","FLEXTIME","FMSCSIZE","FRSTHM","FXDWKPL","GCDWORK","GRADE","GT1JBLWK","HHRESP","HHSTATE","HHSTFIPS","ISSUE","OCCAT","LSTTRDAY","MCUSED","MEDCOND","MEDCOND6","MOROFTEN","MSACAT","MSASIZE","NBIKETRP","NWALKTRP","OUTCNTRY","OUTOFTWN","PAYPROF","PRMACT","PROXY","PTUSED","PURCHASE","R_AGE","R_RELAT","R_SEX","RAIL","SAMEPLC","SCHCARE","SCHCRIM","SCHDIST","SCHSPD","SCHTRAF","SCHTRN1","SCHTRN2","SCHTYP","SCHWTHR","SELF_EMP","TIMETOSC","TIMETOWK","TOSCSIZE","TRAVDAY","URBAN","URBANSIZE","URBRUR","USEINTST","USEPUBTR","WEBUSE","WKFMHMXX","WKFTPT","WKRMHM","WKSTFIPS","WORKER","WRKTIME","WRKTRANS","YEARMILE","YRMLCAP","YRTOUS","DISTTOWK","TDAYDATE","HOMEOWN","HOMETYPE","HBHUR","HTRESDN","HTHTNRNT","HTPPOPDN","HTEEMPDN","HBRESDN","HBHTNRNT","HBPPOPDN","HH_CBSA","HHC_MSA")
 
 NHTS.person <- with(PERV2PUB,{
@@ -52,7 +53,7 @@ NHTS.person <- with(PERV2PUB,{
                                MSA = ifelse(MSASIZE %in% 1:5, TRUE, FALSE),
                                HHSTATE = as.character(HHSTATE),
                                # HHS = as.character(convertToHHS(as.character(HHSTATE))),
-                               MSA_ID = HHC_MSA, stringsAsFactors = FALSE)
+                               MSA_ID = as.character(as.integer(HHC_MSA)), stringsAsFactors = FALSE)
 })
 
 ```
@@ -64,7 +65,7 @@ NHTS.person <- with(PERV2PUB,{
 ```{r TravelSurvey, eval = compute, fig.width = 10, echo = TRUE}
 
 person.df <- with(NHTS.person,{
-    data.frame(houseID=HOUSEID, subjectID=PERSONID, sex = SEX, age = AGE, location = as.character(MSA_ID))
+    data.frame(houseID=HOUSEID, subjectID=PERSONID, sex = SEX, age = AGE, location = MSA_ID)
     })
 
 trip.df <- with(NHTS.trips,{
