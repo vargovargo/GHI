@@ -12,29 +12,6 @@ fig.width <- 24 # inches
 phi <- (1+sqrt(5))/2 # the golden ratio ;)
 ```
 
-```{r msa, eval = TRUE, fig.width = fig.width, echo = FALSE}
-#foo <- read.csv(file ="./../data/cbsatocountycrosswalk.csv", colClasses = "character")
-foo <- read.csv(file = "~/GHI/data/MSA.csv", colClasses = c("character","character"))
-names(foo) <- c("msa","msaname")
-#foo <- unique(foo[,c("msa","msaname")])
-msa <- foo$msa
-msaname <- foo$msaname
-names(msaname) <- msa
-
-```
-
-```{r TravelSurvey, eval = TRUE, fig.width = fig.width, echo = FALSE}
-NHTS.ts <- readRDS(file = "~/GHI/R/data/NHTS.TravelSurvey.rds")
-NHTS.df <- dplyr::left_join(NHTS.ts@person, NHTS.ts@trip, by = c("houseID","subjectID"))
-NHTS.df <- within(NHTS.df, {
-    id <- paste0(houseID,"-",subjectID)
-    duration <- ifelse(is.na(duration), 0, duration)
-    mode <- factor(mode, levels = c("walk","cycle","other"))
-    location <- location
-})
-saveRDS(NHTS.df, file = "~/GHI/R/data/NHTS.df.rds")
-```
-
 ## Mode share of walk/bike by MSA
 
 ```{r plot1, eval = TRUE, fig.width = fig.width, echo = FALSE, fig.asp = 1/phi}
@@ -79,3 +56,14 @@ meanDuration <- NHTS.df %>% group_by(location,sex,age,mode) %>% summarise(meanDu
 
 ```
 
+
+```{r msa, eval = TRUE, fig.width = fig.width, echo = FALSE}
+#foo <- read.csv(file ="./../data/cbsatocountycrosswalk.csv", colClasses = "character")
+foo <- read.csv(file = "~/GHI/data/MSA.csv", colClasses = c("character","character"))
+names(foo) <- c("msa","msaname")
+#foo <- unique(foo[,c("msa","msaname")])
+msa <- foo$msa
+msaname <- foo$msaname
+names(msaname) <- msa
+
+```

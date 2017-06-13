@@ -4,12 +4,12 @@
 options(repos='http://cran.rstudio.com/')
 rm(list=ls())
 #install.packages(c("ggplot2","dplyr","openssl","httr", "git2r", "devtools", "roxygen2"))
-library("tidyverse")
 library("devtools")
+library("TravelSurvey")
 #library("reshape2")
 #library("plyr")
 #library("dplyr")
-library("TravelSurvey")
+install("~/ITHIM/")
 library("ITHIM")
 fig.width <- 6 # inches
 phi <- (1+sqrt(5))/2 # the golden ratio ;)
@@ -78,4 +78,16 @@ trip.df <- subset(trip.df,apply(trip.df,MARGIN=1,FUN=function(x)all(!is.na(x))))
 NHTS.TravelSurvey <- new("TravelSurvey", person = person.df, trip = trip.df)
 
 saveRDS(NHTS.TravelSurvey, file = "~/GHI/R/data/NHTS.TravelSurvey.rds")
+```
+
+```{r TravelSurvey, eval = TRUE, fig.width = fig.width, echo = FALSE}
+NHTS.ts <- readRDS(file = "~/GHI/R/data/NHTS.TravelSurvey.rds")
+NHTS.df <- dplyr::left_join(NHTS.ts@person, NHTS.ts@trip, by = c("houseID","subjectID"))
+NHTS.df <- within(NHTS.df, {
+    id <- paste0(houseID,"-",subjectID)
+    duration <- ifelse(is.na(duration), 0, duration)
+    mode <- factor(mode, levels = c("walk","cycle","other"))
+    location <- location
+})
+saveRDS(NHTS.df, file = "~/GHI/R/data/NHTS.df.rds")
 ```
