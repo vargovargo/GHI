@@ -1,3 +1,5 @@
+% !Rnw root = ../ITHIM-manuscript.Rnw
+% !TeX root = ../ITHIM-manuscript.Rnw
 Regular exercise has been shown to provide health benefits in terms of
 chronic disease prevention \cite{warburton2006}, cognitive function
 \cite{hillman2008}, and overall well being and satisfaction with life

@@ -1,3 +1,6 @@
+% !Rnw root = ../ITHIM-manuscript.Rnw
+% !TeX root = ../ITHIM-manuscript.Rnw
+
 We report total change (averted or increased) in diability adjusted
 life years (DALYs) as an estimate of disease burden change with
 alternative scenarios.
