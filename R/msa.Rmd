@@ -9,7 +9,7 @@ library("ITHIM")
 ```
 ## List of Population Size Matrices
 
-```{r msamsa, eval = FALSE, echo = TRUE, warning = FALSE, error = FALSE, message = FALSE}
+```{r msamsa, eval = TRUE, echo = TRUE, warning = FALSE, error = FALSE, message = FALSE}
 msaIDFile <- read.csv(system.file("join2.csv", package = "ITHIM"), stringsAsFactors = FALSE)
 msaIDs <- msaIDFile$msaNHTS %>% unique
 msaIDs <- msaIDs[!is.na(msaIDs)] %>% as.list
@@ -33,8 +33,8 @@ formatMeanMatrix <- function(meanTable){
     return(meanMatrix)
 }
 
-#msaIDs <- unique(NHTS.df$location)
-#msaIDs <- as.character(msaIDs[msaIDs!="-1"])
+msaIDs <- unique(NHTS.df$location)
+msaIDs <- as.character(msaIDs[msaIDs!="-1"])
 
 sampleSize <- NHTS.df %>% group_by(location,sex,age) %>% summarise(n=n_distinct(id))
 tripDuration <- NHTS.df %>% group_by(location,mode,sex,age) %>% summarise(total=sum(duration))
@@ -51,6 +51,12 @@ meanWalkList <- mapply(function(x,y) sum(x*y/sum(y), na.rm = TRUE), MwtList[msaI
 meanCycleList <- mapply(function(x,y) sum(x*y/sum(y), na.rm = TRUE), MctList[msaIDs], FList[msaIDs], SIMPLIFY = FALSE)
 
 cbind(data.frame(walk = unlist(meanWalkList)), data.frame(cycle = unlist(meanCycleList)))
+
+msaID.portland <- "6442"
+FList[[msaID.portland]] %>% gather(sex,value,1:2) %>% mutate(ageClass=rep(rownames(FList[[msaID.portland]]),2)) %>% select(ageClass,sex,value) %>% write.csv(., file = "~/ITHIM/inst/F.portland.csv", quote = FALSE, row.names = FALSE)
+
+rbind(MwtList[[msaID.portland]] %>% as.data.frame() %>% gather(sex,value,1:2) %>% mutate(ageClass=rep(rownames(FList[[msaID.portland]]),2)) %>% select(ageClass,sex,value) %>% mutate(mode = "walk"), MctList[[msaID.portland]] %>% as.data.frame() %>% gather(sex,value,1:2) %>% mutate(ageClass=rep(rownames(FList[[msaID.portland]]),2)) %>% select(ageClass,sex,value) %>% mutate(mode = "cycle")) %>% select(ageClass,sex,mode,value) %>% write.csv(., file = "~/ITHIM/inst/activeTransport.portland.csv", quote = FALSE, row.names = FALSE)
+
 
 ```
 
