@@ -1,0 +1,23 @@
+Bullitt Foundation * Equity (via Active Transport)
+** Presumably we will compare the health benefits of active transport across race/gender/socioeconomic class. 
+** To do so we need estimates of active travel times stratified by race/gender/socioeconomic class
+This requires a data set of travel behavior; survey or simulation 
+** Estimated Time: Six months ???
+** Estimate of My Time: Three months (Should this be calendar time, or work time? I am part-time right now?)
+
+* Air Quality
+** We need partners.  (Leads: Neil Maizlish, James Woodcock, Scott Spak)
+** I could learn something about AQ modeling, but I do not have any experience with it
+Woodcock used a simplified linear approximation, given some AQ/VMT
+(Vehicle Miles Traveled) rates.  If we had those rates, we could do
+the same.  I do not know what it takes to generate estimates of the
+rates.
+** Given a model and some estimates we could probably find a way to incorporate it into our ITHIM package
+One piece of the puzzle that we are missing is the ability to estimate
+vehicxle miles for a given scenario.  The change in air quality will be
+some function of the change in vehicle miles traveled (motorized
+vehicles).  Woodcock and Neil are doing this somehow, but only on a
+case-by-case basis, not automated and therefore not truly incorporated
+into the model
+** Estimated Time: 18 months ???
+** Estimate of My Time: Three months ???

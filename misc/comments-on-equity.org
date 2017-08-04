@@ -1,0 +1,18 @@
+Equity
+
+My assumption about how this would be achieved is as follows:
+
+* Estimate the baseline parameters for a pair of subpopulations, e.g., low income and high income
+* Construct a scenario for each subpopulation in which there is no active travel at all
+* Within each subpopulation compare the baseline to the scenario to estimate reduction in disease burden due to baselin elevels of active transport.
+* Compare the estimates of disease burden reduction among the subpopulations.
+
+The result might look something like this.
+* "Active transport accounts for x% reduction in disease burden among
+high income residents, while among low oncome residents only y%
+reduction is achieved."
+* "To reverse this we propose the following changes which will increase
+y to something closer to x."
+* "Our goal is to achieve equity across income groups.  This can be
+achieved by making the following changes to the built environment,
+which ideally will increase y to x (equity occurs when y = x ?)."
