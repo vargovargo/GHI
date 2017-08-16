@@ -3,14 +3,9 @@
 ```{r libs, eval = TRUE, echo = FALSE, results = "hide", warning = FALSE, error = FALSE, message = FALSE}
 options(repos='http://cran.rstudio.com/')
 rm(list=ls())
-#install.packages(c("ggplot2","dplyr","openssl","httr", "git2r", "devtools", "roxygen2"))
-library("devtools")
-library("TravelSurvey")
-#library("reshape2")
-#library("plyr")
-#library("dplyr")
-install("~/ITHIM/")
-library("ITHIM")
+#library("devtools")
+#install("~/ITHIM/")
+#library("ITHIM")
 fig.width <- 6 # inches
 phi <- (1+sqrt(5))/2 # the golden ratio ;)
 ```
@@ -42,7 +37,7 @@ NHTS.trips <- with(DAYV2PUB,{
                    TRPMILES = as.numeric(TRPMILES)
 )})
 
-PERV2PUB <- read.csv(file = "~/GHI/data/NHTS/Ascii/PERV2PUB.CSV", na.strings = "-9", stringsAsFactors = FALSE)
+PERV2PUB <- read.csv(file = "~/GHI/data/NHTS/Ascii/PERV2PUB.CSV", na.strings = c("-7","-8","-9"), stringsAsFactors = FALSE)
 names(PERV2PUB) <- c("HOUSEID","PERSONID","VARSTRAT","WTPERFIN","SFWGT","HH_HISP","HH_RACE","DRVRCNT","HHFAMINC","HHSIZE","HHVEHCNT","NUMADLT","WRKCOUNT","FLAG100","LIF_CYC","CNTTDTR","BORNINUS","CARRODE","CDIVMSAR","CENSUS_D","CENSUS_R","CONDNIGH","CONDPUB","CONDRIDE","CONDRIVE","CONDSPEC","CONDTAX","CONDTRAV","DELIVER","DIARY","DISTTOSC","DRIVER","DTACDT","DTCONJ","DTCOST","DTRAGE","DTRAN","DTWALK","EDUC","EVERDROV","FLEXTIME","FMSCSIZE","FRSTHM","FXDWKPL","GCDWORK","GRADE","GT1JBLWK","HHRESP","HHSTATE","HHSTFIPS","ISSUE","OCCAT","LSTTRDAY","MCUSED","MEDCOND","MEDCOND6","MOROFTEN","MSACAT","MSASIZE","NBIKETRP","NWALKTRP","OUTCNTRY","OUTOFTWN","PAYPROF","PRMACT","PROXY","PTUSED","PURCHASE","R_AGE","R_RELAT","R_SEX","RAIL","SAMEPLC","SCHCARE","SCHCRIM","SCHDIST","SCHSPD","SCHTRAF","SCHTRN1","SCHTRN2","SCHTYP","SCHWTHR","SELF_EMP","TIMETOSC","TIMETOWK","TOSCSIZE","TRAVDAY","URBAN","URBANSIZE","URBRUR","USEINTST","USEPUBTR","WEBUSE","WKFMHMXX","WKFTPT","WKRMHM","WKSTFIPS","WORKER","WRKTIME","WRKTRANS","YEARMILE","YRMLCAP","YRTOUS","DISTTOWK","TDAYDATE","HOMEOWN","HOMETYPE","HBHUR","HTRESDN","HTHTNRNT","HTPPOPDN","HTEEMPDN","HBRESDN","HBHTNRNT","HBPPOPDN","HH_CBSA","HHC_MSA")
 
 NHTS.person <- with(PERV2PUB,{
@@ -55,15 +50,13 @@ NHTS.person <- with(PERV2PUB,{
                                # HHS = as.character(convertToHHS(as.character(HHSTATE))),
                                MSA_ID = as.character(as.integer(HHC_MSA)), stringsAsFactors = FALSE,
                                HHFAMINC = as.factor(HHFAMINC),
-                               NWALKTRP = as.numeric(NWALKTRP),
-                               NBIKETRP = as.numeric(NBIKETRP))
+                               #NWALKTRP = as.numeric(if(NWALKTRP < 0, NA, NWALKTRP)),
+                               #NBIKETRP = as.numeric(if(NBIKETRP < 0, NA, NBIKETRP)))
+                               NWALKTRP = NWALKTRP,
+                               NBIKETRP = NBIKETRP)
 })
 
 ```
-
-### Create TravelSurvey Object
-
-
 
 ```{r TravelSurvey, eval = compute, fig.width = 10, echo = TRUE}
 
@@ -75,19 +68,12 @@ trip.df <- with(NHTS.trips,{
     data.frame(houseID=HOUSEID, subjectID=PERSONID, duration = TRVL_MIN, mode = AT)
 })
 
-person.df <- subset(person.df,apply(person.df,MARGIN=1,FUN=function(x)all(!is.na(x))))
-trip.df <- subset(trip.df,apply(trip.df,MARGIN=1,FUN=function(x)all(!is.na(x))))
+#person.df <- subset(person.df,apply(person.df,MARGIN=1,FUN=function(x)all(!is.na(x))))
+#trip.df <- subset(trip.df,apply(trip.df,MARGIN=1,FUN=function(x)all(!is.na(x))))
 
-#NHTS.TravelSurvey <- new("TravelSurvey", person = person.df, trip = trip.df)
-
-#saveRDS(NHTS.TravelSurvey, file = "~/GHI/R/data/NHTS.TravelSurvey.rds")
 ```
 
 ```{r TravelSurvey2, eval = TRUE, fig.width = fig.width, echo = FALSE}
-#NHTS.ts <- readRDS(file = "~/GHI/R/data/NHTS.TravelSurvey.rds")
-
-#NHTS.df <- dplyr::left_join(NHTS.ts@person, NHTS.ts@trip, by = c("houseID","subjectID"))
-
 NHTS.df <- dplyr::left_join(person.df, trip.df, by = c("houseID","subjectID"))
 NHTS.df <- within(NHTS.df, {
     id <- paste0(houseID,"-",subjectID)
