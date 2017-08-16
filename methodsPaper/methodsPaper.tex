@@ -1,0 +1,660 @@
+\documentclass[10pt,letterpaper]{article}\usepackage[]{graphicx}\usepackage[]{color}
+%% maxwidth is the original width if it is less than linewidth
+%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+\usepackage[top=0.85in,left=2.75in,footskip=0.75in]{geometry}
+% amsmath and amssymb packages, useful for mathematical formulas and symbols
+\usepackage{amsmath,amssymb}
+% Use adjustwidth environment to exceed column width (see example table in text)
+\usepackage{changepage}
+% Use Unicode characters when possible
+\usepackage[utf8x]{inputenc}
+% textcomp package and marvosym package for additional characters
+\usepackage{textcomp,marvosym}
+% cite package, to clean up citations in the main text. Do not remove.
+\usepackage{cite}
+% Use nameref to cite supporting information files (see Supporting Information section for more info)
+\usepackage{nameref,hyperref}
+% line numbers
+\usepackage[right]{lineno}
+% ligatures disabled
+\usepackage{microtype}
+\DisableLigatures[f]{encoding = *, family = * }
+% color can be used to apply background shading to table cells only
+\usepackage[table]{xcolor}
+% array package and thick rules for tables
+\usepackage{array}
+% create "+" rule type for thick vertical lines
+\newcolumntype{+}{!{\vrule width 2pt}}
+% create \thickcline for thick horizontal lines of variable length
+\newlength\savedwidth
+\newcommand\thickcline[1]{%
+  \noalign{\global\savedwidth\arrayrulewidth\global\arrayrulewidth 2pt}%
+  \cline{#1}%
+  \noalign{\vskip\arrayrulewidth}%
+  \noalign{\global\arrayrulewidth\savedwidth}%
+}
+% \thickhline command for thick horizontal lines that span the table
+\newcommand\thickhline{\noalign{\global\savedwidth\arrayrulewidth\global\arrayrulewidth 2pt}%
+\hline
+\noalign{\global\arrayrulewidth\savedwidth}}
+
+% Remove comment for double spacing
+\usepackage{setspace}
+\doublespacing
+
+% Text layout
+\raggedright
+\setlength{\parindent}{0.5cm}
+\textwidth 5.25in
+\textheight 8.75in
+
+% Bold the 'Figure #' in the caption and separate it from the title/caption with a period
+% Captions will be left justified
+\usepackage[aboveskip=1pt,labelfont=bf,labelsep=period,justification=raggedright,singlelinecheck=off]{caption}
+\renewcommand{\figurename}{Fig}
+
+% Use the PLoS provided BiBTeX style
+\bibliographystyle{plos2015}
+
+% Remove brackets from numbering in List of References
+\makeatletter
+\renewcommand{\@biblabel}[1]{\quad#1.}
+\makeatother
+
+% Leave date blank
+\date{}
+
+% Header and Footer with logo
+\usepackage{lastpage,fancyhdr,graphicx}
+\usepackage{epstopdf}
+\pagestyle{myheadings}
+\pagestyle{fancy}
+\fancyhf{}
+\setlength{\headheight}{27.023pt}
+\lhead{\includegraphics[width=2.0in]{PLOS-submission.eps}}
+\rfoot{\thepage/\pageref{LastPage}}
+\renewcommand{\footrule}{\hrule height 2pt \vspace{2mm}}
+\fancyheadoffset[L]{2.25in}
+\fancyfootoffset[L]{2.25in}
+\lfoot{\sf PLOS}
+
+%% Include all macros below
+
+\newcommand{\lorem}{{\bf LOREM}}
+\newcommand{\ipsum}{{\bf IPSUM}}
+
+% added by sgy
+\usepackage{url}
+\usepackage{mathtools}
+\usepackage{rotating}
+\input{../tex/sgy}
+
+%% END MACROS SECTION
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+\vspace*{0.2in}
+
+% Titlemust be 250 characters or less.
+\begin{flushleft}
+{\Large
+\textbf\newline{A Comparative Risk Assessment of Active Transportation in the United
+States} % Please use "title case" (capitalize all terms in the title except conjunctions, prepositions, and articles).
+}
+\newline
+% Insert author names, affiliations and corresponding author email (do not include titles, positions, or degrees).
+\\
+Samuel Younkin\textsuperscript{1},\ %,2\Yinyang},
+Jason Vargo\textsuperscript{1, 2}\ %\Yinyang},
+Neil Maizlish\textsuperscript{3},\ %\Yinyang},
+\ldots,\
+Jonathan Patz\textsuperscript{1, 2}%,3\textcurrency},
+%Name4 Surname\textsuperscript{2},
+%#Name5 Surname\textsuperscript{2\ddag},
+%Name6 Surname\textsuperscript{2\ddag},
+%Name7 Surname\textsuperscript{1,2,3*},
+%with the Global Health Institute\textsuperscript{\textpilcrow}
+\\
+\bigskip
+\textbf{1} Global Health Institute, University of Wisconsin{\textendash}Madison, Madison, WI, USA
+\\
+\textbf{2} Nelson Institute for Environmental Studies Center for Sustainability and the Global Environment, University of Wisconsin{\textendash}Madison, Madison, WI, USA
+\\
+\textbf{3} Berkeley, CA, USA
+\\
+%\textbf{2} Affiliation Dept/Program/Center, Institution Name, City, State, Country
+%\\
+%\textbf{3} Affiliation Dept/Program/Center, Institution Name, City, State, Country
+%\\
+\bigskip
+
+% Insert additional author notes using the symbols described below. Insert symbol callouts after author names as necessary.
+%
+% Remove or comment out the author notes below if they aren't used.
+%
+% Primary Equal Contribution Note
+%\Yinyang These authors contributed equally to this work.
+
+% Additional Equal Contribution Note
+% Also use this double-dagger symbol for special authorship notes, such as senior authorship.
+% \ddag These authors also contributed equally to this work.
+
+% Current address notes
+% \textcurrency Current Address: GHI UW{\textendash}Madison, 1300
+% University Ave., Madison, WI, 53706, USA
+% WI, USA % change symbol to "\textcurrency a" if more than one current address note
+% \textcurrency b Insert second current address
+% \textcurrency c Insert third current address
+
+% Deceased author note
+%\dag Deceased
+
+% Group/Consortium Author Note
+%\textpilcrow Membership list can be found in the Acknowledgments section.
+
+% Use the asterisk to denote corresponding authorship and provide email address in note below.
+%* correspondingauthor@institute.edu
+
+% Please keep the abstract below 300 words
+% Use "Eq" instead of "Equation" for equation citations.
+
+% Results and Discussion can be combined.
+
+\end{flushleft}
+
+\section*{Abstract}
+
+
+Comparative risk assessments to quantify the health potential
+of active transportation, e.g., walking and cycling, have been
+performed in the United States on a limited basis. Current
+methodologies, which rely on extensive data collection and user
+expertise, have estimated health benefits for select metropolitan
+areas under a few alternative scenarios. These analyses have largely
+been conducted using the Integrated Transport Health Impacts Model
+(ITHIM) which was developed in the UK and has been adapted for use in
+the US, primarily California. Here we present an implementation of the
+active transportation component of ITHIM to model the health impacts
+of modified active transportation levels. Using the newly developed
+software package \package{} written in R, along with publicly
+available national datasets, we quantify the change in disability
+adjusted life years over a wide range of scenarios.  The R package
+implemention of ITHIM's physical activity component provides a robust
+environment for exploring the relationship between active
+transportation and positive health outcomes.  A web-based
+user-interface is available for users who want a first estimate for
+the impact active transportation has on their
+state/region.
+
+%\input{lib/abstract}
+
+% Please keep the Author Summary between 150 and 200 words
+% Use first person. PLOS ONE authors please skip this step.
+% Author Summary not valid for PLOS ONE submissions.
+% \section*{Author Summary}
+% \input{lib/authorSummary}
+
+\linenumbers
+
+\section*{Introduction}
+
+Regular exercise has been shown to provide health benefits in terms of
+chronic disease prevention \cite{warburton2006}, cognitive function
+\cite{hillman2008}, and overall well being and satisfaction with life
+\cite{maher2013}. Still only half of Americans obtain the recommended
+levels of aerobic activity of 2.5 hours per week. There is
+considerable variability in the attainment of this goal by location
+within the country. Supportive local built and policy environments are
+important determinants of population-level activity
+patterns. Particularly, as they facilitate and foster routine and
+moderate physical activity, such as walking, local decisions on design
+and policy can play a huge role in improving the nation's health.
+
+Given the constraints and complexity of local governance and
+infrastructure investments, land use, and human behavior there is a
+need for high quality and reliable data and tools for decision-making
+related to urban transportaiton systems. The lack of accurate and
+availbale estimates of the health impacts of such decisions has
+limited the effectiveness of efforts to encourage non-motorized
+transport in the US and in other countries. In the last decade new
+tools, applying comparative risk assessment methodologies, have made
+progress toward quantifying the multple health impacts of changes to
+the transportation system and behaviors.
+
+ITHIM is one such statistical model that integrates data on active
+transport, physical activity, fine particulate matter and greenhouse
+gas emissions to provide estimates for the proportional change in
+mortality and morbidity for given baseline and alternate travel
+scenarios. The model has been used to calculate the health impacts of
+walking and bicycling short distances usually traveled by car or
+driving low-emission automobiles \cite{woodcock2013,maizlish2013}.
+
+ITHIM uses a comparative risk assessment framework for the active
+transport component of the model.  We improve on the existing
+implementation of the active transport component by including the
+distribution of non-travel-related activity, improving numerical
+precision when computing the population attributable fraction and
+creating a simple user-interface for the custom-built \R{} package
+\package{}.  We present this implementation here by using it to
+estimate the relationship between overall, nationwide disease burden
+and active transportation time in the United States.
+
+\section*{Materials and Methods}
+
+
+As with the original ITHIM implementation we, employed a comparative
+risk assessment (CRA) across scenarios defined by mean active
+transportation time, i.e., combined walking and cycling.  To do so we
+investigate the proportional change in national disease burden between
+the baseline model and a given alternative scenario, i.e., the
+population attributable fraction, $\af$.  The population attributable
+fraction is defined below and computed for each disease (ICD-10)
+included in the model, namely Breast Cancer (C50), Colon Cancer
+(C18-C21), Dementia (G30), Diabetes (E10-E14) and Cardiovascular
+disease (I10, I12, I15, I20-I25, I30-I31, I33, I40).  We also include
+the disability impacts of depression, though it is not listed as a
+cause of death in CDC's data. For readability we omit an index
+indicating disease.
+
+\begin{equation}
+\af_j = \frac{\int \! R_j(x)P(x) \, \mathrm{d}x  - \int \! R_j(x)Q(x) \,
+  \mathrm{d}x}{\int \! R_j(x)P(x) \, \mathrm{d}x} \approx 1 - \frac{{\displaystyle \sum_{i=1}^n} R_j(x_i^\prime)}{{\displaystyle \sum_{i=1}^n} R_j(x_i)}  = 1 - \delta_j % = 1 - \frac{{\displaystyle \sum_{i=1}^n} e^{-\alpha \sqrt{x_i^\prime}}}{{\displaystyle \sum_{i=1}^n} e^{-\alpha \sqrt{x_i}}}
+  \label{paf}
+\end{equation}
+
+Here $R(x)$ represents the risk when the individual has exposure $x$,
+physical activity (\mets).  $P(x)$ and $Q(x)$ denote the population
+density of individuals with exposure $x$, in the baseline and
+alternate scenarios, respectively.  The exposure variable, $x$, is
+modeled as the sum of two independent random variables, travel-related
+and non-travel-related physical activity.  $\mathbf{x}$ and
+$\mathbf{x}^\prime$ represent the quantiles for the exposure
+distribution in baseline and alternative scenarios, respectively.
+$\delta_j$ is the proportional burden for disease $j$ in the alternate
+scenario.
+
+\paragraph{Non-Travel-Related Physical Activity}
+
+\begin{equation}
+X_{ij}^{\mathrm{non-travel}} \sim \logNormalMath\left(\mu_{ij}, \gamma \mu_{ij}\right)
+\end{equation}
+
+Within each age-sex class the non-travel-related exposure is modeled
+with a \logNormal{} distribution.  The age-sex specific mean ratios,
+$r_{ij} = \frac{\mu_{ij}}{\mu_0}$ and $\gamma$ are estimated from the
+American Time Use Survey data \cite{ATUS}.
+
+
+\paragraph{Travel-Related Physical Activity}
+
+The distribution for travel-related exposure is estimated from the
+time spent walking or cycling, i.e., active transport time, which as
+in the original ITHIM model is assigned a \logNormal{} distribution
+with constant coefficient of variation across age-sex classes.
+Travel-related exposure is estimated from active transport time using
+assumptions about how much physical activity is required for cycling
+and walking.
+
+
+
+%To estimate the disease burden we first approximate the population
+%attributable fraction through a discretization of the integral in
+%equation \ref{paf}.
+
+\paragraph{Non-Travel-Related Physical Activity}
+
+With a simulated distribution for total physical activity in hand we
+compute the empirical percentiles in the baseline and alternate
+scenarios, $\mathbf{x}$ and $\mathbf{x}^\prime$. The proportional
+change in disease burden, $\delta$, may be approximated as follows,
+where $R$ is the risk function for total activity.
+
+%% \begin{equation}
+%% \delta = 1 - \af \approx \frac{{\displaystyle \sum_{i=1}^{n}} R(x_i)}{{\displaystyle \sum_{i=1}^{n}} R(x_i^\prime)}
+%% \end{equation}
+
+
+\paragraph{Estimation of Disease Burden}
+
+The disease burden, in this case DALYs, is found for each of the
+quantiles using equation \ref{burden} using $B_0$, the overall
+nation-wide burden for the baseline.  The overall burden is then
+computed as the sum across quintiles, $B=\sum_{j=1}^n B_j$.
+
+\begin{equation}
+B_j = \delta B_0\frac{\RR_j}{\sum_{k=1}^n \RR_j}\label{burden}
+\end{equation}
+
+\paragraph{Risk Functions}
+
+We assign risk based on dose-response curves for each of the diseases
+included in the model.
+
+\begin{equation}
+\RR_j(x) = \mathrm{e}^{-\alpha_j \tilde{x}}
+\end{equation}
+
+where $\tilde{x} = x^k$, $k=\frac{1}{2}$ and $r$ varies by age-sex
+class and disease.  For a table of $r$ values see supplementary
+material.
+
+\paragraph{Nationwide Health Benefits to Active Transport}
+
+For the purposes of this implementation we limited our analyses to
+metropolitan regions of the United States. To idenfity urban
+populations we used the National Center for Health Statistics 2013
+Urban-Rural Classification Scheme for Counties \cite{ingram2014}. We
+eliminated counties in the US with the classifcation of
+`nonmetropolitan' (noncore or micropolitan). We used this and similar
+classification schemes as well as county and state identifiers in
+other datsets (NHTS, ATUS, CDC WONDER) to ensure consistency in our
+estimates for input parameters.
+
+To test the new implementation of ITHIM's active transportation
+component, we used the US national metro population estimates for
+active travel time (walking and cycling) as the baseline. We obtained
+active travel time input parameters for alternate scenarios using
+states with large sample sizes. From these examples we were able to
+approximate low and high active travel scenarios. Finally, we applied
+these active travel times to the US metro population to perform the
+comparative risk assessment against the baseline US numbers. We then
+examined the sensitivity of disease burden estimates to input
+parameters including the active travel time and non-travel activity.
+
+\begin{figure}[t]
+  \centerline{\includegraphics[width=\textwidth]{./figures/fig1}}
+    \caption{}\label{fig1}
+\end{figure}
+
+\begin{figure}[t]
+  \centerline{\includegraphics[width=\textwidth]{./figures/fig2.pdf}}
+    \caption{}\label{fig2}
+\end{figure}
+
+\begin{sidewaysfigure}[t]
+  \centerline{\includegraphics[width=\textwidth]{./figures/fig3.pdf}}
+  \caption{Estimates for disease burden nationwide in terms of thousands of
+    DALYs for each of the six diseases included in the model.
+  }\label{fig3}
+\end{sidewaysfigure}
+
+
+
+%\input{lib/materialsAndMethods}
+
+\section*{Results}
+
+
+We report total change (averted or increased) in diability adjusted
+life years (DALYs) as an estimate of disease burden change with
+alternative scenarios.
+
+To estimate DALYs we use a methodology adopted from previous US
+implementations of ITHIM which scale Global Budern of Disease
+Estimates for the US to smaller populations using mortality rate
+ratios \cite{maizlish2013}. Age, sex, and casuse specific mortalities
+were obtained form the CDC WONDER database for US metro counties for
+the years 2010-2014. Cells with mortality counts less than 10 deaths
+were suppressed for privacy and imputed (0 to 9) using R's random
+integer generator.
+
+Our subset of the US population to only metropolitan counties
+consisted of 1,090 of 3,141 (34.7\%) counties, or approximately 272M
+of 312M (87\%) of the total US population. The age and gender
+distribution of our subset population was slightly younger (???making
+this up???) than the national population. Baseline active transport
+times (walking and cycling) for the US across age and sex groupings
+was found to be approximately 43 min/week (???). Baseline non-travel
+activity time was found to be ???X??? (min/week) from the ATUS for US
+metropolitan populations.
+
+Adapting ITHIM's methods to the R platform enables the rapid and
+thorough assessment of parameter influence within the model. Another
+important improvement enabled by the shift to a more computationaly
+robust platform was to examine methodological assumptions of former
+implementations. One critical assumption invovles the approximation of
+??? used to calculate the attirbutable fraction (see Figure
+\ref{fig:overview}). Previous implementations used quitiles to
+approximate this value, essentailly the area under the ???? curve. We
+improved upon those methods to use percentiles or 100 points to
+estimate the same values. We find our estimates to be much more stable
+and reliable at all values of active travel and non-travel activity
+parameters.
+
+As exhibited in Figure \ref{fig1}, the variability in disease burden
+benefits varies to a much greater degree when using fewer points in
+the attirbutable fraction approximation. Importantly, we see greater
+stability when using the package and percentiles to approximate
+attirbutable fraction.
+
+Comparing baseline to scenarios with increased active travel produced
+estimates of up to 360,000??? fewer DALYs (with 300\% increase in mean
+active travel time) for our US population subset. We then varied the
+mean non-travel activity time and active travel time to observe how
+this chaged results (\ref{fig1}). We observe the most dramatic
+responses in disease burden estimates to changes in active travel time
+when non-travel activity times are lowest. This result is consistent
+with the non-linear dose-response curve for physical activity and
+several health outcomes.
+
+%\input{lib/results}
+
+\section*{Discussion}
+%\input{lib/discussion}
+
+\section*{Conclusion}
+%\input{lib/conclusion}
+
+%\section*{Supporting Information}
+
+%\input{lib/supportingInformation}
+
+\section*{Acknowledgments}
+
+\nolinenumbers
+
+\bibliography{../tex/ITHIM}
+
+\end{document}
+
+
+% Template for PLoS
+% Version 3.3 June 2016
+%
+% % % % % % % % % % % % % % % % % % % % % %
+%
+% -- IMPORTANT NOTE
+%
+% This template contains comments intended
+% to minimize problems and delays during our production
+% process. Please follow the template instructions
+% whenever possible.
+%
+% % % % % % % % % % % % % % % % % % % % % % %
+%
+% Once your paper is accepted for publication,
+% PLEASE REMOVE ALL TRACKED CHANGES in this file
+% and leave only the final text of your manuscript.
+% PLOS recommends the use of latexdiff to track changes during review, as this will help to maintain a clean tex file.
+% Visit https://www.ctan.org/pkg/latexdiff?lang=en for info or contact us at latex@plos.org.
+%
+%
+% There are no restrictions on package use within the LaTeX files except that
+% no packages listed in the template may be deleted.
+%
+% Please do not include colors or graphics in the text.
+%
+% The manuscript LaTeX source should be contained within a single file (do not use \input, \externaldocument, or similar commands).
+%
+% % % % % % % % % % % % % % % % % % % % % % %
+%
+% -- FIGURES AND TABLES
+%
+% Please include tables/figure captions directly after the paragraph where they are first cited in the text.
+%
+% DO NOT INCLUDE GRAPHICS IN YOUR MANUSCRIPT
+% - Figures should be uploaded separately from your manuscript file.
+% - Figures generated using LaTeX should be extracted and removed from the PDF before submission.
+% - Figures containing multiple panels/subfigures must be combined into one image file before submission.
+% For figure citations, please use "Fig" instead of "Figure".
+% See http://journals.plos.org/plosone/s/figures for PLOS figure guidelines.
+%
+% Tables should be cell-based and may not contain:
+% - spacing/line breaks within cells to alter layout or alignment
+% - do not nest tabular environments (no tabular environments within tabular environments)
+% - no graphics or colored text (cell background color/shading OK)
+% See http://journals.plos.org/plosone/s/tables for table guidelines.
+%
+% For tables that exceed the width of the text column, use the adjustwidth environment as illustrated in the example table in text below.
+%
+% % % % % % % % % % % % % % % % % % % % % % % %
+%
+% -- EQUATIONS, MATH SYMBOLS, SUBSCRIPTS, AND SUPERSCRIPTS
+%
+% IMPORTANT
+% Below are a few tips to help format your equations and other special characters according to our specifications. For more tips to help reduce the possibility of formatting errors during conversion, please see our LaTeX guidelines at http://journals.plos.org/plosone/s/latex
+%
+% For inline equations, please be sure to include all portions of an equation in the math environment.  For example, x$^2$ is incorrect; this should be formatted as $x^2$ (or $\mathrm{x}^2$ if the romanized font is desired).
+%
+% Do not include text that is not math in the math environment. For example, CO2 should be written as CO\textsubscript{2} instead of CO$_2$.
+%
+% Please add line breaks to long display equations when possible in order to fit size of the column.
+%
+% For inline equations, please do not include punctuation (commas, etc) within the math environment unless this is part of the equation.
+%
+% When adding superscript or subscripts outside of brackets/braces, please group using {}.  For example, change "[U(D,E,\gamma)]^2" to "{[U(D,E,\gamma)]}^2".
+%
+% Do not use \cal for caligraphic font.  Instead, use \mathcal{}
+%
+% % % % % % % % % % % % % % % % % % % % % % % %
+%
+% Please contact latex@plos.org with any questions.
+%
+% % % % % % % % % % % % % % % % % % % % % % % %
+
+% \subsection*{Etiam eget sapien nibh.}
+
+% % For figure citations, please use "Fig" instead of "Figure".
+% Nulla mi mi, Fig~\ref{fig1} venenatis sed ipsum varius, volutpat euismod diam. Proin rutrum vel massa non gravida. Quisque tempor sem et dignissim rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi at justo vitae nulla elementum commodo eu id massa. In vitae diam ac augue semper tincidunt eu ut eros. Fusce fringilla erat porttitor lectus cursus, \nameref{S1_Video} vel sagittis arcu lobortis. Aliquam in enim semper, aliquam massa id, cursus neque. Praesent faucibus semper libero.
+
+% % Place figure captions after the first paragraph in which they are cited.
+% \begin{figure}[!h]
+% \caption{{\bf Bold the figure title.}
+% Figure caption text here, please use this space for the figure panel descriptions instead of using subfigure commands. A: Lorem ipsum dolor sit amet. B: Consectetur adipiscing elit.}
+% \label{fig1}
+% \end{figure}
+
+% Either type in your references using
+% \begin{thebibliography}{}
+% \bibitem{}
+% Text
+% \end{thebibliography}
+%
+% or
+%
+% Compile your BiBTeX database using our plos2015.bst
+% style file and paste the contents of your .bbl file
+% here.
+%
+% \begin{thebibliography}{10}
+
+% % \bibitem{bib1}
+% % Conant GC, Wolfe KH.
+% % \newblock {{T}urning a hobby into a job: how duplicated genes find new
+% %   functions}.
+% % \newblock Nat Rev Genet. 2008 Dec;9(12):938--950.
+
+% % \bibitem{bib2}
+% % Ohno S.
+% % \newblock Evolution by gene duplication.
+% % \newblock London: George Alien \& Unwin Ltd. Berlin, Heidelberg and New York:
+% %   Springer-Verlag.; 1970.
+
+% % \bibitem{bib3}
+% % Magwire MM, Bayer F, Webster CL, Cao C, Jiggins FM.
+% % \newblock {{S}uccessive increases in the resistance of {D}rosophila to viral
+% %   infection through a transposon insertion followed by a {D}uplication}.
+% % \newblock PLoS Genet. 2011 Oct;7(10):e1002337.
+% \input{../tex/ITHIM}
+% \end{thebibliography}
+
+%% Manuscript Organization
+
+%% Manuscripts should be organized as follows. Instructions for each element appear below the list.
+%% Beginning section
+
+%% The following elements are required, in order:
+
+%% Title page: List title, authors, and affiliations as first page of manuscript
+%% Abstract
+%% Introduction
+
+%% Middle section
+
+%% The following elements can be renamed as needed and presented in any order:
+
+%% Materials and Methods
+%% Results
+%% Discussion
+%% Conclusions (optional)
+
+%% Ending section
+
+%% The following elements are required, in order:
+
+%% Acknowledgments
+%% References
+%% Supporting information captions (if applicable)
+
+%% Other elements
+
+%% Figure captions are inserted immediately after the first paragraph in which the figure is cited. Figure files are uploaded separately.
+%% Tables are inserted immediately after the first paragraph in which they are cited.
+%% Supporting information files are uploaded separately.
