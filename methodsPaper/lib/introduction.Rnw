@@ -6,17 +6,20 @@ levels of aerobic activity of 2.5 hours per week. There is
 considerable variability in the attainment of this goal by location
 within the country. Supportive local built and policy environments are
 important determinants of population-level activity
-patterns. Particularly, as they facilitate and foster routine and
-moderate physical activity, such as walking, local decisions on design
-and policy can play a huge role in improving the nation's health.
+patterns. Local decisions on design
+and policy can play a huge role in improving the nation's health,
+particularly, as they facilitate and foster routine and
+moderate physical activity, such as walking.
 
 Given the constraints and complexity of local governance and
 infrastructure investments, land use, and human behavior there is a
 need for high quality and reliable data and tools for decision-making
-related to urban transportaiton systems. The lack of accurate and
+related to urban transportaiton systems. The absence of accurate and
 availbale estimates of the health impacts of such decisions has
 limited the effectiveness of efforts to encourage non-motorized
-transport in the US and in other countries. In the last decade new
+transport in the US and in other countries. Despite robust evidence showing 
+the mental and physical health benefits of physical activity, the quantification of health 
+benefits tied to proposed transportation funding and planning is not common. In the last decade new
 tools, applying comparative risk assessment methodologies, have made
 progress toward quantifying the multple health impacts of changes to
 the transportation system and behaviors.
